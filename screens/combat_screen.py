@@ -239,7 +239,7 @@ Ataque: {self.inimigo.ataque_total}   Defesa: {self.inimigo.defesa_total}{enemy_
         """Callback: chamado quando a ItemScreen é fechada."""
         if item_selecionado:
             item_nome_real = item_selecionado.replace("_", " ")
-            await self.processar_turno_completo("item", nome_item=item_nome_real)
+            await self.processar_turno_completo("item", item_name=item_nome_real)
         else:
             self.log_message("Você decidiu não usar um item.")
     
@@ -247,7 +247,7 @@ Ataque: {self.inimigo.ataque_total}   Defesa: {self.inimigo.defesa_total}{enemy_
         """Callback: chamado quando a SkillScreen é fechada."""
         if habilidade_selecionada:
             habilidade_nome_real = habilidade_selecionada.replace("_", " ")
-            await self.processar_turno_completo("skill", nome_habilidade=habilidade_nome_real)
+            await self.processar_turno_completo("skill", skill_name=habilidade_nome_real)
         else:
             self.log_message("Você decidiu não usar uma habilidade.")
             

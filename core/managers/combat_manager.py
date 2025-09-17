@@ -8,7 +8,7 @@ from enum import Enum
 from core.managers.base_manager import BaseManager
 from core.managers.event_manager import emit_event, EventType
 from core.models import Personagem, Habilidade, TipoHabilidade
-from core.exceptions import CombatError, InsufficientResourcesError, InvalidActionError
+from core.exceptions import CombatError, InsufficientResourcesError, InvalidActionError, ResourceNotFoundError
 from utils.error_handler import handle_exceptions, validate_not_none
 from config.settings import get_config
 
