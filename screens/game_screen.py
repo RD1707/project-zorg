@@ -1,14 +1,29 @@
 from textual.screen import Screen
 
-from core.engine import GameEngine
 # 1. Importar TODOS os scripts de fase
 from scenes.phase_scripts import phase1, phase2, phase3, phase4, phase5, phase6, phase7, phase8, phase9, phase10 
+from core.engine import GameEngine
 
 # Importa as telas que este gestor irá controlar
 from .story_screen import StoryScreen
 from .combat_screen import CombatScreen
 from .victory_screen import VictoryScreen
 from .city_screen import CityScreen
+
+# Mapeia o número da fase para a função geradora correspondente
+PHASE_MAP = {
+    1: phase1.run_phase_1,
+    2: phase2.run_phase_2,
+    3: phase3.run_phase_3,
+    4: phase4.run_phase_4,
+    5: phase5.run_phase_5,
+    6: phase6.run_phase_6,
+    7: phase7.run_phase_7,
+    8: phase8.run_phase_8,
+    9: phase9.run_phase_9,
+    10: phase10.run_phase_10,
+}
+
 
 class GameScreen(Screen):
     """
@@ -24,7 +39,9 @@ class GameScreen(Screen):
         self.engine = engine
         self.phase_generator = None
         self.current_enemy = None 
-        self.victory_text = ""  
+        self.victory_text = ""
+        # Lista para armazenar as recompensas pendentes
+        self._pending_rewards = []
 
     def on_mount(self) -> None:
         """
@@ -36,24 +53,15 @@ class GameScreen(Screen):
         """
         Carrega e inicia o gerador de eventos para a fase especificada.
         """
-        if phase_number == 1: self.phase_generator = phase1.run_phase_1()
-        elif phase_number == 2: self.phase_generator = phase2.run_phase_2()
-        elif phase_number == 3: self.phase_generator = phase3.run_phase_3()
-        elif phase_number == 4: self.phase_generator = phase4.run_phase_4()
-        # 2. Adicionar as condições para carregar as fases restantes
-        elif phase_number == 5: self.phase_generator = phase5.run_phase_5()
-        elif phase_number == 6: self.phase_generator = phase6.run_phase_6()
-        elif phase_number == 7: self.phase_generator = phase7.run_phase_7()
-        elif phase_number == 8: self.phase_generator = phase8.run_phase_8()
-        elif phase_number == 9: self.phase_generator = phase9.run_phase_9()
-        elif phase_number == 10: self.phase_generator = phase10.run_phase_10()
+        generator_func = PHASE_MAP.get(phase_number)
+        if generator_func:
+            self.phase_generator = generator_func()
+            self.process_next_event()
         else:
             # Se não houver mais fases, termina
             self.app.pop_screen()
             return
         
-        self.process_next_event()
-
     def process_next_event(self, _=None):
         """
         Pega o próximo evento do gerador da fase e apresenta a tela correspondente.
@@ -76,7 +84,11 @@ class GameScreen(Screen):
                 self.app.push_screen(CityScreen(self.engine), self.on_hub_closed)
 
             elif event["type"] == "grant_reward":
-                # Lógica futura para dar itens e habilidades específicas
+                # Armazena a recompensa e processa o próximo evento
+                if "equipment" in event:
+                    self._pending_rewards.append(self.engine.adicionar_equipamento(event["equipment"]))
+                elif "ability" in event:
+                    self._pending_rewards.append(self.engine.aprender_habilidade(event["ability"]))
                 self.process_next_event()
             
             elif event["type"] == "phase_end":
@@ -96,6 +108,9 @@ class GameScreen(Screen):
         """Callback: chamado quando a CombatScreen é fechada."""
         if combat_result: 
             victory_data = self.engine.processar_vitoria(self.current_enemy)
+            # Adicionar recompensas pendentes aos dados da vitória
+            victory_data["rewards"] = self._pending_rewards
+            self._pending_rewards = [] # Limpar a lista
             self.app.push_screen(VictoryScreen(victory_data), self.on_victory_closed)
         else:
             self.app.pop_screen() 

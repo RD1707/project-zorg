@@ -19,6 +19,9 @@ class TipoHabilidade(Enum):
     BUFF_DEFESA = "buff_defesa"
     BUFF_ATAQUE = "buff_ataque"
     DEBUFF = "debuff"
+    FURIA = "furia"
+    REGENERACAO = "regeneracao"
+    COMBO = "combo"
 
 
 @dataclass
@@ -109,7 +112,7 @@ class Habilidade:
         """Validação após inicialização."""
         validate_string_not_empty(self.nome, "nome da habilidade")
         validate_non_negative(self.custo_mp, "custo MP")
-        validate_positive(self.valor_efeito, "valor do efeito")
+        validate_non_negative(self.valor_efeito, "valor do efeito")
         validate_non_negative(self.cooldown, "cooldown")
         validate_positive(self.nivel_requerido, "nível requerido")
 
@@ -121,7 +124,7 @@ class Habilidade:
     @property
     def is_defensive(self) -> bool:
         """Verifica se é uma habilidade defensiva."""
-        return self.tipo in [TipoHabilidade.CURA, TipoHabilidade.BUFF_DEFESA, TipoHabilidade.BUFF_ATAQUE]
+        return self.tipo in [TipoHabilidade.CURA, TipoHabilidade.BUFF_DEFESA, TipoHabilidade.BUFF_ATAQUE, TipoHabilidade.REGENERACAO]
 
 @dataclass
 class TutorialFlags:
@@ -225,7 +228,8 @@ class Personagem:
     def ataque_total(self) -> int:
         """Calcula o ataque total, incluindo o bónus da arma."""
         bonus_arma = self.arma_equipada.bonus_ataque if self.arma_equipada else 0
-        return self.ataque_base + bonus_arma
+        bonus_furia = 10 if self.turnos_furia > 0 else 0
+        return self.ataque_base + bonus_arma + bonus_furia
 
     @property
     def defesa_total(self) -> int:
@@ -233,7 +237,8 @@ class Personagem:
         bonus_armadura = self.armadura_equipada.bonus_defesa if self.armadura_equipada else 0
         bonus_escudo = self.escudo_equipada.bonus_defesa if self.escudo_equipada else 0
         bonus_buff = 5 if self.turnos_buff_defesa > 0 else 0
-        return self.defesa_base + bonus_armadura + bonus_escudo + bonus_buff
+        penalidade_furia = -5 if self.turnos_furia > 0 else 0
+        return self.defesa_base + bonus_armadura + bonus_escudo + bonus_buff + penalidade_furia
 
     @property
     def is_alive(self) -> bool:

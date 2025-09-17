@@ -3,7 +3,6 @@ def run_phase_2():
     Este é o gerador que controla o fluxo de eventos da Fase 2: As Cavernas Ecoantes.
     """
     
-    # Evento 1: Texto de introdução da fase
     yield {
         "type": "show_text",
         "title": "FASE 2: AS CAVERNAS ECOANTES",
@@ -13,7 +12,6 @@ def run_phase_2():
         ]
     }
 
-    # Evento 2: Texto antes do primeiro combate
     yield {
         "type": "show_text",
         "segments": [
@@ -22,14 +20,12 @@ def run_phase_2():
         ]
     }
 
-    # Evento 3: Combate com o Morcego Gigante
     yield {
         "type": "combat",
         "enemy_name": "Morcego Gigante",
         "victory_text": "Manu encosta-se na parede, ofegante. Por um momento, o medo ameaça consumi-la, mas a lembrança das palavras de Ramon ecoa mais forte: 'Coragem é fazer o que é certo mesmo com medo.'"
     }
     
-    # Evento 4: Texto de transição
     yield {
         "type": "show_text",
         "segments": [

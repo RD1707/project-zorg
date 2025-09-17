@@ -1,6 +1,3 @@
-"""
-Gerenciador de inventário com operações otimizadas e validadas.
-"""
 from typing import List, Dict, Any, Optional, Tuple
 from enum import Enum
 
@@ -14,7 +11,6 @@ from data.equipment import DB_EQUIPAMENTOS
 
 
 class InventoryAction(Enum):
-    """Tipos de ação no inventário."""
     ADD_ITEM = "add_item"
     REMOVE_ITEM = "remove_item"
     USE_ITEM = "use_item"
@@ -24,35 +20,28 @@ class InventoryAction(Enum):
 
 
 class InventoryManager(BaseManager):
-    """Gerenciador de inventário."""
 
     def __init__(self):
         super().__init__("inventory_manager")
-        self._max_inventory_size = 50  # Limite do inventário
+        self._max_inventory_size = 50  
 
     def _do_initialize(self) -> None:
-        """Inicialização do gerenciador de inventário."""
         pass
 
     @handle_exceptions(reraise=True)
     def add_item(self, player: Personagem, item_name: str, quantity: int = 1) -> bool:
-        """Adiciona item ao inventário do jogador."""
         validate_not_none(player, "jogador")
         validate_positive(quantity, "quantidade")
 
-        # Verificar se o item existe no banco de dados
         item_template = DB_ITENS.get(item_name)
         if not item_template:
             raise ResourceNotFoundError("item", item_name)
 
-        # Verificar limite do inventário
         current_slots = len(player.inventario)
         if current_slots >= self._max_inventory_size:
-            # Tentar empilhar com item existente
             if not self._try_stack_item(player, item_template, quantity):
                 raise InvalidActionError("Inventário cheio e não é possível empilhar o item")
 
-        # Tentar empilhar primeiro
         if self._try_stack_item(player, item_template, quantity):
             emit_event(EventType.ITEM_USED, {
                 "action": "add_stacked",
@@ -63,7 +52,6 @@ class InventoryManager(BaseManager):
             self.logger.debug(f"Item {item_name} x{quantity} empilhado no inventário de {player.nome}")
             return True
 
-        # Adicionar como novo item
         from copy import deepcopy
         new_item = deepcopy(item_template)
         new_item.quantidade = quantity
@@ -81,7 +69,6 @@ class InventoryManager(BaseManager):
 
     @handle_exceptions(reraise=True)
     def remove_item(self, player: Personagem, item_name: str, quantity: int = 1) -> bool:
-        """Remove item do inventário do jogador."""
         validate_not_none(player, "jogador")
         validate_positive(quantity, "quantidade")
 
@@ -108,10 +95,8 @@ class InventoryManager(BaseManager):
 
     @handle_exceptions(reraise=True)
     def use_item(self, player: Personagem, item_name: str) -> List[str]:
-        """Usa um item do inventário."""
         validate_not_none(player, "jogador")
 
-        # Verificar se tem o item
         item = self._find_item(player, item_name)
         if not item:
             raise ResourceNotFoundError("item no inventário", item_name)
@@ -119,7 +104,6 @@ class InventoryManager(BaseManager):
         messages = []
         effects_applied = False
 
-        # Aplicar efeitos de cura de HP
         if item.cura_hp > 0:
             heal_amount = player.heal(item.cura_hp)
             if heal_amount > 0:
@@ -128,7 +112,6 @@ class InventoryManager(BaseManager):
             else:
                 messages.append(f"{player.nome} usa {item_name}, mas sua vida já está cheia.")
 
-        # Aplicar efeitos de cura de MP
         if item.cura_mp > 0:
             mp_amount = player.restore_mp(item.cura_mp)
             if mp_amount > 0:
@@ -137,18 +120,15 @@ class InventoryManager(BaseManager):
             else:
                 messages.append(f"{player.nome} usa {item_name}, mas seu MP já está cheio.")
 
-        # Aplicar cura de veneno
         if item.cura_veneno > 0 and player.is_poisoned:
             player.turnos_veneno = 0
             player.dano_por_turno_veneno = 0
             messages.append(f"🧪 {player.nome} usa {item_name} e se cura do [b magenta]veneno[/b magenta]!")
             effects_applied = True
 
-        # Se nenhum efeito foi aplicado
         if not effects_applied:
             messages.append(f"{player.nome} usa {item_name}, mas nada acontece.")
 
-        # Remover item do inventário
         self.remove_item(player, item_name, 1)
 
         emit_event(EventType.ITEM_USED, {
@@ -163,10 +143,8 @@ class InventoryManager(BaseManager):
 
     @handle_exceptions(reraise=True)
     def equip_item(self, player: Personagem, equipment_name: str) -> Tuple[bool, List[str]]:
-        """Equipa um equipamento."""
         validate_not_none(player, "jogador")
 
-        # Verificar se o equipamento existe
         equipment = DB_EQUIPAMENTOS.get(equipment_name)
         if not equipment:
             raise ResourceNotFoundError("equipamento", equipment_name)
@@ -174,7 +152,6 @@ class InventoryManager(BaseManager):
         messages = []
         old_equipment = None
 
-        # Determinar slot e equipar
         if equipment.is_weapon:
             old_equipment = player.arma_equipada
             player.arma_equipada = equipment
@@ -193,7 +170,6 @@ class InventoryManager(BaseManager):
         else:
             raise InvalidActionError(f"Tipo de equipamento desconhecido: {equipment.tipo}")
 
-        # Adicionar equipamento anterior ao inventário se existir
         if old_equipment:
             self.add_item(player, old_equipment.nome, 1)
             messages.append(f"{old_equipment.nome} foi colocado no inventário.")
@@ -217,7 +193,6 @@ class InventoryManager(BaseManager):
         messages = []
         equipment_to_unequip = None
 
-        # Determinar equipamento a remover
         if slot.lower() in ["arma", "weapon"]:
             equipment_to_unequip = player.arma_equipada
             player.arma_equipada = None
@@ -233,7 +208,6 @@ class InventoryManager(BaseManager):
         if not equipment_to_unequip:
             raise InvalidActionError(f"Nenhum equipamento no slot {slot}")
 
-        # Adicionar ao inventário
         self.add_item(player, equipment_to_unequip.nome, 1)
         messages.append(f"{equipment_to_unequip.nome} foi removido e colocado no inventário.")
 
@@ -248,7 +222,6 @@ class InventoryManager(BaseManager):
         return True, messages
 
     def sort_inventory(self, player: Personagem, sort_by: str = "name") -> bool:
-        """Organiza o inventário do jogador."""
         validate_not_none(player, "jogador")
 
         if sort_by == "name":
@@ -266,7 +239,6 @@ class InventoryManager(BaseManager):
         return True
 
     def get_inventory_info(self, player: Personagem) -> Dict[str, Any]:
-        """Retorna informações detalhadas do inventário."""
         validate_not_none(player, "jogador")
 
         total_items = sum(item.quantidade for item in player.inventario)
@@ -294,7 +266,6 @@ class InventoryManager(BaseManager):
         }
 
     def _try_stack_item(self, player: Personagem, item_template: Item, quantity: int) -> bool:
-        """Tenta empilhar item com item existente."""
         for existing_item in player.inventario:
             if (existing_item.nome == item_template.nome and
                 existing_item.quantidade + quantity <= existing_item.stack_max):
@@ -303,30 +274,23 @@ class InventoryManager(BaseManager):
         return False
 
     def _find_item(self, player: Personagem, item_name: str) -> Optional[Item]:
-        """Encontra item no inventário."""
         return next((item for item in player.inventario if item.nome == item_name), None)
 
     def can_add_item(self, player: Personagem, item_name: str, quantity: int = 1) -> bool:
-        """Verifica se pode adicionar item ao inventário."""
         item_template = DB_ITENS.get(item_name)
         if not item_template:
             return False
 
-        # Verificar se pode empilhar
         if self._try_stack_item(player, item_template, quantity):
             return True
 
-        # Verificar se há espaço para novo slot
         return len(player.inventario) < self._max_inventory_size
 
     def get_items_by_category(self, player: Personagem, category: str) -> List[Item]:
         """Retorna itens de uma categoria específica."""
         return [item for item in player.inventario if item.categoria == category]
 
-
-# Instância global do gerenciador de inventário
 _inventory_manager = InventoryManager()
-
 
 def get_inventory_manager() -> InventoryManager:
     """Retorna a instância global do gerenciador de inventário."""

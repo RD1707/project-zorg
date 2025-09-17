@@ -5,7 +5,6 @@ def run_phase_1():
     permitindo que a interface do usuário processe cada um separadamente.
     """
     
-    # Evento 1: Texto de introdução da fase
     yield {
         "type": "show_text",
         "title": "FASE 1: A FLOREsta DOS SUSSURROS",
@@ -17,14 +16,12 @@ def run_phase_1():
         ]
     }
 
-    # Evento 2: Combate
     yield {
         "type": "combat",
         "enemy_name": "Goblin Verdejante",
         "victory_text": "Manu olha para suas mãos trêmulas. Nunca havia ferido ninguém antes. Mas o pensamento de Ramon aprisionado endurece seu coração. 'Nada vai me impedir de salvá-lo.'"
     }
     
-    # Evento 3: Texto de transição
     yield {
         "type": "show_text",
         "segments": [
@@ -34,14 +31,12 @@ def run_phase_1():
         ]
     }
 
-    # Evento 4: Combate
     yield {
         "type": "combat",
         "enemy_name": "Lobo das Sombras",
         "victory_text": "A coragem de Manu cresce a cada vitória. O medo dá lugar à determinação."
     }
 
-    # Evento 5: Texto antes do chefe
     yield {
         "type": "show_text",
         "segments": [
@@ -51,14 +46,12 @@ def run_phase_1():
         ]
     }
 
-    # Evento 6: Combate com o chefe da fase
     yield {
         "type": "combat",
         "enemy_name": "Garg, o Chefe Goblin",
         "victory_text": "Com Garg derrotado, a floresta suspira de alívio. As sombras recuam."
     }
 
-    # Evento 7: Recompensa e final da fase
     yield {
         "type": "show_text",
         "title": "FIM DA FASE 1",
@@ -69,13 +62,11 @@ def run_phase_1():
         ]
     }
 
-    # Evento 8: Dar a recompensa ao jogador
     yield {
         "type": "grant_reward",
         "equipment": "Espada Curta"
     }
 
-    # Evento 9: Fim da fase
     yield {
         "type": "phase_end"
     }

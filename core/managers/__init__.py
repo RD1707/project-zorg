@@ -1,7 +1,3 @@
-"""
-Managers para diferentes aspectos do jogo ZORG.
-"""
-
 from .combat_manager import CombatManager
 from .inventory_manager import InventoryManager
 from .save_manager import SaveManager

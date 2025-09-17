@@ -6,8 +6,9 @@ import threading
 # Importa os modelos e os bancos de dados que criamos
 from .models import Personagem, Item, Habilidade, TipoHabilidade
 from .managers import CombatManager, InventoryManager, SaveManager, EventManager, CacheManager
+from .managers.combat_manager import CombatAction
 from .managers.event_manager import emit_event, EventType
-from .exceptions import GameEngineError, ResourceNotFoundError
+from .exceptions import GameEngineError, ResourceNotFoundError, InvalidActionError, InsufficientResourcesError, CombatError
 from data.equipment import DB_EQUIPAMENTOS
 from data.items import DB_ITENS
 from data.abilities import DB_HABILIDADES
@@ -49,6 +50,9 @@ class GameEngine:
 
         # Inicializar todos os managers
         self._initialize_managers()
+        
+        # Pré-carregar dados comuns para o cache
+        self._preload_data()
 
         GameEngine._initialized = True
         self.logger.info("GameEngine inicializado")
@@ -67,6 +71,18 @@ class GameEngine:
             if not manager.initialize():
                 self.logger.error(f"Falha ao inicializar {manager.name}")
                 raise GameEngineError(f"Falha ao inicializar {manager.name}")
+    
+    def _preload_data(self) -> None:
+        """Carrega dados estáticos para o cache na inicialização."""
+        self.logger.info("Pré-carregando dados estáticos...")
+        # Adiciona itens, equipamentos e habilidades ao cache de recursos
+        for item_name, item_data in DB_ITENS.items():
+            self.cache_manager.set(f"item_template_{item_name}", item_data, "resources")
+        for equip_name, equip_data in DB_EQUIPAMENTOS.items():
+            self.cache_manager.set(f"equipment_template_{equip_name}", equip_data, "resources")
+        for ability_name, ability_data in DB_HABILIDADES.items():
+            self.cache_manager.set(f"ability_template_{ability_name}", ability_data, "resources")
+        self.logger.info("Dados estáticos pré-carregados com sucesso.")
 
     @property
     def combat_manager(self) -> CombatManager:
@@ -197,23 +213,64 @@ class GameEngine:
         if not self.jogador:
             raise GameEngineError("Nenhum jogador ativo")
 
+        item_template = self._cache_manager.get(f"item_template_{nome_item}", "resources")
+        if not item_template:
+            item_template = DB_ITENS.get(nome_item)
+            if not item_template:
+                raise ResourceNotFoundError("item", nome_item)
+            self._cache_manager.set(f"item_template_{nome_item}", item_template, "resources")
+            
         return self._inventory_manager.add_item(self.jogador, nome_item, quantidade)
+    
+    @handle_exceptions(reraise=True)
+    def adicionar_equipamento(self, nome_equipamento: str) -> Optional[Any]:
+        """Adiciona um equipamento ao inventário do jogador ou o equipa diretamente."""
+        if not self.jogador:
+            raise GameEngineError("Nenhum jogador ativo")
+        
+        # Obter o equipamento do cache ou do banco de dados
+        equipamento_template = self._cache_manager.get(f"equipment_template_{nome_equipamento}", "resources")
+        if not equipamento_template:
+            equipamento_template = DB_EQUIPAMENTOS.get(nome_equipamento)
+            if not equipamento_template:
+                raise ResourceNotFoundError("equipamento", nome_equipamento)
+            self._cache_manager.set(f"equipment_template_{nome_equipamento}", equipamento_template, "resources")
+
+        # Equipar item se o slot estiver vazio
+        if equipamento_template.is_weapon and self.jogador.arma_equipada is None:
+            self.jogador.arma_equipada = deepcopy(equipamento_template)
+            return self.jogador.arma_equipada
+        elif equipamento_template.is_armor and self.jogador.armadura_equipada is None:
+            self.jogador.armadura_equipada = deepcopy(equipamento_template)
+            return self.jogador.armadura_equipada
+        elif equipamento_template.is_shield and self.jogador.escudo_equipada is None:
+            self.jogador.escudo_equipada = deepcopy(equipamento_template)
+            return self.jogador.escudo_equipada
+        
+        # Se o slot estiver ocupado, adiciona ao inventário
+        self._inventory_manager.add_item(self.jogador, nome_equipamento, 1)
+        self.logger.info(f"Slot de equipamento ocupado, {nome_equipamento} adicionado ao inventário.")
+        return equipamento_template
 
     @handle_exceptions(reraise=True)
-    def aprender_habilidade(self, nome_habilidade: str) -> bool:
+    def aprender_habilidade(self, nome_habilidade: str) -> Optional[Habilidade]:
         """Adiciona uma habilidade à lista de habilidades conhecidas do jogador."""
         if not self.jogador:
             raise GameEngineError("Nenhum jogador ativo")
 
-        habilidade = DB_HABILIDADES.get(nome_habilidade)
-        if not habilidade:
-            raise ResourceNotFoundError("habilidade", nome_habilidade)
+        habilidade_template = self._cache_manager.get(f"ability_template_{nome_habilidade}", "resources")
+        if not habilidade_template:
+            habilidade_template = DB_HABILIDADES.get(nome_habilidade)
+            if not habilidade_template:
+                raise ResourceNotFoundError("habilidade", nome_habilidade)
+            self._cache_manager.set(f"ability_template_{nome_habilidade}", habilidade_template, "resources")
 
-        if habilidade not in self.jogador.habilidades_conhecidas:
-            self.jogador.habilidades_conhecidas.append(habilidade)
+        if habilidade_template not in self.jogador.habilidades_conhecidas:
+            self.jogador.habilidades_conhecidas.append(habilidade_template)
             self.logger.debug(f"Habilidade {nome_habilidade} aprendida por {self.jogador.nome}")
-            return True
-        return False
+            return habilidade_template
+            
+        return None
 
     @handle_exceptions(reraise=True)
     def verificar_level_up(self) -> Optional[Dict[str, Any]]:
@@ -261,19 +318,16 @@ class GameEngine:
         self.logger.info(f"{self.jogador.nome} subiu para o nível {self.jogador.nivel}")
         return level_up_data
 
-    @handle_exceptions(reraise=True)
+    # Ação do jogador agora com tratamento de exceções específico
     def processar_turno_jogador(self, acao: str, inimigo: Personagem, **kwargs) -> List[str]:
-        """Processa a ação do jogador delegando para o CombatManager."""
+        """Processa a ação do jogador, delegando para o CombatManager com tratamento de erros."""
         if not self.jogador:
             raise GameEngineError("Nenhum jogador ativo")
-
+        
         validate_not_none(inimigo, "inimigo")
 
-        # Usar o CombatManager para processar ações
         if not self._combat_manager.is_combat_active():
             self._combat_manager.start_combat(self.jogador, inimigo)
-
-        from core.managers.combat_manager import CombatAction
 
         action_map = {
             "attack": CombatAction.ATTACK,
@@ -284,10 +338,26 @@ class GameEngine:
 
         combat_action = action_map.get(acao)
         if not combat_action:
-            raise GameEngineError(f"Ação inválida: {acao}")
+            raise InvalidActionError(f"Ação inválida: {acao}")
 
-        combat_state = self._combat_manager.process_player_turn(combat_action, **kwargs)
-        return combat_state.get("log", [])
+        try:
+            combat_state = self._combat_manager.process_player_turn(combat_action, **kwargs)
+            return combat_state.get("log", [])
+        except InsufficientResourcesError as e:
+            self.logger.warning(f"Ação do jogador falhou por falta de recursos: {e.message}")
+            return [f"[b red]{e.message}[/b red]"]
+        except InvalidActionError as e:
+            self.logger.warning(f"Ação do jogador falhou: {e.message}")
+            return [f"[b red]{e.message}[/b red]"]
+        except ResourceNotFoundError as e:
+            self.logger.warning(f"Recurso não encontrado para ação do jogador: {e.message}")
+            return [f"[b red]Erro:[/] {e.message}"]
+        except CombatError as e:
+            self.logger.error(f"Erro de combate: {e.message}")
+            return [f"[b red]Erro de Combate:[/] {e.message}"]
+        except Exception as e:
+            self.logger.error(f"Erro inesperado no turno do jogador: {e}", exc_info=True)
+            return ["[b red]Ocorreu um erro inesperado.[/b red]"]
 
     @handle_exceptions(reraise=True)
     def processar_turno_inimigo(self, inimigo: Personagem) -> List[str]:

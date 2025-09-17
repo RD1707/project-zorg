@@ -1,10 +1,6 @@
-# Importa a classe Personagem, que usaremos como base para os inimigos.
 from core.models import Personagem, Habilidade
 from data.abilities import DB_HABILIDADES
 
-# Dicionário com todos os inimigos do jogo.
-# A chave é o nome do inimigo, e o valor é um objeto Personagem
-# configurado com os atributos de um inimigo.
 DB_INIMIGOS = {
     "Goblin Verdejante": Personagem(
         nome="Goblin Verdejante", hp_max=20, mp_max=10, ataque_base=6, defesa_base=2,

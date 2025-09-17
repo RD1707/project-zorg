@@ -1,14 +1,6 @@
 # Importa a classe Habilidade e tipos do nosso módulo de modelos.
 from core.models import Habilidade, TipoHabilidade
 
-# Manter constantes para compatibilidade com código legado
-TIPO_ATAQUE = TipoHabilidade.ATAQUE.value
-TIPO_CURA = TipoHabilidade.CURA.value
-TIPO_BUFF_DEFESA = TipoHabilidade.BUFF_DEFESA.value
-TIPO_FURIA = "furia"  # Para compatibilidade
-TIPO_REGENERACAO = "regeneracao"  # Para compatibilidade
-TIPO_COMBO = "combo"  # Para compatibilidade
-
 # Dicionário com todas as habilidades do jogo.
 DB_HABILIDADES = {
     "Golpe Poderoso": Habilidade(
@@ -24,7 +16,7 @@ DB_HABILIDADES = {
         nome="Lanca de Gelo",
         descricao="Cria um espinho de gelo que perfura o inimigo e pode congelar.",
         custo_mp=12,
-        tipo=TIPO_ATAQUE,
+        tipo=TipoHabilidade.ATAQUE,
         valor_efeito=25
     ),
     "Toque Restaurador": Habilidade(
@@ -49,56 +41,56 @@ DB_HABILIDADES = {
         nome="Furia Berserker",
         descricao="Entra em fúria, aumentando ataque por 4 turnos mas perdendo defesa.",
         custo_mp=20,
-        tipo=TIPO_FURIA,
+        tipo=TipoHabilidade.FURIA,
         valor_efeito=0 # O efeito é tratado na lógica de combate, não por um valor direto.
     ),
     "Regeneracao Vital": Habilidade(
         nome="Regeneracao Vital",
         descricao="Ativa regeneração que cura HP a cada turno por 5 turnos.",
         custo_mp=25,
-        tipo=TIPO_REGENERACAO,
+        tipo=TipoHabilidade.REGENERACAO,
         valor_efeito=0
     ),
     "Golpe Flamejante": Habilidade(
         nome="Golpe Flamejante",
         descricao="Ataque de fogo que causa dano contínuo.",
         custo_mp=18,
-        tipo=TIPO_ATAQUE,
+        tipo=TipoHabilidade.ATAQUE,
         valor_efeito=30
     ),
     "Combo Devastador": Habilidade(
         nome="Combo Devastador",
         descricao="Ataque especial que ganha poder com combos consecutivos.",
         custo_mp=15,
-        tipo=TIPO_COMBO,
+        tipo=TipoHabilidade.COMBO,
         valor_efeito=0
     ),
     "Lâmina Sombria": Habilidade(
         nome="Lâmina Sombria",
         descricao="Ataque das sombras com alta chance de crítico.",
         custo_mp=14,
-        tipo=TIPO_ATAQUE,
+        tipo=TipoHabilidade.ATAQUE,
         valor_efeito=22
     ),
     "Escudo de Luz": Habilidade(
         nome="Escudo de Luz",
         descricao="Cria barreira mágica que absorve dano e cura simultaneamente.",
         custo_mp=22,
-        tipo=TIPO_CURA,
+        tipo=TipoHabilidade.CURA,
         valor_efeito=30
     ),
     "Rajada Arcana": Habilidade(
         nome="Rajada Arcana",
         descricao="Múltiplos projéteis mágicos com dano variável.",
         custo_mp=16,
-        tipo=TIPO_ATAQUE,
+        tipo=TipoHabilidade.ATAQUE,
         valor_efeito=0 # Dano é calculado dinamicamente
     ),
     "Benção da Natureza": Habilidade(
         nome="Benção da Natureza",
         descricao="Remove todos os debuffs e ativa regeneração.",
         custo_mp=20,
-        tipo=TIPO_CURA,
+        tipo=TipoHabilidade.CURA,
         valor_efeito=25
     )
 }

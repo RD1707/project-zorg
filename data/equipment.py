@@ -1,10 +1,6 @@
-# Importa a classe Equipamento e tipos do nosso módulo de modelos.
 from core.models import Equipamento, TipoEquipamento
 
-# Dicionário com todos os equipamentos do jogo.
-# A chave é o nome do equipamento e o valor é um objeto do tipo Equipamento.
 DB_EQUIPAMENTOS = {
-    # Armas
     "Adaga Enferrujada": Equipamento(
         nome="Adaga Enferrujada",
         tipo=TipoEquipamento.ARMA,
@@ -42,7 +38,6 @@ DB_EQUIPAMENTOS = {
         raridade="épico"
     ),
 
-    # Armaduras
     "Roupas de Pano": Equipamento(
         nome="Roupas de Pano",
         tipo=TipoEquipamento.ARMADURA,
@@ -71,7 +66,6 @@ DB_EQUIPAMENTOS = {
         raridade="raro"
     ),
 
-    # Escudos
     "Escudo de Madeira": Equipamento(
         nome="Escudo de Madeira",
         tipo=TipoEquipamento.ESCUDO,

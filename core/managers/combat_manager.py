@@ -8,7 +8,7 @@ from enum import Enum
 from core.managers.base_manager import BaseManager
 from core.managers.event_manager import emit_event, EventType
 from core.models import Personagem, Habilidade, TipoHabilidade
-from core.exceptions import CombatError, InsufficientResourcesError
+from core.exceptions import CombatError, InsufficientResourcesError, InvalidActionError
 from utils.error_handler import handle_exceptions, validate_not_none
 from config.settings import get_config
 
@@ -89,15 +89,17 @@ class CombatManager(BaseManager):
         elif action == CombatAction.SKILL:
             skill_name = kwargs.get("skill_name")
             if not skill_name:
-                raise CombatError("Nome da habilidade não fornecido")
+                raise InvalidActionError("Nome da habilidade não fornecido")
             log_messages.extend(self._process_skill_use(player, enemy, skill_name))
         elif action == CombatAction.ITEM:
             item_name = kwargs.get("item_name")
             if not item_name:
-                raise CombatError("Nome do item não fornecido")
+                raise InvalidActionError("Nome do item não fornecido")
             log_messages.extend(self._process_item_use(player, item_name))
         elif action == CombatAction.ESCAPE:
             log_messages.extend(self._process_escape(player, enemy))
+        else:
+            raise InvalidActionError(f"Ação de combate inválida: {action}")
 
         self._current_combat["log"].extend(log_messages)
         self._current_combat["turn_count"] += 1
@@ -120,8 +122,7 @@ class CombatManager(BaseManager):
         enemy = self._current_combat["enemy"]
 
         log_messages = self._process_enemy_ai(enemy, player)
-        self._current_combat["log"].extend(log_messages)
-
+        
         # Processar efeitos de status
         log_messages.extend(player.process_status_effects())
         log_messages.extend(enemy.process_status_effects())
@@ -165,13 +166,13 @@ class CombatManager(BaseManager):
         # Encontrar habilidade
         skill = next((h for h in user.habilidades_conhecidas if h.nome == skill_name), None)
         if not skill:
-            raise CombatError(f"Habilidade '{skill_name}' não encontrada")
+            raise ResourceNotFoundError("habilidade", skill_name)
 
         # Verificar se pode usar
         if not user.can_use_skill(skill):
             if user.mp < skill.custo_mp:
                 raise InsufficientResourcesError("MP", skill.custo_mp, user.mp)
-            raise CombatError(f"Não é possível usar a habilidade '{skill_name}'")
+            raise InvalidActionError(f"Não é possível usar a habilidade '{skill_name}'")
 
         # Gastar MP
         user.spend_mp(skill.custo_mp)
@@ -194,6 +195,19 @@ class CombatManager(BaseManager):
         elif skill.tipo == TipoHabilidade.BUFF_DEFESA:
             user.turnos_buff_defesa = 3
             messages.append(f"🛡️ A defesa de {user.nome} aumenta por [b cyan]3 turnos[/b cyan]!")
+        
+        # NOVAS HABILIDADES AQUI
+        elif skill.tipo == TipoHabilidade.FURIA:
+            user.turnos_furia = 4
+            messages.append(f"😠 {user.nome} entra em fúria! Seu ataque aumenta, mas sua defesa diminui por [b red]4 turnos[/b red]!")
+
+        elif skill.tipo == TipoHabilidade.REGENERACAO:
+            user.turnos_regeneracao = 5
+            messages.append(f"♻️ {user.nome} ativa a regeneração vital! HP será recuperado a cada turno por [b green]5 turnos[/b green]!")
+        
+        else:
+            raise InvalidActionError(f"Tipo de habilidade desconhecido: {skill.tipo.value}")
+
 
         emit_event(EventType.SKILL_USED, {
             "user": user.nome,
@@ -210,13 +224,9 @@ class CombatManager(BaseManager):
         messages = []
 
         # Verificar se tem o item
-        if not user.has_item(item_name):
-            raise CombatError(f"Item '{item_name}' não encontrado no inventário")
-
-        # Encontrar o item
         item = next((i for i in user.inventario if i.nome == item_name), None)
         if not item:
-            raise CombatError(f"Item '{item_name}' não encontrado")
+            raise ResourceNotFoundError("item no inventário", item_name)
 
         # Aplicar efeitos
         effects_applied = False
@@ -273,26 +283,54 @@ class CombatManager(BaseManager):
         """Processa a IA do inimigo."""
         messages = []
 
-        # Lógica de IA baseada na original
+        # Lógica de IA melhorada
         action = "attack"
         skill_to_use = None
-
+        
         if enemy.habilidades_conhecidas and enemy.mp > 0:
-            # Habilidades de cura se HP baixo
+            # Encontrar habilidades por tipo
             healing_skills = [h for h in enemy.habilidades_conhecidas
-                            if h.tipo == TipoHabilidade.CURA and enemy.mp >= h.custo_mp]
+                              if h.tipo == TipoHabilidade.CURA and enemy.mp >= h.custo_mp]
+            buff_skills = [h for h in enemy.habilidades_conhecidas
+                           if h.tipo == TipoHabilidade.BUFF_DEFESA and enemy.mp >= h.custo_mp]
+            regeneracao_skills = [h for h in enemy.habilidades_conhecidas
+                                  if h.tipo == TipoHabilidade.REGENERACAO and enemy.mp >= h.custo_mp]
+            furia_skills = [h for h in enemy.habilidades_conhecidas
+                            if h.tipo == TipoHabilidade.FURIA and enemy.mp >= h.custo_mp]
             attack_skills = [h for h in enemy.habilidades_conhecidas
-                           if h.tipo == TipoHabilidade.ATAQUE and enemy.mp >= h.custo_mp]
-
+                             if h.tipo == TipoHabilidade.ATAQUE and enemy.mp >= h.custo_mp]
+                             
+            # 1. Usar cura se o HP estiver baixo
             if enemy.hp_percentage < 40 and healing_skills:
                 action = "skill"
                 skill_to_use = random.choice(healing_skills)
+            
+            # 2. Usar regeneração se o HP estiver baixo e a habilidade não estiver ativa
+            elif enemy.hp_percentage < 60 and regeneracao_skills and not enemy.turnos_regeneracao > 0:
+                action = "skill"
+                skill_to_use = random.choice(regeneracao_skills)
+            
+            # 3. Usar buff de defesa se não estiver ativo e o HP não estiver baixo
+            elif enemy.hp_percentage > 50 and buff_skills and not enemy.turnos_buff_defesa > 0:
+                action = "skill"
+                skill_to_use = random.choice(buff_skills)
+
+            # 4. Usar fúria se o HP estiver alto e a habilidade não estiver ativa
+            elif enemy.hp_percentage > 70 and furia_skills and not enemy.turnos_furia > 0:
+                action = "skill"
+                skill_to_use = random.choice(furia_skills)
+            
+            # 5. Usar ataque com habilidade se tiver MP e chance
             elif attack_skills and random.randint(1, 100) <= 60:
                 action = "skill"
                 skill_to_use = random.choice(attack_skills)
 
         if action == "skill" and skill_to_use:
-            messages.extend(self._process_skill_use(enemy, player, skill_to_use.nome))
+            try:
+                messages.extend(self._process_skill_use(enemy, player, skill_to_use.nome))
+            except (InsufficientResourcesError, InvalidActionError):
+                # Se não puder usar a habilidade, volta a atacar
+                messages.extend(self._process_attack(enemy, player))
         else:
             messages.extend(self._process_attack(enemy, player))
 
