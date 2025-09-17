@@ -4,8 +4,9 @@ from textual.screen import Screen
 from textual.widgets import Button, Static, Header, Footer
 
 from core.engine import GameEngine
-# 1. Importar a nossa nova tela da loja
-from .shop_screen import ShopScreen
+from core.managers.event_manager import emit_event, EventType
+from data.npcs import DB_NPCS
+from .npc_screen import NPCLocationScreen
 
 class CityScreen(Screen):
     """A tela principal para a cidade de Nullhaven (hub)."""
@@ -68,11 +69,14 @@ class CityScreen(Screen):
         yield self.create_status_bar()
 
         with Vertical(id="city_options"):
-            yield Button("Visitar 'O Ponteiro Enferrujado' (Loja)", id="shop", variant="primary")
-            yield Button("Descansar na estalagem 'O Pescador Cansado'", id="rest", variant="success")
-            yield Button("Explorar as docas", id="docks", variant="default")
-            yield Button("Salvar Jogo", id="save", variant="warning")
-            yield Button("Partir Rumo ao Mar (Continuar Aventura)", id="progress", variant="error")
+            yield Button("🛒 Visitar 'O Ponteiro Enferrujado' (Loja)", id="shop", variant="primary")
+            yield Button("🛏️ Descansar na estalagem 'O Pescador Cansado'", id="rest", variant="success")
+            yield Button("🚢 Explorar as docas", id="docks", variant="default")
+            yield Button("🏛️ Visitar a Praça Central", id="plaza", variant="default")
+            yield Button("📚 Ir à Biblioteca Antiga", id="library", variant="default")
+            yield Button("🚪 Ir ao Portão da Cidade", id="gate", variant="default")
+            yield Button("💾 Salvar Jogo", id="save", variant="warning")
+            yield Button("⚔️ Partir Rumo ao Mar (Continuar Aventura)", id="progress", variant="error")
         
         yield Footer()
 
@@ -85,8 +89,8 @@ class CityScreen(Screen):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Lida com as escolhas do jogador na cidade."""
         if event.button.id == "shop":
-            # 2. Substituir a notificação pela chamada da tela da loja
-            self.app.push_screen(ShopScreen(self.engine))
+            # Emitir evento para mostrar a loja em vez de instanciar diretamente
+            emit_event(EventType.SHOW_SHOP_SCREEN, {"engine": self.engine})
         
         elif event.button.id == "rest":
             self.engine.jogador.hp = self.engine.jogador.hp_max
@@ -96,7 +100,20 @@ class CityScreen(Screen):
             self.on_resume() # Reutiliza a lógica para atualizar o ecrã
 
         elif event.button.id == "docks":
-            self.app.notify("Você observa o movimento dos barcos, sentindo a brisa do mar.")
+            npcs_na_doca = [npc for npc in DB_NPCS.values() if npc.location == "docas"]
+            self.app.push_screen(NPCLocationScreen(self.engine, "docas", npcs_na_doca))
+
+        elif event.button.id == "plaza":
+            npcs_na_praca = [npc for npc in DB_NPCS.values() if npc.location == "praca_central"]
+            self.app.push_screen(NPCLocationScreen(self.engine, "praca_central", npcs_na_praca))
+
+        elif event.button.id == "library":
+            npcs_na_biblioteca = [npc for npc in DB_NPCS.values() if npc.location == "biblioteca"]
+            self.app.push_screen(NPCLocationScreen(self.engine, "biblioteca", npcs_na_biblioteca))
+
+        elif event.button.id == "gate":
+            npcs_no_portao = [npc for npc in DB_NPCS.values() if npc.location == "entrada_cidade"]
+            self.app.push_screen(NPCLocationScreen(self.engine, "entrada_cidade", npcs_no_portao))
 
         elif event.button.id == "save":
             sucesso = self.engine.save_game_state()

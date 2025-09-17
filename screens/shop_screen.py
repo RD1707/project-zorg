@@ -90,15 +90,28 @@ class ShopScreen(Screen):
     def update_buy_list(self):
         """Atualiza a lista de itens para comprar."""
         buy_list = self.query_one("#buy_list")
-        buy_list.remove_children() # Limpa a lista antiga
-        
+        buy_list.remove_children()
+
         for nome, preco in ITENS_DA_LOJA.items():
             item = DB_ITENS.get(nome)
             if item:
                 can_afford = self.engine.jogador.ouro >= preco
                 container = Container(classes="item_row")
-                container.mount(Static(f"{item.nome} - [i]{item.descricao}[/i]", classes="item_name"))
-                container.mount(Button(f"Comprar ({preco} Ouro)", id=f"buy_{nome}", disabled=not can_afford, classes="item_action"))
+
+                # Informações detalhadas do item
+                item_info = f"[b cyan]{item.nome}[/b cyan]\n[i]{item.descricao}[/i]"
+                if hasattr(item, 'valor_cura') and item.valor_cura > 0:
+                    item_info += f"\n🩹 Cura: {item.valor_cura} HP"
+                if hasattr(item, 'valor_mp') and item.valor_mp > 0:
+                    item_info += f"\n✨ MP: +{item.valor_mp}"
+
+                container.mount(Static(item_info, classes="item_name"))
+
+                button_text = f"Comprar ({preco} 🪙)"
+                if not can_afford:
+                    button_text += " - Sem ouro suficiente"
+
+                container.mount(Button(button_text, id=f"buy_{nome}", disabled=not can_afford, classes="item_action"))
                 buy_list.mount(container)
 
     def update_sell_list(self):
@@ -112,8 +125,18 @@ class ShopScreen(Screen):
             for item in self.engine.jogador.inventario:
                 preco_venda = item.preco_venda
                 container = Container(classes="item_row")
-                container.mount(Static(f"{item.nome} (x{item.quantidade})", classes="item_name"))
-                container.mount(Button(f"Vender ({preco_venda} Ouro)", id=f"sell_{item.nome}", classes="item_action"))
+
+                # Informações detalhadas do item
+                item_template = DB_ITENS.get(item.nome)
+                item_info = f"[b cyan]{item.nome}[/b cyan] (x{item.quantidade})"
+                if item_template:
+                    item_info += f"\n[i]{item_template.descricao}[/i]"
+                    if hasattr(item_template, 'valor_cura') and item_template.valor_cura > 0:
+                        item_info += f"\n🩹 Cura: {item_template.valor_cura} HP"
+
+                container.mount(Static(item_info, classes="item_name"))
+                container.mount(Button(f"Vender ({preco_venda} 🪙)", id=f"sell_{item.nome}", classes="item_action"))
+                sell_list.mount(container)
 
     def update_gold_display(self):
         """Atualiza a exibição de ouro do jogador."""

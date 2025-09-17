@@ -10,6 +10,7 @@ from core.managers.event_manager import emit_event, EventType
 from core.models import Personagem, TutorialFlags
 from core.exceptions import SaveLoadError, DataValidationError
 from utils.error_handler import handle_exceptions, validate_not_none
+from utils.security import SaveFileValidator
 from config.settings import get_config, get_save_path
 from data.equipment import DB_EQUIPAMENTOS
 from data.items import DB_ITENS
@@ -70,7 +71,8 @@ class SaveManager(BaseManager):
             with open(self._save_file, "r", encoding="utf-8") as f:
                 save_data = json.load(f)
 
-            self._validate_save_data(save_data)
+            # Usar o SaveFileValidator para validação de segurança completa
+            SaveFileValidator.validate_save_data(save_data)
 
             player = self._reconstruct_player(save_data)
 
@@ -86,6 +88,9 @@ class SaveManager(BaseManager):
         except json.JSONDecodeError as e:
             self.logger.error(f"Arquivo de save corrompido: {e}")
             raise SaveLoadError("Arquivo de save está corrompido ou em formato inválido")
+        except DataValidationError as e:
+            self.logger.error(f"Dados de save inválidos: {e}")
+            raise SaveLoadError(f"Arquivo de save contém dados inválidos: {str(e)}")
         except Exception as e:
             self.logger.error(f"Erro ao carregar jogo: {e}")
             raise SaveLoadError(f"Falha ao carregar o jogo: {str(e)}")

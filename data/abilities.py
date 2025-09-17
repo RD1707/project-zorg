@@ -92,5 +92,81 @@ DB_HABILIDADES = {
         custo_mp=20,
         tipo=TipoHabilidade.CURA,
         valor_efeito=25
+    ),
+
+    # Habilidades de nível intermediário
+    "Bola de Fogo": Habilidade(
+        nome="Bola de Fogo",
+        descricao="Projétil de fogo que causa dano em área e pode queimar.",
+        custo_mp=14,
+        tipo=TipoHabilidade.ATAQUE,
+        valor_efeito=28,
+        nivel_requerido=3,
+        elemento="fogo"
+    ),
+    "Escudo Mágico": Habilidade(
+        nome="Escudo Mágico",
+        descricao="Cria uma barreira mágica que reduz dano por 3 turnos.",
+        custo_mp=12,
+        tipo=TipoHabilidade.BUFF_DEFESA,
+        valor_efeito=15,
+        nivel_requerido=3,
+        elemento="arcano"
+    ),
+    "Drenar Vida": Habilidade(
+        nome="Drenar Vida",
+        descricao="Ataque que rouba HP do inimigo para curar o usuário.",
+        custo_mp=16,
+        tipo=TipoHabilidade.ATAQUE,
+        valor_efeito=20,
+        nivel_requerido=4,
+        elemento="sombrio"
+    ),
+    "Raio Congelante": Habilidade(
+        nome="Raio Congelante",
+        descricao="Ataque de gelo que pode diminuir a velocidade do inimigo.",
+        custo_mp=13,
+        tipo=TipoHabilidade.ATAQUE,
+        valor_efeito=24,
+        nivel_requerido=3,
+        elemento="gelo"
+    ),
+
+    # Habilidades avançadas
+    "Meteoro": Habilidade(
+        nome="Meteoro",
+        descricao="Invoca uma rocha flamejante do céu que causa dano devastador.",
+        custo_mp=35,
+        tipo=TipoHabilidade.ATAQUE,
+        valor_efeito=60,
+        nivel_requerido=6,
+        elemento="fogo"
+    ),
+    "Tempestade de Gelo": Habilidade(
+        nome="Tempestade de Gelo",
+        descricao="Múltiplos ataques de gelo que podem congelar o inimigo.",
+        custo_mp=32,
+        tipo=TipoHabilidade.ATAQUE,
+        valor_efeito=45,
+        nivel_requerido=5,
+        elemento="gelo"
+    ),
+    "Cura Suprema": Habilidade(
+        nome="Cura Suprema",
+        descricao="Poderosa magia de cura que restaura muito HP e remove debuffs.",
+        custo_mp=30,
+        tipo=TipoHabilidade.CURA,
+        valor_efeito=100,
+        nivel_requerido=5,
+        elemento="divino"
+    ),
+    "Barreira Divina": Habilidade(
+        nome="Barreira Divina",
+        descricao="Proteção suprema que reduz drasticamente o dano por 5 turnos.",
+        custo_mp=40,
+        tipo=TipoHabilidade.BUFF_DEFESA,
+        valor_efeito=25,
+        nivel_requerido=6,
+        elemento="divino"
     )
 }

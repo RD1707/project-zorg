@@ -84,11 +84,11 @@ class GameScreen(Screen):
                 self.app.push_screen(CityScreen(self.engine), self.on_hub_closed)
 
             elif event["type"] == "grant_reward":
-                # Armazena a recompensa e processa o próximo evento
+                # Agora apenas armazena o nome da recompensa, o processamento será no GameEngine
                 if "equipment" in event:
-                    self._pending_rewards.append(self.engine.adicionar_equipamento(event["equipment"]))
+                    self._pending_rewards.append(event["equipment"])
                 elif "ability" in event:
-                    self._pending_rewards.append(self.engine.aprender_habilidade(event["ability"]))
+                    self._pending_rewards.append(event["ability"])
                 self.process_next_event()
             
             elif event["type"] == "phase_end":
@@ -106,10 +106,9 @@ class GameScreen(Screen):
 
     def on_combat_finished(self, combat_result: bool):
         """Callback: chamado quando a CombatScreen é fechada."""
-        if combat_result: 
-            victory_data = self.engine.processar_vitoria(self.current_enemy)
-            # Adicionar recompensas pendentes aos dados da vitória
-            victory_data["rewards"] = self._pending_rewards
+        if combat_result:
+            # Processar vitória com recompensas pendentes centralizadamente no GameEngine
+            victory_data = self.engine.processar_vitoria(self.current_enemy, self._pending_rewards)
             self._pending_rewards = [] # Limpar a lista
             self.app.push_screen(VictoryScreen(victory_data), self.on_victory_closed)
         else:

@@ -19,6 +19,7 @@ class EventType(Enum):
     SAVE_GAME = "save_game"
     LOAD_GAME = "load_game"
     ERROR_OCCURRED = "error_occurred"
+    SHOW_SHOP_SCREEN = "show_shop_screen"
 
 
 @dataclass

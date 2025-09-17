@@ -377,12 +377,18 @@ class GameEngine:
         return []
 
     @handle_exceptions(reraise=True)
-    def processar_vitoria(self, inimigo: Personagem) -> Dict[str, Any]:
-        """Processa as recompensas após derrotar um inimigo."""
+    def processar_vitoria(self, inimigo: Personagem, recompensas_pendentes: List[Any] = None) -> Dict[str, Any]:
+        """
+        Processa todas as recompensas após derrotar um inimigo.
+        Agora centraliza toda a lógica de recompensas incluindo equipamentos e habilidades.
+        """
         if not self.jogador:
             raise GameEngineError("Nenhum jogador ativo")
 
         validate_not_none(inimigo, "inimigo")
+
+        if recompensas_pendentes is None:
+            recompensas_pendentes = []
 
         xp_ganho = inimigo.xp_dado
         ouro_ganho = inimigo.ouro_dado
@@ -396,11 +402,44 @@ class GameEngine:
 
         info_level_up = self.verificar_level_up()
 
+        # Processar recompensas pendentes (equipamentos e habilidades)
+        recompensas_processadas = []
+        for recompensa in recompensas_pendentes:
+            if recompensa is not None:
+                # Se for string, assumir que é nome de equipamento ou habilidade
+                if isinstance(recompensa, str):
+                    # Tentar como equipamento primeiro
+                    equipment = self.adicionar_equipamento(recompensa)
+                    if equipment:
+                        recompensas_processadas.append({
+                            "tipo": "equipamento",
+                            "nome": recompensa,
+                            "equipado": equipment == self.jogador.arma_equipada or
+                                       equipment == self.jogador.armadura_equipada or
+                                       equipment == self.jogador.escudo_equipada
+                        })
+                    else:
+                        # Tentar como habilidade
+                        habilidade = self.aprender_habilidade(recompensa)
+                        if habilidade:
+                            recompensas_processadas.append({
+                                "tipo": "habilidade",
+                                "nome": recompensa
+                            })
+                else:
+                    # Se é objeto, verificar o tipo
+                    if hasattr(recompensa, 'nome'):
+                        recompensas_processadas.append({
+                            "tipo": "item",
+                            "nome": recompensa.nome
+                        })
+
         victory_data = {
             "enemy_name": inimigo.nome,
             "xp_ganho": xp_bonus,
             "ouro_ganho": ouro_bonus,
-            "level_up": info_level_up
+            "level_up": info_level_up,
+            "rewards": recompensas_processadas
         }
 
         # Finalizar combate no CombatManager
@@ -408,6 +447,9 @@ class GameEngine:
             self._combat_manager.end_combat()
 
         self.logger.info(f"{self.jogador.nome} derrotou {inimigo.nome} - XP: +{xp_bonus}, Ouro: +{ouro_bonus}")
+        if recompensas_processadas:
+            self.logger.info(f"Recompensas adicionais processadas: {len(recompensas_processadas)} itens")
+
         return victory_data
 
     @handle_exceptions(reraise=True)

@@ -92,5 +92,112 @@ DB_EQUIPAMENTOS = {
         descricao="Um escudo pesado de aço, quase indestrutível.",
         preco=120,
         raridade="raro"
+    ),
+
+    # Equipamentos intermediários
+    "Espada de Ferro": Equipamento(
+        nome="Espada de Ferro",
+        tipo=TipoEquipamento.ARMA,
+        bonus_ataque=8,
+        bonus_defesa=0,
+        descricao="Uma espada sólida de ferro bem forjada.",
+        preco=80,
+        raridade="comum"
+    ),
+    "Machado de Guerra": Equipamento(
+        nome="Machado de Guerra",
+        tipo=TipoEquipamento.ARMA,
+        bonus_ataque=12,
+        bonus_defesa=0,
+        descricao="Arma pesada que causa dano devastador mas é lenta.",
+        preco=200,
+        raridade="raro"
+    ),
+    "Lâmina Élfica": Equipamento(
+        nome="Lâmina Élfica",
+        tipo=TipoEquipamento.ARMA,
+        bonus_ataque=11,
+        bonus_defesa=1,
+        descricao="Espada leve e elegante forjada pelos elfos antigos.",
+        preco=250,
+        raridade="raro"
+    ),
+
+    # Armaduras intermediárias
+    "Armadura de Malha": Equipamento(
+        nome="Armadura de Malha",
+        tipo=TipoEquipamento.ARMADURA,
+        bonus_ataque=0,
+        bonus_defesa=4,
+        descricao="Armadura flexível feita de anéis de metal entrelaçados.",
+        preco=60,
+        raridade="comum"
+    ),
+    "Armadura de Placas": Equipamento(
+        nome="Armadura de Placas",
+        tipo=TipoEquipamento.ARMADURA,
+        bonus_ataque=0,
+        bonus_defesa=8,
+        descricao="Armadura pesada que oferece proteção máxima.",
+        preco=180,
+        raridade="raro"
+    ),
+    "Manto Élfico": Equipamento(
+        nome="Manto Élfico",
+        tipo=TipoEquipamento.ARMADURA,
+        bonus_ataque=1,
+        bonus_defesa=5,
+        descricao="Manto mágico que oferece proteção e agilidade.",
+        preco=220,
+        raridade="raro"
+    ),
+
+    # Escudos intermediários
+    "Escudo de Ferro": Equipamento(
+        nome="Escudo de Ferro",
+        tipo=TipoEquipamento.ESCUDO,
+        bonus_ataque=0,
+        bonus_defesa=5,
+        descricao="Escudo robusto de ferro com boa proteção.",
+        preco=70,
+        raridade="comum"
+    ),
+    "Escudo Rúnico": Equipamento(
+        nome="Escudo Rúnico",
+        tipo=TipoEquipamento.ESCUDO,
+        bonus_ataque=0,
+        bonus_defesa=9,
+        descricao="Escudo gravado com runas mágicas de proteção.",
+        preco=280,
+        raridade="épico"
+    ),
+
+    # Equipamentos lendários
+    "Excalibur": Equipamento(
+        nome="Excalibur",
+        tipo=TipoEquipamento.ARMA,
+        bonus_ataque=20,
+        bonus_defesa=3,
+        descricao="A lendária espada do rei, brilha com poder divino.",
+        preco=1000,
+        raridade="lendário"
+    ),
+    "Armadura Dragão": Equipamento(
+        nome="Armadura Dragão",
+        tipo=TipoEquipamento.ARMADURA,
+        bonus_ataque=2,
+        bonus_defesa=12,
+        descricao="Armadura forjada com escamas de dragão antigo.",
+        preco=800,
+        raridade="lendário"
+    ),
+    "Aegis Celestial": Equipamento(
+        nome="Aegis Celestial",
+        tipo=TipoEquipamento.ESCUDO,
+        bonus_ataque=1,
+        bonus_defesa=15,
+        descricao="Escudo abençoado pelos próprios deuses.",
+        preco=900,
+        raridade="lendário"
     )
 }
