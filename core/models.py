@@ -192,7 +192,7 @@ class Personagem:
     turnos_buff_defesa: int = 0
     turnos_furia: int = 0
     turnos_regeneracao: int = 0
-    
+
     # Equipamento do Jogador
     arma_equipada: Optional[Equipamento] = None
     armadura_equipada: Optional[Equipamento] = None
@@ -214,7 +214,7 @@ class Personagem:
         # Validações
         validate_string_not_empty(self.nome, "nome do personagem")
         validate_positive(self.hp_max, "HP máximo")
-        validate_positive(self.mp_max, "MP máximo")
+        validate_non_negative(self.mp_max, "MP máximo")
         validate_non_negative(self.ataque_base, "ataque base")
         validate_non_negative(self.defesa_base, "defesa base")
         validate_non_negative(self.xp_dado, "XP dado")

@@ -178,12 +178,11 @@ Ataque: {self.inimigo.ataque_total}   Defesa: {self.inimigo.defesa_total}{enemy_
         for btn in self.query(Button):
             btn.disabled = True
 
-        # ANIMAÇÃO DE ATAQUE DO JOGADOR
         if acao == "attack" or acao == "skill":
             player_box = self.query_one("#player_box")
-            player_box.styles.animate("offset", value=(2, 0), duration=0.08)
+            player_box.styles.offset = (2, 0)
             await asyncio.sleep(0.08)
-            player_box.styles.animate("offset", value=(0, 0), duration=0.08)
+            player_box.styles.offset = (0, 0)
             await asyncio.sleep(0.1)
 
         player_messages = self.engine.processar_turno_jogador(acao, self.inimigo, **kwargs)
@@ -203,11 +202,10 @@ Ataque: {self.inimigo.ataque_total}   Defesa: {self.inimigo.defesa_total}{enemy_
         turn_indicator.update(f"Vez de [b red]{self.inimigo.nome}[/b red]...")
         await asyncio.sleep(1)
 
-        # ANIMAÇÃO DE ATAQUE DO INIMIGO
         enemy_box = self.query_one("#enemy_box")
-        enemy_box.styles.animate("offset", value=(-2, 0), duration=0.08)
+        enemy_box.styles.offset = (-2, 0)
         await asyncio.sleep(0.08)
-        enemy_box.styles.animate("offset", value=(0, 0), duration=0.08)
+        enemy_box.styles.offset = (0, 0)
         await asyncio.sleep(0.1)
         
         enemy_messages = self.engine.processar_turno_inimigo(self.inimigo)
