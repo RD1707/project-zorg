@@ -2,9 +2,9 @@
 Tela de interação com NPCs.
 """
 from textual.app import ComposeResult
-from textual.containers import Vertical, Horizontal
 from textual.screen import Screen
-from textual.widgets import Button, Static, Header, Footer, ScrollableContainer
+from textual.widgets import Button, Static, Header, Footer
+from textual.containers import ScrollableContainer, Vertical 
 from typing import Optional
 
 from core.engine import GameEngine
@@ -163,8 +163,7 @@ class NPCScreen(Screen):
             self.app.notify(f"Nova missão aceita: {quest.name}!", timeout=5)
 
             # Atualizar a tela
-            self.remove()
-            self.mount(*self.compose())
+            self.refresh()
 
     def _handle_complete_quest(self, quest_id: str) -> None:
         """Processa o evento de completar uma missão."""
@@ -192,8 +191,7 @@ class NPCScreen(Screen):
             self.app.notify(reward_text, timeout=10)
 
             # Atualizar a tela
-            self.remove()
-            self.mount(*self.compose())
+            self.refresh()
 
 
 class NPCLocationScreen(Screen):

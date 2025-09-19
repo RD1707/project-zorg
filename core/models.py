@@ -227,15 +227,15 @@ class Personagem:
     @property
     def ataque_total(self) -> int:
         """Calcula o ataque total, incluindo o bónus da arma."""
-        bonus_arma = self.arma_equipada.bonus_ataque if self.arma_equipada else 0
+        bonus_arma = getattr(self.arma_equipada, 'bonus_ataque', 0) if self.arma_equipada else 0
         bonus_furia = 10 if self.turnos_furia > 0 else 0
         return self.ataque_base + bonus_arma + bonus_furia
 
     @property
     def defesa_total(self) -> int:
         """Calcula a defesa total, incluindo bónus de armadura e escudo."""
-        bonus_armadura = self.armadura_equipada.bonus_defesa if self.armadura_equipada else 0
-        bonus_escudo = self.escudo_equipada.bonus_defesa if self.escudo_equipada else 0
+        bonus_armadura = getattr(self.armadura_equipada, 'bonus_defesa', 0) if self.armadura_equipada else 0
+        bonus_escudo = getattr(self.escudo_equipada, 'bonus_defesa', 0) if self.escudo_equipada else 0
         bonus_buff = 5 if self.turnos_buff_defesa > 0 else 0
         penalidade_furia = -5 if self.turnos_furia > 0 else 0
         return self.defesa_base + bonus_armadura + bonus_escudo + bonus_buff + penalidade_furia

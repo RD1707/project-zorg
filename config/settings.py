@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Dict, Any
 import os
+import json
 
 BASE_DIR = Path(__file__).parent.parent
 CONFIG_DIR = BASE_DIR / "config"
@@ -85,3 +86,83 @@ def get_config(section: str) -> Dict[str, Any]:
         "performance": PERFORMANCE_CONFIG,
     }
     return config_map.get(section, {})
+
+
+class GameSettings:
+    """Gerenciador de configurações do usuário."""
+
+    def __init__(self):
+        self.settings_file = SAVE_DIR / "user_settings.json"
+        self._data = self._load_default_settings()
+        self._load()
+
+    def _load_default_settings(self) -> Dict[str, Any]:
+        """Carrega as configurações padrão."""
+        return {
+            # Gameplay
+            "text_speed": "normal",
+            "auto_save": True,
+            "confirm_actions": True,
+
+            # Audio
+            "background_music": True,
+            "sound_effects": True,
+            "master_volume": "75",
+
+            # Interface
+            "theme": "dark",
+            "show_tooltips": True,
+
+            # Controles
+            "key_bindings": {
+                "quit": "q",
+                "menu": "escape",
+                "confirm": "enter",
+                "cancel": "escape"
+            }
+        }
+
+    def _load(self) -> None:
+        """Carrega configurações do arquivo."""
+        if self.settings_file.exists():
+            try:
+                with open(self.settings_file, 'r', encoding='utf-8') as f:
+                    saved_settings = json.load(f)
+                    # Mesclar com configurações padrão
+                    self._data.update(saved_settings)
+            except Exception as e:
+                print(f"Erro ao carregar configurações: {e}")
+                # Usar configurações padrão
+
+    def get(self, key: str, default=None):
+        """Obtém uma configuração."""
+        return self._data.get(key, default)
+
+    def set(self, key: str, value: Any) -> None:
+        """Define uma configuração."""
+        self._data[key] = value
+
+    def save(self) -> bool:
+        """Salva as configurações no arquivo."""
+        try:
+            with open(self.settings_file, 'w', encoding='utf-8') as f:
+                json.dump(self._data, f, indent=2, ensure_ascii=False)
+            return True
+        except Exception as e:
+            print(f"Erro ao salvar configurações: {e}")
+            return False
+
+    def reset_to_defaults(self) -> None:
+        """Restaura configurações padrão."""
+        self._data = self._load_default_settings()
+
+    def get_text_speed_delay(self) -> float:
+        """Converte configuração de velocidade para delay em segundos."""
+        speed_map = {
+            "very_slow": 0.1,
+            "slow": 0.05,
+            "normal": 0.025,
+            "fast": 0.01,
+            "instant": 0.0
+        }
+        return speed_map.get(self.get("text_speed", "normal"), 0.025)

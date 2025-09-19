@@ -20,6 +20,8 @@ class EventType(Enum):
     LOAD_GAME = "load_game"
     ERROR_OCCURRED = "error_occurred"
     SHOW_SHOP_SCREEN = "show_shop_screen"
+    SETTINGS_CHANGED = "settings_changed"
+    ACHIEVEMENT_UNLOCKED = "achievement_unlocked"
 
 
 @dataclass

@@ -6,6 +6,7 @@ import threading
 # Importa os modelos e os bancos de dados que criamos
 from .models import Personagem, Item, Habilidade, TipoHabilidade
 from .managers import CombatManager, InventoryManager, SaveManager, EventManager, CacheManager
+from .managers.audio_manager import AudioManager
 from .managers.combat_manager import CombatAction
 from .managers.event_manager import emit_event, EventType
 from .exceptions import GameEngineError, ResourceNotFoundError, InvalidActionError, InsufficientResourcesError, CombatError
@@ -47,6 +48,11 @@ class GameEngine:
         self._save_manager = SaveManager()
         self._event_manager = EventManager()
         self._cache_manager = CacheManager()
+        self._audio_manager = AudioManager()
+
+        # Inicializar sistema de conquistas
+        from core.achievements import get_achievement_manager
+        self._achievement_manager = get_achievement_manager()
 
         # Inicializar todos os managers
         self._initialize_managers()
@@ -64,7 +70,8 @@ class GameEngine:
             self._inventory_manager,
             self._save_manager,
             self._event_manager,
-            self._cache_manager
+            self._cache_manager,
+            self._audio_manager
         ]
 
         for manager in managers:
@@ -108,6 +115,16 @@ class GameEngine:
     def cache_manager(self) -> CacheManager:
         """Retorna o gerenciador de cache."""
         return self._cache_manager
+
+    @property
+    def audio_manager(self) -> AudioManager:
+        """Retorna o gerenciador de audio."""
+        return self._audio_manager
+
+    @property
+    def achievement_manager(self):
+        """Retorna o gerenciador de conquistas."""
+        return self._achievement_manager
 
     # --- FUNÇÕES DE SAVE/LOAD ATUALIZADAS ---
     @handle_exceptions(reraise=True)
@@ -519,25 +536,45 @@ class GameEngine:
                 "save": self._save_manager.get_status(),
                 "event": self._event_manager.get_status(),
                 "cache": self._cache_manager.get_status(),
+                "audio": self._audio_manager.get_status(),
             }
         }
 
     def shutdown(self) -> None:
         """Finaliza o engine e todos os managers."""
-        managers = [
-            self._combat_manager,
-            self._inventory_manager,
-            self._save_manager,
-            self._event_manager,
-            self._cache_manager
-        ]
+        with GameEngine._lock:
+            if not GameEngine._initialized:
+                return
 
-        for manager in managers:
-            manager.shutdown()
+            managers = [
+                self._combat_manager,
+                self._inventory_manager,
+                self._save_manager,
+                self._event_manager,
+                self._cache_manager,
+                self._audio_manager
+            ]
 
-        self.logger.info("GameEngine finalizado")
-        GameEngine._initialized = False
-        GameEngine._instance = None
+            # Finalizar managers de forma segura
+            for manager in managers:
+                try:
+                    if hasattr(manager, 'shutdown'):
+                        manager.shutdown()
+                except Exception as e:
+                    self.logger.error(f"Erro ao finalizar manager {manager.__class__.__name__}: {e}")
+
+            # Limpar referências
+            self.jogador = None
+            self._combat_manager = None
+            self._inventory_manager = None
+            self._save_manager = None
+            self._event_manager = None
+            self._cache_manager = None
+            self._audio_manager = None
+
+            self.logger.info("GameEngine finalizado")
+            GameEngine._initialized = False
+            GameEngine._instance = None
 
 
 # Função conveniente para obter a instância global

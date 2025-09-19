@@ -99,7 +99,7 @@ class MainMenuScreen(Screen):
                 yield Button("Novo Jogo", id="new_game", variant="primary")
                 yield Button("Carregar Jogo", id="load_game", variant="default")
                 yield Button("Salvar Jogo", id="save_game", variant="success", disabled=True)
-                # O botão de sair foi completamente removido da composição.
+                yield Button("Configurações", id="settings", variant="default")
 
     def on_mount(self) -> None:
         """Chamado quando a tela é montada. Ativa o botão de salvar se houver um jogo em andamento."""
@@ -126,6 +126,10 @@ class MainMenuScreen(Screen):
                 self.app.notify("Jogo salvo com sucesso!")
             else:
                 self.app.notify("[b red]Erro:[/] Não foi possível salvar o jogo.", timeout=5)
+
+        elif event.button.id == "settings":
+            from .settings_screen import SettingsScreen
+            self.app.push_screen(SettingsScreen())
 
     def start_game(self, _):
         """Callback que inicia a tela principal do jogo."""

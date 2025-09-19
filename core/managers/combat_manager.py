@@ -80,8 +80,16 @@ class CombatManager(BaseManager):
         if self._current_combat["result"] != CombatResult.ONGOING:
             raise CombatError("Combate já finalizado")
 
-        player = self._current_combat["player"]
-        enemy = self._current_combat["enemy"]
+        # Validações de segurança adicionais
+        player = self._current_combat.get("player")
+        enemy = self._current_combat.get("enemy")
+
+        if not player or not enemy:
+            raise CombatError("Estado de combate corrompido: personagens inválidos")
+
+        if not player.is_alive:
+            raise CombatError("Jogador não pode agir - está morto")
+
         log_messages = []
 
         if action == CombatAction.ATTACK:
@@ -348,23 +356,35 @@ class CombatManager(BaseManager):
         if not self._current_combat:
             return
 
-        player = self._current_combat["player"]
-        enemy = self._current_combat["enemy"]
+        try:
+            player = self._current_combat.get("player")
+            enemy = self._current_combat.get("enemy")
 
-        if player.is_dead:
-            self._current_combat["result"] = CombatResult.PLAYER_DEAD
-            emit_event(EventType.PLAYER_DEATH, {
-                "player_name": player.nome,
-                "enemy_name": enemy.nome,
-                "turn_count": self._current_combat["turn_count"]
-            })
-        elif enemy.is_dead:
-            self._current_combat["result"] = CombatResult.PLAYER_WIN
-            emit_event(EventType.COMBAT_END, {
-                "winner": player.nome,
-                "loser": enemy.nome,
-                "turn_count": self._current_combat["turn_count"]
-            })
+            # Validar que os personagens existem
+            if not player or not enemy:
+                self.logger.error("Combate corrompido: personagens inválidos")
+                self._current_combat = None
+                return
+
+            if player.is_dead:
+                self._current_combat["result"] = CombatResult.PLAYER_DEAD
+                emit_event(EventType.PLAYER_DEATH, {
+                    "player_name": getattr(player, 'nome', 'Desconhecido'),
+                    "enemy_name": getattr(enemy, 'nome', 'Desconhecido'),
+                    "turn_count": self._current_combat.get("turn_count", 0)
+                })
+            elif enemy.is_dead:
+                self._current_combat["result"] = CombatResult.PLAYER_WIN
+                emit_event(EventType.COMBAT_END, {
+                    "winner": getattr(player, 'nome', 'Desconhecido'),
+                    "loser": getattr(enemy, 'nome', 'Desconhecido'),
+                    "turn_count": self._current_combat.get("turn_count", 0)
+                })
+        except Exception as e:
+            self.logger.error(f"Erro ao verificar fim de combate: {e}")
+            # Em caso de erro, finalizar combate com segurança
+            if self._current_combat:
+                self._current_combat["result"] = CombatResult.PLAYER_WIN
 
     def get_combat_state(self) -> Dict[str, Any]:
         """Retorna o estado atual do combate."""
