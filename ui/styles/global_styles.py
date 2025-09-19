@@ -137,7 +137,6 @@ Button:disabled {{
     color: {COLORS["accent"]};
     text-align: center;
     margin-bottom: {SIZES["margin_medium"]};
-    text-size: 2;
 }}
 
 .section_header {{
@@ -395,7 +394,7 @@ def get_global_css() -> str:
 def get_component_css(component_name: str) -> str:
     """Retorna o CSS de um componente específico."""
     return COMPONENT_STYLES.get(component_name, "")
-
+ 
 def get_all_component_css() -> str:
     """Retorna todos os estilos de componentes combinados."""
     return "\n".join(COMPONENT_STYLES.values())
