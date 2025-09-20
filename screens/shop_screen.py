@@ -7,7 +7,7 @@ from textual.widgets import Button, Static, Header, Footer, Tabs, Tab, TabbedCon
 from core.engine import GameEngine
 from data.items import DB_ITENS
 
-# Itens que estarão à venda na loja
+# Itens que estarao a venda na loja
 ITENS_DA_LOJA = {
     "Pocao de Cura": 50,
     "Antidoto": 75,
@@ -70,7 +70,7 @@ class ShopScreen(Screen):
     def compose(self) -> ComposeResult:
         """Cria os widgets da tela da loja."""
         yield Header(name="Loja 'O Ponteiro Enferrujado'")
-        yield Static(f"Seu Ouro: [b yellow]{self.engine.jogador.ouro}[/b yellow]", id="player_gold")
+        yield Static(f"Seu Ouro: [b]{self.engine.jogador.ouro}[/b]", id="player_gold")
         
         with TabbedContent(id="shop_container"):
             # Separador de Compra
@@ -99,15 +99,15 @@ class ShopScreen(Screen):
                 container = Container(classes="item_row")
 
                 # Informações detalhadas do item
-                item_info = f"[b cyan]{item.nome}[/b cyan]\n[i]{item.descricao}[/i]"
+                item_info = f"[b]{item.nome}[/b]\n[i]{item.descricao}[/i]"
                 if hasattr(item, 'valor_cura') and item.valor_cura > 0:
-                    item_info += f"\n🩹 Cura: {item.valor_cura} HP"
+                    item_info += f"\nCura: {item.valor_cura} HP"
                 if hasattr(item, 'valor_mp') and item.valor_mp > 0:
-                    item_info += f"\n✨ MP: +{item.valor_mp}"
+                    item_info += f"\nMP: +{item.valor_mp}"
 
                 container.mount(Static(item_info, classes="item_name"))
 
-                button_text = f"Comprar ({preco} 🪙)"
+                button_text = f"Comprar ({preco} Ouro)"
                 if not can_afford:
                     button_text += " - Sem ouro suficiente"
 
@@ -115,12 +115,12 @@ class ShopScreen(Screen):
                 buy_list.mount(container)
 
     def update_sell_list(self):
-        """Atualiza a lista de itens para vender do inventário do jogador."""
+        """Atualiza a lista de itens para vender do inventario do jogador."""
         sell_list = self.query_one("#sell_list")
         sell_list.remove_children()
 
         if not self.engine.jogador.inventario:
-            sell_list.mount(Static("Seu inventário está vazio."))
+            sell_list.mount(Static("Seu inventario esta vazio."))
         else:
             for item in self.engine.jogador.inventario:
                 preco_venda = item.preco_venda
@@ -128,19 +128,19 @@ class ShopScreen(Screen):
 
                 # Informações detalhadas do item
                 item_template = DB_ITENS.get(item.nome)
-                item_info = f"[b cyan]{item.nome}[/b cyan] (x{item.quantidade})"
+                item_info = f"[b]{item.nome}[/b] (x{item.quantidade})"
                 if item_template:
                     item_info += f"\n[i]{item_template.descricao}[/i]"
                     if hasattr(item_template, 'valor_cura') and item_template.valor_cura > 0:
-                        item_info += f"\n🩹 Cura: {item_template.valor_cura} HP"
+                        item_info += f"\nCura: {item_template.valor_cura} HP"
 
                 container.mount(Static(item_info, classes="item_name"))
-                container.mount(Button(f"Vender ({preco_venda} 🪙)", id=f"sell_{item.nome}", classes="item_action"))
+                container.mount(Button(f"Vender ({preco_venda} Ouro)", id=f"sell_{item.nome}", classes="item_action"))
                 sell_list.mount(container)
 
     def update_gold_display(self):
-        """Atualiza a exibição de ouro do jogador."""
-        self.query_one("#player_gold").update(f"Seu Ouro: [b yellow]{self.engine.jogador.ouro}[/b yellow]")
+        """Atualiza a exibicao de ouro do jogador."""
+        self.query_one("#player_gold").update(f"Seu Ouro: [b]{self.engine.jogador.ouro}[/b]")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Lida com os cliques nos botões de comprar e vender."""
@@ -151,7 +151,7 @@ class ShopScreen(Screen):
             if preco and self.engine.jogador.ouro >= preco:
                 self.engine.jogador.ouro -= preco
                 self.engine.adicionar_item_inventario(item_name)
-                self.app.notify(f"Você comprou [b cyan]{item_name}[/b cyan]!")
+                self.app.notify(f"Voce comprou [b]{item_name}[/b]!")
         
         elif action == "sell":
             item_para_vender = next((item for item in self.engine.jogador.inventario if item.nome == item_name), None)
@@ -160,7 +160,7 @@ class ShopScreen(Screen):
                 item_para_vender.quantidade -= 1
                 if item_para_vender.quantidade <= 0:
                     self.engine.jogador.inventario.remove(item_para_vender)
-                self.app.notify(f"Você vendeu [b cyan]{item_name}[/b cyan]!")
+                self.app.notify(f"Voce vendeu [b]{item_name}[/b]!")
         
         # Atualiza tudo
         self.update_gold_display()

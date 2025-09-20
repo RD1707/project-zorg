@@ -41,7 +41,7 @@ class Achievement:
     type: AchievementType
     rarity: AchievementRarity
     points: int
-    icon: str = "🏆"
+    icon: str = "[*]"  # Asterisco para conquista
     hidden: bool = False
     progress_max: int = 1
     progress_current: int = 0
@@ -147,7 +147,7 @@ class AchievementManager:
             type=AchievementType.MILESTONE,
             rarity=AchievementRarity.COMMON,
             points=10,
-            icon="⚔️"
+            icon="[X]"  # X para combate
         ))
 
         self.add_achievement(Achievement(
@@ -157,7 +157,7 @@ class AchievementManager:
             type=AchievementType.PROGRESS,
             rarity=AchievementRarity.COMMON,
             points=25,
-            icon="🗡️",
+            icon="[#]",  # Hash para matador
             progress_max=10
         ))
 
@@ -168,7 +168,7 @@ class AchievementManager:
             type=AchievementType.MILESTONE,
             rarity=AchievementRarity.COMMON,
             points=20,
-            icon="📈"
+            icon="[+]"  # Plus para progresso
         ))
 
         self.add_achievement(Achievement(
@@ -178,7 +178,7 @@ class AchievementManager:
             type=AchievementType.STORY,
             rarity=AchievementRarity.UNCOMMON,
             points=50,
-            icon="🚪"
+            icon="[>]"  # Seta para exploracao
         ))
 
         self.add_achievement(Achievement(
@@ -188,7 +188,7 @@ class AchievementManager:
             type=AchievementType.STORY,
             rarity=AchievementRarity.LEGENDARY,
             points=200,
-            icon="👑"
+            icon="[@]"  # Arroba para realizacao final
         ))
 
         self.add_achievement(Achievement(
@@ -198,7 +198,7 @@ class AchievementManager:
             type=AchievementType.SKILL,
             rarity=AchievementRarity.RARE,
             points=75,
-            icon="✨",
+            icon="[~]",  # Til para magia
             progress_max=25
         ))
 
@@ -209,7 +209,7 @@ class AchievementManager:
             type=AchievementType.COLLECTION,
             rarity=AchievementRarity.UNCOMMON,
             points=30,
-            icon="🧪",
+            icon="[=]",  # Igual para pocoes
             progress_max=20
         ))
 
@@ -221,7 +221,7 @@ class AchievementManager:
             type=AchievementType.SECRET,
             rarity=AchievementRarity.EPIC,
             points=100,
-            icon="🔍",
+            icon="[?]",  # Interrogacao para colecionador
             hidden=True
         ))
 

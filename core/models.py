@@ -352,33 +352,33 @@ class Personagem:
         if self.turnos_veneno > 0:
             damage = min(self.dano_por_turno_veneno, self.hp)
             self.hp = max(0, self.hp - self.dano_por_turno_veneno)
-            messages.append(f"☠️ {self.nome} sofre {damage} de dano por veneno!")
+            messages.append(f"{self.nome} sofre {damage} de dano por veneno!")
             self.turnos_veneno -= 1
             if self.turnos_veneno <= 0:
                 self.dano_por_turno_veneno = 0
-                messages.append(f"✨ {self.nome} se recupera do veneno.")
+                messages.append(f"{self.nome} se recupera do veneno.")
 
         # Buff de defesa
         if self.turnos_buff_defesa > 0:
             self.turnos_buff_defesa -= 1
             if self.turnos_buff_defesa <= 0:
-                messages.append(f"🛡️ O buff de defesa de {self.nome} termina.")
+                messages.append(f"O buff de defesa de {self.nome} termina.")
 
         # Fúria
         if self.turnos_furia > 0:
             self.turnos_furia -= 1
             if self.turnos_furia <= 0:
-                messages.append(f"😠 A fúria de {self.nome} termina.")
+                messages.append(f"A furia de {self.nome} termina.")
 
         # Regeneração
         if self.turnos_regeneracao > 0:
             heal_amount = min(5, self.hp_max - self.hp)
             if heal_amount > 0:
                 self.hp += heal_amount
-                messages.append(f"💚 {self.nome} regenera {heal_amount} HP.")
+                messages.append(f"{self.nome} regenera {heal_amount} HP.")
             self.turnos_regeneracao -= 1
             if self.turnos_regeneracao <= 0:
-                messages.append(f"✨ A regeneração de {self.nome} termina.")
+                messages.append(f"A regeneracao de {self.nome} termina.")
 
         return messages
 

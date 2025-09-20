@@ -12,7 +12,7 @@ sys.path.insert(0, str(project_root))
 
 def run_black():
     """Executa formatação com Black."""
-    print("🔧 Executando formatação com Black...")
+    print("Executando formatacao com Black...")
     try:
         result = subprocess.run([
             sys.executable, "-m", "black",
@@ -21,17 +21,17 @@ def run_black():
         ], cwd=project_root, capture_output=True, text=True)
 
         if result.returncode == 0:
-            print("✅ Black: Formatação concluída")
+            print("Black: Formatacao concluida")
         else:
-            print(f"❌ Black: {result.stderr}")
+            print(f"Black: {result.stderr}")
         return result.returncode
     except Exception as e:
-        print(f"❌ Erro ao executar Black: {e}")
+        print(f"Erro ao executar Black: {e}")
         return 1
 
 def run_isort():
     """Executa organização de imports com isort."""
-    print("📦 Organizando imports com isort...")
+    print("Organizando imports com isort...")
     try:
         result = subprocess.run([
             sys.executable, "-m", "isort",
@@ -40,17 +40,17 @@ def run_isort():
         ], cwd=project_root, capture_output=True, text=True)
 
         if result.returncode == 0:
-            print("✅ isort: Imports organizados")
+            print("isort: Imports organizados")
         else:
-            print(f"❌ isort: {result.stderr}")
+            print(f"isort: {result.stderr}")
         return result.returncode
     except Exception as e:
-        print(f"❌ Erro ao executar isort: {e}")
+        print(f"Erro ao executar isort: {e}")
         return 1
 
 def run_flake8():
     """Executa verificação de estilo com flake8."""
-    print("🔍 Verificando estilo com flake8...")
+    print("Verificando estilo com flake8...")
     try:
         result = subprocess.run([
             sys.executable, "-m", "flake8",
@@ -60,17 +60,17 @@ def run_flake8():
         ], cwd=project_root, capture_output=True, text=True)
 
         if result.returncode == 0:
-            print("✅ flake8: Nenhum problema encontrado")
+            print("flake8: Nenhum problema encontrado")
         else:
-            print(f"⚠️  flake8: Problemas encontrados:\n{result.stdout}")
+            print(f"AVISO - flake8: Problemas encontrados:\n{result.stdout}")
         return result.returncode
     except Exception as e:
-        print(f"❌ Erro ao executar flake8: {e}")
+        print(f"Erro ao executar flake8: {e}")
         return 1
 
 def run_mypy():
     """Executa verificação de tipos com mypy."""
-    print("🔬 Verificando tipos com mypy...")
+    print("Verificando tipos com mypy...")
     try:
         result = subprocess.run([
             sys.executable, "-m", "mypy",
@@ -80,17 +80,17 @@ def run_mypy():
         ], cwd=project_root, capture_output=True, text=True)
 
         if result.returncode == 0:
-            print("✅ mypy: Verificação de tipos passou")
+            print("mypy: Verificacao de tipos passou")
         else:
-            print(f"⚠️  mypy: Problemas de tipo encontrados:\n{result.stdout}")
+            print(f"AVISO - mypy: Problemas de tipo encontrados:\n{result.stdout}")
         return result.returncode
     except Exception as e:
-        print(f"❌ Erro ao executar mypy: {e}")
+        print(f"Erro ao executar mypy: {e}")
         return 1
 
 def main():
     """Executa todas as verificações de qualidade."""
-    print("🚀 Iniciando verificações de qualidade do código ZORG\n")
+    print("Iniciando verificacoes de qualidade do codigo ZORG\n")
 
     exit_codes = []
 
@@ -104,14 +104,14 @@ def main():
     exit_codes.append(run_flake8())
     exit_codes.append(run_mypy())
 
-    print("\n📊 Resumo:")
+    print("\nResumo:")
 
     if all(code == 0 for code in exit_codes):
-        print("✅ Todas as verificações passaram!")
+        print("Todas as verificacoes passaram!")
         return 0
     else:
         failed_checks = sum(1 for code in exit_codes if code != 0)
-        print(f"❌ {failed_checks} verificação(ões) falharam")
+        print(f"{failed_checks} verificacao(oes) falharam")
         return 1
 
 if __name__ == "__main__":

@@ -69,14 +69,14 @@ class CityScreen(Screen):
         yield self.create_status_bar()
 
         with Vertical(id="city_options"):
-            yield Button("🛒 Visitar 'O Ponteiro Enferrujado' (Loja)", id="shop", variant="primary")
-            yield Button("🛏️ Descansar na estalagem 'O Pescador Cansado'", id="rest", variant="success")
-            yield Button("🚢 Explorar as docas", id="docks", variant="default")
-            yield Button("🏛️ Visitar a Praça Central", id="plaza", variant="default")
-            yield Button("📚 Ir à Biblioteca Antiga", id="library", variant="default")
-            yield Button("🚪 Ir ao Portão da Cidade", id="gate", variant="default")
-            yield Button("💾 Salvar Jogo", id="save", variant="warning")
-            yield Button("⚔️ Partir Rumo ao Mar (Continuar Aventura)", id="progress", variant="error")
+            yield Button("Visitar 'O Ponteiro Enferrujado' (Loja)", id="shop", variant="primary")
+            yield Button("Descansar na estalagem 'O Pescador Cansado'", id="rest", variant="success")
+            yield Button("Explorar as docas", id="docks", variant="default")
+            yield Button("Visitar a Praca Central", id="plaza", variant="default")
+            yield Button("Ir a Biblioteca Antiga", id="library", variant="default")
+            yield Button("Ir ao Portao da Cidade", id="gate", variant="default")
+            yield Button("Salvar Jogo", id="save", variant="warning")
+            yield Button("Partir Rumo ao Mar (Continuar Aventura)", id="progress", variant="error")
         
         yield Footer()
 
@@ -96,8 +96,8 @@ class CityScreen(Screen):
             self.engine.jogador.hp = self.engine.jogador.hp_max
             self.engine.jogador.mp = self.engine.jogador.mp_max
             self.engine.jogador.turnos_veneno = 0
-            self.app.notify("Você descansa e sente as suas forças renovadas. HP e MP recuperados!")
-            self.on_resume() # Reutiliza a lógica para atualizar o ecrã
+            self.app.notify("Voce descansa e sente as suas forcas renovadas. HP e MP recuperados!")
+            self.on_resume() # Reutiliza a logica para atualizar o ecra
 
         elif event.button.id == "docks":
             npcs_na_doca = [npc for npc in DB_NPCS.values() if npc.location == "docas"]
@@ -120,20 +120,20 @@ class CityScreen(Screen):
             if sucesso:
                 self.app.notify("Jogo salvo com sucesso!")
             else:
-                self.app.notify("[b red]Erro:[/] Não foi possível salvar o jogo.", timeout=5)
+                self.app.notify("[b]Erro:[/b] Nao foi possivel salvar o jogo.", timeout=5)
 
         elif event.button.id == "progress":
             self.dismiss(True)
 
     def action_progress_story(self) -> None:
-        """Ação para o atalho de teclado 'p'."""
+        """Acao para o atalho de teclado 'p'."""
         self.dismiss(True)
 
     def create_status_bar(self) -> Horizontal:
-        """Função auxiliar para recriar a barra de status."""
+        """Funcao auxiliar para recriar a barra de status."""
         return Horizontal(
-            Static(f"❤️ HP: {self.engine.jogador.hp}/{self.engine.jogador.hp_max}", classes="status_item"),
-            Static(f"🪙 Ouro: {self.engine.jogador.ouro}", classes="status_item"),
-            Static(f"⭐ Nível: {self.engine.jogador.nivel}", classes="status_item"),
+            Static(f"HP: {self.engine.jogador.hp}/{self.engine.jogador.hp_max}", classes="status_item"),
+            Static(f"Ouro: {self.engine.jogador.ouro}", classes="status_item"),
+            Static(f"Nivel: {self.engine.jogador.nivel}", classes="status_item"),
             id="player_status_bar"
         )

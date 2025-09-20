@@ -508,18 +508,18 @@ class GameEngine:
             raise InsufficientResourcesError("MP", hab_escolhida.custo_mp, self.jogador.mp)
 
         self.jogador.spend_mp(hab_escolhida.custo_mp)
-        log_mensagens = [f"✨ Você usa [b yellow]{hab_escolhida.nome}[/b yellow]!"]
+        log_mensagens = [f"Voce usa [b]{hab_escolhida.nome}[/b]!"]
 
         if hab_escolhida.tipo == TipoHabilidade.CURA:
             heal_amount = self.jogador.heal(hab_escolhida.valor_efeito)
             if heal_amount > 0:
-                log_mensagens.append(f"💚 Você se cura em [b green]{heal_amount} HP[/b green].")
+                log_mensagens.append(f"Voce se cura em [b]{heal_amount} HP[/b].")
             else:
                 log_mensagens.append("Sua vida já está no máximo.")
 
         elif hab_escolhida.tipo == TipoHabilidade.BUFF_DEFESA:
             self.jogador.turnos_buff_defesa = 3
-            log_mensagens.append(f"🛡️ Sua defesa aumenta por [b cyan]3 turnos[/b cyan]!")
+            log_mensagens.append(f"Sua defesa aumenta por [b]3 turnos[/b]!")
 
         return log_mensagens
 

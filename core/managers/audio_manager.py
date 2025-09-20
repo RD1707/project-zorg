@@ -92,7 +92,7 @@ class AudioManager(BaseManager):
         if self._current_music == music_name:
             return True
 
-        self.logger.info(f"🎵 Tocando música: {music_name} (loop: {loop})")
+        self.logger.info(f"Tocando musica: {music_name} (loop: {loop})")
 
         if self._audio_library_available:
             # Implementação real aqui
@@ -107,7 +107,7 @@ class AudioManager(BaseManager):
     def stop_music(self) -> None:
         """Para a música atual."""
         if self._current_music:
-            self.logger.info(f"🎵 Parando música: {self._current_music}")
+            self.logger.info(f"Parando musica: {self._current_music}")
 
             if self._audio_library_available:
                 # Implementação real aqui
@@ -123,7 +123,7 @@ class AudioManager(BaseManager):
         if volume is None:
             volume = self._effects_volume
 
-        self.logger.debug(f"🔊 Efeito sonoro: {sound_name} (volume: {volume:.2f})")
+        self.logger.debug(f"Efeito sonoro: {sound_name} (volume: {volume:.2f})")
 
         if self._audio_library_available:
             # Implementação real aqui

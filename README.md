@@ -6,13 +6,13 @@
 
 **ZORG** é um RPG épico baseado em texto, desenvolvido com Textual, que conta a história de Manuella em sua jornada heroica para resgatar seu amado Ramon das garras do malévolo feiticeiro Zorg.
 
-## 📖 História
+## Historia
 
 Em um tempo onde o amor ainda era puro, no tranquilo vilarejo de Coden, dois corações batiam em perfeita sintonia: Manuella, artesã de mãos habilidosas, e Ramon, programador de códigos brilhantes.
 
 Mas nas sombras, o feiticeiro Zorg observava com inveja corrosiva. Incapaz de amar, ele aprisionou Ramon no topo da temível Torre do Ponteiro Nulo. Agora, Manuella deve embarcar em uma jornada épica para salvá-lo.
 
-## ✨ Características
+## Caracteristicas
 
 - **Interface Rica**: Construído com Textual para uma experiência visual impressionante
 - **Sistema de Combate**: Combates táticos com habilidades, itens e estratégias
@@ -21,7 +21,7 @@ Mas nas sombras, o feiticeiro Zorg observava com inveja corrosiva. Incapaz de am
 - **Sistema de Save/Load**: Salve seu progresso a qualquer momento
 - **Arte ASCII**: Elementos visuais únicos e atmosféricos
 
-## 🚀 Instalação
+## Instalacao
 
 ### Requisitos
 - Python 3.8 ou superior
@@ -56,7 +56,7 @@ isort .
 mypy .
 ```
 
-## 🎮 Como Jogar
+## Como Jogar
 
 ### Controles Básicos
 - **Enter/Espaço**: Confirmar ações
@@ -76,7 +76,7 @@ mypy .
 - Explore diferentes combinações de equipamentos
 - Cada inimigo tem pontos fracos únicos
 
-## 🏗️ Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 zorg-game/
@@ -102,7 +102,7 @@ zorg-game/
 └── tests/                 # Testes unitários
 ```
 
-## 🛠️ Desenvolvimento
+## Desenvolvimento
 
 ### Adicionando Novo Conteúdo
 
@@ -133,7 +133,7 @@ pytest --cov=core --cov=data --cov=scenes
 pytest tests/test_engine.py -v
 ```
 
-## 🎯 Roadmap
+## Roadmap
 
 ### Versão 1.1
 - [ ] Sistema de crafting
@@ -147,7 +147,7 @@ pytest tests/test_engine.py -v
 - [ ] Suporte a mods
 - [ ] Trilha sonora
 
-## 🤝 Contribuindo
+## Contribuindo
 
 Contribuições são bem-vindas! Por favor, siga estas diretrizes:
 
@@ -164,26 +164,26 @@ Contribuições são bem-vindas! Por favor, siga estas diretrizes:
 - Escreva testes para novas funcionalidades
 - Documente funções públicas
 
-## 📝 Changelog
+## Changelog
 
 ### v1.0.0 (2024-12-17)
-- 🎉 Lançamento inicial
-- ✨ 10 fases jogáveis
-- ⚔️ Sistema de combate completo
-- 💾 Sistema de save/load
-- 🎨 Interface rica com Textual
+- Lançamento inicial
+- 10 fases jogaveis
+- Sistema de combate completo
+- Sistema de save/load
+- Interface rica com Textual
 
-## 📄 Licença
+## Licenca
 
 Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
-## 🙏 Agradecimentos
+## Agradecimentos
 
 - **Textual**: Framework incrível para aplicações de terminal
 - **Rich**: Biblioteca para formatação rica de texto
 - **Comunidade Python**: Por todas as ferramentas fantásticas
 
-## 📞 Suporte
+## Suporte
 
 Se você encontrar bugs ou tiver sugestões:
 - Abra uma [issue](https://github.com/seu-usuario/zorg-game/issues)
@@ -191,4 +191,4 @@ Se você encontrar bugs ou tiver sugestões:
 
 ---
 
-*"Onde o código encontra a coragem."* ⚔️
+*"Onde o codigo encontra a coragem."*

@@ -1,36 +1,38 @@
+# -*- coding: utf-8 -*-
 """
-Estilos globais consistentes para o jogo ZORG.
+Estilos globais moncromaticos para o jogo ZORG.
+Sistema de cores limitado a preto, branco e tons de cinza.
 """
 
-# === CORES ===
+# === CORES MONOCROMATICAS ===
 COLORS = {
     # Cores principais
-    "background": "#0d0d0d",
-    "surface": "#1e1e1e",
-    "surface_variant": "#2a2a2a",
-    "border": "#444444",
-    "border_active": "#666666",
+    "background": "#000000",        # Preto puro
+    "surface": "#1a1a1a",          # Cinza muito escuro
+    "surface_variant": "#2d2d2d",  # Cinza escuro
+    "border": "#555555",           # Cinza medio
+    "border_active": "#777777",    # Cinza medio claro
 
     # Texto
-    "text_primary": "#ffffff",
-    "text_secondary": "#cccccc",
-    "text_disabled": "#888888",
+    "text_primary": "#ffffff",     # Branco puro
+    "text_secondary": "#cccccc",   # Cinza claro
+    "text_disabled": "#888888",    # Cinza medio
 
-    # Estado
-    "success": "#22c55e",
-    "warning": "#f59e0b",
-    "error": "#ef4444",
-    "info": "#3b82f6",
+    # Estados - todos em tons de cinza
+    "success": "#aaaaaa",          # Cinza claro (era verde)
+    "warning": "#cccccc",          # Cinza muito claro (era laranja)
+    "error": "#999999",            # Cinza medio (era vermelho)
+    "info": "#bbbbbb",             # Cinza claro (era azul)
 
-    # Elementos especiais
-    "accent": "#06b6d4",
-    "highlight": "#fbbf24",
-    "hp_color": "#22c55e",
-    "mp_color": "#3b82f6",
-    "xp_color": "#fbbf24",
+    # Elementos especiais - tons de cinza
+    "accent": "#dddddd",           # Cinza muito claro (era ciano)
+    "highlight": "#eeeeee",        # Quase branco (era amarelo)
+    "hp_color": "#aaaaaa",         # Cinza claro (era verde)
+    "mp_color": "#bbbbbb",         # Cinza claro (era azul)
+    "xp_color": "#cccccc",         # Cinza muito claro (era amarelo)
 }
 
-# === DIMENSÕES ===
+# === DIMENSOES ===
 SIZES = {
     "border_radius": "round",
     "padding_small": "1",
@@ -68,7 +70,7 @@ Screen {{
     padding: {SIZES["padding_medium"]};
 }}
 
-/* === BOTÕES === */
+/* === BOTOES === */
 Button {{
     min-width: 20;
     height: 3;
@@ -124,7 +126,7 @@ Button:disabled {{
     color: {COLORS["text_disabled"]};
 }}
 
-/* === CABEÇALHOS === */
+/* === CABECALHOS === */
 .header {{
     text-style: bold;
     color: {COLORS["accent"]};
@@ -146,7 +148,7 @@ Button:disabled {{
     margin-bottom: {SIZES["margin_small"]};
 }}
 
-/* === ESTATÍSTICAS === */
+/* === ESTATISTICAS === */
 .stat_hp {{
     color: {COLORS["hp_color"]};
     text-style: bold;
@@ -179,7 +181,7 @@ Button:disabled {{
     border: {SIZES["border_radius"]} {COLORS["accent"]};
 }}
 
-/* === FORMULÁRIOS === */
+/* === FORMULARIOS === */
 Input {{
     background: {COLORS["surface"]};
     border: tall {COLORS["border"]};
@@ -283,7 +285,7 @@ Footer {{
     color: {COLORS["text_secondary"]};
 }}
 
-/* === CLASSES UTILITÁRIAS === */
+/* === CLASSES UTILITARIAS === */
 .hidden {{
     display: none;
 }}
@@ -317,7 +319,7 @@ Footer {{
 }}
 """
 
-# === COMPONENTES REUTILIZÁVEIS ===
+# === COMPONENTES REUTILIZAVEIS ===
 COMPONENT_STYLES = {
     "game_panel": f"""
     #game_panel {{
@@ -392,17 +394,17 @@ def get_global_css() -> str:
     return GLOBAL_CSS
 
 def get_component_css(component_name: str) -> str:
-    """Retorna o CSS de um componente específico."""
+    """Retorna o CSS de um componente especifico."""
     return COMPONENT_STYLES.get(component_name, "")
- 
+
 def get_all_component_css() -> str:
     """Retorna todos os estilos de componentes combinados."""
     return "\n".join(COMPONENT_STYLES.values())
 
 def get_color(color_name: str) -> str:
-    """Retorna uma cor específica."""
+    """Retorna uma cor especifica."""
     return COLORS.get(color_name, "#ffffff")
 
 def get_size(size_name: str) -> str:
-    """Retorna um tamanho específico."""
+    """Retorna um tamanho especifico."""
     return SIZES.get(size_name, "1")

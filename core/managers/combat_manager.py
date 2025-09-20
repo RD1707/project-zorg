@@ -162,7 +162,7 @@ class CombatManager(BaseManager):
         total_damage = max(1, total_damage)
         actual_damage = defender.take_damage(total_damage)
 
-        messages.append(f"⚔️ {attacker.nome} ataca {defender.nome} e causa [b red]{actual_damage}[/b red] de dano!")
+        messages.append(f"{attacker.nome} ataca {defender.nome} e causa [b]{actual_damage}[/b] de dano!")
 
         self.logger.debug(f"Ataque: {attacker.nome} -> {defender.nome}, dano: {actual_damage}, crítico: {is_critical}")
         return messages
@@ -184,7 +184,7 @@ class CombatManager(BaseManager):
 
         # Gastar MP
         user.spend_mp(skill.custo_mp)
-        messages.append(f"✨ {user.nome} usa [b yellow]{skill.nome}[/b yellow]!")
+        messages.append(f"{user.nome} usa [b]{skill.nome}[/b]!")
 
         # Aplicar efeito
         if skill.tipo == TipoHabilidade.ATAQUE:
@@ -196,22 +196,22 @@ class CombatManager(BaseManager):
         elif skill.tipo == TipoHabilidade.CURA:
             heal_amount = user.heal(skill.valor_efeito)
             if heal_amount > 0:
-                messages.append(f"💚 {user.nome} se cura em [b green]{heal_amount} HP[/b green].")
+                messages.append(f"{user.nome} se cura em [b]{heal_amount} HP[/b].")
             else:
                 messages.append(f"{user.nome} já está com a vida cheia.")
 
         elif skill.tipo == TipoHabilidade.BUFF_DEFESA:
             user.turnos_buff_defesa = 3
-            messages.append(f"🛡️ A defesa de {user.nome} aumenta por [b cyan]3 turnos[/b cyan]!")
+            messages.append(f"A defesa de {user.nome} aumenta por [b]3 turnos[/b]!")
         
         # NOVAS HABILIDADES AQUI
         elif skill.tipo == TipoHabilidade.FURIA:
             user.turnos_furia = 4
-            messages.append(f"😠 {user.nome} entra em fúria! Seu ataque aumenta, mas sua defesa diminui por [b red]4 turnos[/b red]!")
+            messages.append(f"{user.nome} entra em furia! Seu ataque aumenta, mas sua defesa diminui por [b]4 turnos[/b]!")
 
         elif skill.tipo == TipoHabilidade.REGENERACAO:
             user.turnos_regeneracao = 5
-            messages.append(f"♻️ {user.nome} ativa a regeneração vital! HP será recuperado a cada turno por [b green]5 turnos[/b green]!")
+            messages.append(f"{user.nome} ativa a regeneracao vital! HP sera recuperado a cada turno por [b]5 turnos[/b]!")
         
         else:
             raise InvalidActionError(f"Tipo de habilidade desconhecido: {skill.tipo.value}")
@@ -242,19 +242,19 @@ class CombatManager(BaseManager):
         if item.cura_hp > 0:
             heal_amount = user.heal(item.cura_hp)
             if heal_amount > 0:
-                messages.append(f"🧪 {user.nome} usa [b cyan]{item_name}[/b cyan] e recupera [b green]{heal_amount} HP[/b green]!")
+                messages.append(f"{user.nome} usa [b]{item_name}[/b] e recupera [b]{heal_amount} HP[/b]!")
                 effects_applied = True
 
         if item.cura_mp > 0:
             mp_amount = user.restore_mp(item.cura_mp)
             if mp_amount > 0:
-                messages.append(f"🧪 {user.nome} usa [b cyan]{item_name}[/b cyan] e recupera [b blue]{mp_amount} MP[/b blue]!")
+                messages.append(f"{user.nome} usa [b]{item_name}[/b] e recupera [b]{mp_amount} MP[/b]!")
                 effects_applied = True
 
         if item.cura_veneno > 0 and user.is_poisoned:
             user.turnos_veneno = 0
             user.dano_por_turno_veneno = 0
-            messages.append(f"🧪 {user.nome} usa [b cyan]{item_name}[/b cyan] e se cura do [b magenta]veneno[/b magenta]!")
+            messages.append(f"{user.nome} usa [b]{item_name}[/b] e se cura do veneno!")
             effects_applied = True
 
         if not effects_applied:
@@ -283,9 +283,9 @@ class CombatManager(BaseManager):
 
         if random.randint(1, 100) <= escape_chance:
             self._current_combat["result"] = CombatResult.ESCAPED
-            return ["🏃 Você conseguiu escapar do combate!"]
+            return ["Voce conseguiu escapar do combate!"]
         else:
-            return ["🚫 Você tentou fugir, mas não conseguiu escapar!"]
+            return ["Voce tentou fugir, mas nao conseguiu escapar!"]
 
     def _process_enemy_ai(self, enemy: Personagem, player: Personagem) -> List[str]:
         """Processa a IA do inimigo."""
@@ -347,7 +347,7 @@ class CombatManager(BaseManager):
             if random.randint(1, 100) <= 50:
                 player.turnos_veneno = 3
                 player.dano_por_turno_veneno = enemy.dano_por_turno_veneno
-                messages.append("☠️ Você foi [b magenta]envenenado![/b magenta]")
+                messages.append("Voce foi envenenado!")
 
         return messages
 

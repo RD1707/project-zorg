@@ -118,14 +118,14 @@ class MainMenuScreen(Screen):
                 self.app.notify("Jogo carregado com sucesso!")
                 self.start_game(None)
             else:
-                self.app.notify("[b red]Erro:[/] Nenhum jogo salvo encontrado ou o ficheiro está corrompido.", timeout=5)
+                self.app.notify("[b]Erro:[/b] Nenhum jogo salvo encontrado ou o ficheiro esta corrompido.", timeout=5)
 
         elif event.button.id == "save_game":
             sucesso = self.app.engine.save_game_state()
             if sucesso:
                 self.app.notify("Jogo salvo com sucesso!")
             else:
-                self.app.notify("[b red]Erro:[/] Não foi possível salvar o jogo.", timeout=5)
+                self.app.notify("[b]Erro:[/b] Nao foi possivel salvar o jogo.", timeout=5)
 
         elif event.button.id == "settings":
             from .settings_screen import SettingsScreen

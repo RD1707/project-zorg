@@ -5,7 +5,7 @@ from textual.screen import Screen
 from textual.widgets import Static
 
 class VictoryScreen(Screen):
-    """Tela para exibir as recompensas após uma vitória em combate."""
+    """Tela para exibir as recompensas apos uma vitoria em combate."""
 
     BINDINGS = [
         Binding("enter", "dismiss", "Continuar"),
@@ -49,28 +49,28 @@ class VictoryScreen(Screen):
     """
 
     def __init__(self, victory_data: dict):
-        """Recebe o dicionário com os dados da vitória e as recompensas."""
+        """Recebe o dicionario com os dados da vitoria e as recompensas."""
         super().__init__()
         self.victory_data = victory_data
 
     def compose(self) -> ComposeResult:
         """Cria os widgets da tela."""
         with Vertical(id="victory_box"):
-            yield Static("✨ V I T Ó R I A ✨", id="victory_title")
+            yield Static("V I T O R I A", id="victory_title")
 
             # Mostra as recompensas base
-            yield Static(f"⭐ XP Ganho: [b yellow]{self.victory_data['xp_ganho']}[/b yellow]", classes="reward_line")
-            yield Static(f"🪙 Ouro Ganho: [b yellow]{self.victory_data['ouro_ganho']}[/b yellow]", classes="reward_line")
+            yield Static(f"XP Ganho: [b]{self.victory_data['xp_ganho']}[/b]", classes="reward_line")
+            yield Static(f"Ouro Ganho: [b]{self.victory_data['ouro_ganho']}[/b]", classes="reward_line")
 
             # Se houve um level up, mostra os detalhes
             level_up_info = self.victory_data.get("level_up")
             if level_up_info:
                 with Vertical(id="level_up_box"):
-                    yield Static(f"[b green]LEVEL UP! Você alcançou o Nível {level_up_info['new_level']}![/b green]")
-                    yield Static(f"❤️ HP Máximo +{level_up_info['hp_bonus']}")
-                    yield Static(f"💙 MP Máximo +{level_up_info['mp_bonus']}")
-                    yield Static(f"⚔️ Ataque Base +{level_up_info['atk_bonus']}")
-                    yield Static(f"🛡️ Defesa Base +{level_up_info['def_bonus']}")
+                    yield Static(f"[b]LEVEL UP! Voce alcancou o Nivel {level_up_info['new_level']}![/b]")
+                    yield Static(f"HP Maximo +{level_up_info['hp_bonus']}")
+                    yield Static(f"MP Maximo +{level_up_info['mp_bonus']}")
+                    yield Static(f"Ataque Base +{level_up_info['atk_bonus']}")
+                    yield Static(f"Defesa Base +{level_up_info['def_bonus']}")
 
             # Se houver recompensas adicionais, mostra-as
             rewards = self.victory_data.get("rewards", [])
@@ -79,6 +79,6 @@ class VictoryScreen(Screen):
                     if reward:
                         with Vertical(classes="new_reward_box"):
                             if hasattr(reward, "tipo"): # É um equipamento
-                                yield Static(f"🛡️ Você recebeu o equipamento [b cyan]{reward.nome}[/b cyan]!")
+                                yield Static(f"Voce recebeu o equipamento [b]{reward.nome}[/b]!")
                             else: # É uma habilidade
-                                yield Static(f"🧠 Você aprendeu a habilidade [b yellow]{reward.nome}[/b yellow]!")
+                                yield Static(f"Voce aprendeu a habilidade [b]{reward.nome}[/b]!")

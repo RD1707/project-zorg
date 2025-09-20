@@ -173,11 +173,11 @@ class ElementalSystem:
             final_damage = int(final_damage * affinity_modifier)
 
             if affinity_modifier == 0:
-                messages.append(f"💫 Imune ao elemento {attacker_element.value}!")
+                messages.append(f"Imune ao elemento {attacker_element.value}!")
             elif affinity_modifier < 0.6:
-                messages.append(f"🛡️ Resistente ao elemento {attacker_element.value}!")
+                messages.append(f"Resistente ao elemento {attacker_element.value}!")
             elif affinity_modifier > 1.4:
-                messages.append(f"💥 Fraco ao elemento {attacker_element.value}!")
+                messages.append(f"Fraco ao elemento {attacker_element.value}!")
 
         # Adicionar variação aleatória pequena
         variation = random.uniform(0.9, 1.1)
@@ -186,7 +186,7 @@ class ElementalSystem:
         # Aplicar bônus de crítico se aplicável
         if critical_hit:
             final_damage = int(final_damage * 1.5)
-            messages.append("⭐ Acerto crítico elemental!")
+            messages.append("Acerto critico elemental!")
 
         # Aplicar efeitos secundários baseados no elemento
         secondary_effects = self._get_secondary_effects(attacker_element)
@@ -214,13 +214,13 @@ class ElementalSystem:
         effects = []
 
         effect_chances = {
-            Element.FOGO: (0.3, "🔥 O alvo começa a queimar!"),
-            Element.GELO: (0.25, "🧊 O alvo fica mais lento!"),
-            Element.SOMBRA: (0.2, "👻 O alvo é envolto em sombras!"),
-            Element.LUZ: (0.2, "✨ O alvo é purificado!"),
-            Element.NATUREZA: (0.15, "🌿 Espinhos brotam ao redor do alvo!"),
-            Element.ARCANO: (0.25, "🔮 Energia arcana interfere na magia do alvo!"),
-            Element.DIVINO: (0.3, "⭐ Poder divino abençoa o ataque!")
+            Element.FOGO: (0.3, "O alvo comeca a queimar!"),
+            Element.GELO: (0.25, "O alvo fica mais lento!"),
+            Element.SOMBRA: (0.2, "O alvo e envolto em sombras!"),
+            Element.LUZ: (0.2, "O alvo e purificado!"),
+            Element.NATUREZA: (0.15, "Espinhos brotam ao redor do alvo!"),
+            Element.ARCANO: (0.25, "Energia arcana interfere na magia do alvo!"),
+            Element.DIVINO: (0.3, "Poder divino abencoa o ataque!")
         }
 
         if element in effect_chances:
@@ -322,17 +322,17 @@ class ElementalSystem:
     def get_element_color(self, element: Element) -> str:
         """Retorna cor/emoji representativo do elemento."""
         colors = {
-            Element.NEUTRO: "⚪",
-            Element.FOGO: "🔴",
-            Element.GELO: "🔵",
-            Element.SOMBRA: "⚫",
-            Element.LUZ: "🟡",
-            Element.NATUREZA: "🟢",
-            Element.ARCANO: "🟣",
-            Element.FISICO: "🟤",
-            Element.DIVINO: "✨"
+            Element.NEUTRO: "O",
+            Element.FOGO: "X",
+            Element.GELO: "I",
+            Element.SOMBRA: "#",
+            Element.LUZ: "*",
+            Element.NATUREZA: "+",
+            Element.ARCANO: "~",
+            Element.FISICO: "=",
+            Element.DIVINO: "@"
         }
-        return colors.get(element, "⚪")
+        return colors.get(element, "O")
 
 
 # Instância global do sistema elemental

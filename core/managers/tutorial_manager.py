@@ -67,7 +67,7 @@ class TutorialManager(BaseManager):
             flag_name="combate_basico_mostrado",
             steps=[
                 TutorialStep(
-                    title="💀 Seu Primeiro Combate!",
+                    title="Seu Primeiro Combate!",
                     content=[
                         "Bem-vinda ao sistema de combate do ZORG!",
                         "Durante o combate, você pode:",
@@ -76,7 +76,7 @@ class TutorialManager(BaseManager):
                         "• [I]tens - Usa itens do inventário",
                         "• [F]ugir - Tenta escapar do combate"
                     ],
-                    visual_hint="⚔️ Escolha sua ação sabiamente!"
+                    visual_hint="Escolha sua acao sabiamente!"
                 )
             ],
             priority=10
@@ -89,7 +89,7 @@ class TutorialManager(BaseManager):
             flag_name="habilidades_mostrado",
             steps=[
                 TutorialStep(
-                    title="✨ Habilidades Especiais",
+                    title="Habilidades Especiais",
                     content=[
                         "Habilidades são ataques poderosos que custam MP (Mana Points).",
                         "Diferentes tipos de habilidades:",
@@ -98,7 +98,7 @@ class TutorialManager(BaseManager):
                         "• Buff - Melhoram suas estatísticas",
                         "• Debuff - Enfraquecem inimigos"
                     ],
-                    visual_hint="💫 Use MP sabiamente - ele não se regenera automaticamente!"
+                    visual_hint="Use MP sabiamente - ele nao se regenera automaticamente!"
                 )
             ],
             priority=8
@@ -111,7 +111,7 @@ class TutorialManager(BaseManager):
             flag_name="itens_mostrado",
             steps=[
                 TutorialStep(
-                    title="🧪 Usando Itens",
+                    title="Usando Itens",
                     content=[
                         "Itens podem salvar sua vida em situações difíceis!",
                         "Tipos principais:",
@@ -120,7 +120,7 @@ class TutorialManager(BaseManager):
                         "• Antídotos - Curam envenenamento",
                         "• Itens de Buff - Melhoram temporariamente suas stats"
                     ],
-                    visual_hint="💡 Dica: Use itens estrategicamente - alguns são raros!"
+                    visual_hint="Dica: Use itens estrategicamente - alguns sao raros!"
                 )
             ],
             priority=7
@@ -133,7 +133,7 @@ class TutorialManager(BaseManager):
             flag_name="level_up_mostrado",
             steps=[
                 TutorialStep(
-                    title="🌟 Você Subiu de Nível!",
+                    title="Voce Subiu de Nivel!",
                     content=[
                         "Parabéns! Subir de nível traz muitos benefícios:",
                         "• HP e MP máximos aumentam",
@@ -141,7 +141,7 @@ class TutorialManager(BaseManager):
                         "• Novas habilidades podem ser desbloqueadas",
                         "• Acesso a equipamentos melhores"
                     ],
-                    visual_hint="⭐ Continue derrotando inimigos para ganhar mais XP!"
+                    visual_hint="Continue derrotando inimigos para ganhar mais XP!"
                 )
             ],
             priority=9
@@ -154,7 +154,7 @@ class TutorialManager(BaseManager):
             flag_name="equipamentos_mostrado",
             steps=[
                 TutorialStep(
-                    title="⚔️ Equipamentos",
+                    title="Equipamentos",
                     content=[
                         "Equipamentos melhoram suas capacidades de combate:",
                         "• Armas - Aumentam seu ataque",
@@ -162,7 +162,7 @@ class TutorialManager(BaseManager):
                         "• Escudos - Proteção extra",
                         "• Acessórios - Bônus especiais"
                     ],
-                    visual_hint="🔧 Visite a loja para comprar equipamentos melhores!"
+                    visual_hint="Visite a loja para comprar equipamentos melhores!"
                 )
             ],
             priority=6
@@ -175,7 +175,7 @@ class TutorialManager(BaseManager):
             flag_name="save_load_mostrado",
             steps=[
                 TutorialStep(
-                    title="💾 Sistema de Save",
+                    title="Sistema de Save",
                     content=[
                         "Importante: Salve seu progresso frequentemente!",
                         "• Use o menu da cidade para salvar",
@@ -183,7 +183,7 @@ class TutorialManager(BaseManager):
                         "• Você pode carregar um save a qualquer momento",
                         "• O jogo salva automaticamente em momentos críticos"
                     ],
-                    visual_hint="⚠️ Não deixe para salvar só no final - acidentes acontecem!"
+                    visual_hint="Nao deixe para salvar so no final - acidentes acontecem!"
                 )
             ],
             priority=5
@@ -196,7 +196,7 @@ class TutorialManager(BaseManager):
             flag_name="cidade_mostrada",
             steps=[
                 TutorialStep(
-                    title="🏘️ Bem-vinda a Nullhaven!",
+                    title="Bem-vinda a Nullhaven!",
                     content=[
                         "A cidade é seu refúgio entre as aventuras:",
                         "• Loja - Compre itens e equipamentos",
@@ -204,7 +204,7 @@ class TutorialManager(BaseManager):
                         "• Save/Load - Gerencie seus saves",
                         "• Status - Veja estatísticas detalhadas"
                     ],
-                    visual_hint="🗺️ Explore e converse com todos os NPCs!"
+                    visual_hint="Explore e converse com todos os NPCs!"
                 )
             ],
             priority=4
@@ -217,15 +217,15 @@ class TutorialManager(BaseManager):
             flag_name="status_effects_mostrado",
             steps=[
                 TutorialStep(
-                    title="🌪️ Efeitos de Status",
+                    title="Efeitos de Status",
                     content=[
                         "Efeitos temporários podem afetar o combate:",
-                        "• 🟢 Buffs - Melhoram suas capacidades",
-                        "• 🔴 Debuffs - Prejudicam você ou inimigos",
-                        "• ☠️ Veneno - Causa dano contínuo",
-                        "• 💚 Regeneração - Cura HP gradualmente"
+                        "• Buffs - Melhoram suas capacidades",
+                        "• Debuffs - Prejudicam voce ou inimigos",
+                        "• Veneno - Causa dano continuo",
+                        "• Regeneracao - Cura HP gradualmente"
                     ],
-                    visual_hint="⏰ Todos os efeitos têm duração limitada!"
+                    visual_hint="Todos os efeitos tem duracao limitada!"
                 )
             ],
             priority=3
@@ -238,7 +238,7 @@ class TutorialManager(BaseManager):
             flag_name="quests_mostrado",
             steps=[
                 TutorialStep(
-                    title="📜 Sistema de Missões",
+                    title="Sistema de Missoes",
                     content=[
                         "NPCs podem dar missões valiosas:",
                         "• Converse com NPCs para descobrir missões",
@@ -246,7 +246,7 @@ class TutorialManager(BaseManager):
                         "• XP, ouro e itens especiais te aguardam",
                         "• Algumas missões desbloqueiam novas áreas"
                     ],
-                    visual_hint="🎯 Verifique seus objetivos no menu de status!"
+                    visual_hint="Verifique seus objetivos no menu de status!"
                 )
             ],
             priority=2
@@ -312,13 +312,13 @@ class TutorialManager(BaseManager):
     def get_contextual_hint(self, context: str, player_tutorials: TutorialFlags) -> Optional[str]:
         """Retorna dica contextual baseada na situação atual."""
         hints = {
-            "low_hp": "💡 Dica: Use uma Poção de Cura quando seu HP estiver baixo!",
-            "no_mp": "💡 Dica: Use Poções de Mana para restaurar MP e usar habilidades!",
-            "inventory_full": "💡 Dica: Seu inventário está cheio! Venda itens desnecessários na loja.",
-            "boss_approaching": "⚠️ Cuidado: Um chefe poderoso se aproxima! Prepare-se bem.",
-            "new_area": "🗺️ Você entrou em uma nova área. Explore com cuidado!",
-            "status_poisoned": "☠️ Você está envenenado! Use um Antídoto rapidamente.",
-            "equipment_damaged": "🔧 Seus equipamentos estão danificados. Visite um ferreiro."
+            "low_hp": "Dica: Use uma Pocao de Cura quando seu HP estiver baixo!",
+            "no_mp": "Dica: Use Pocoes de Mana para restaurar MP e usar habilidades!",
+            "inventory_full": "Dica: Seu inventario esta cheio! Venda itens desnecessarios na loja.",
+            "boss_approaching": "Cuidado: Um chefe poderoso se aproxima! Prepare-se bem.",
+            "new_area": "Voce entrou em uma nova area. Explore com cuidado!",
+            "status_poisoned": "Voce esta envenenado! Use um Antidoto rapidamente.",
+            "equipment_damaged": "Seus equipamentos estao danificados. Visite um ferreiro."
         }
 
         # Verificar se já mostrou tutoriais relacionados

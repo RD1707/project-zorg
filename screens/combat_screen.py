@@ -97,12 +97,13 @@ class CombatScreen(Screen):
         self.jogador = engine.jogador
         self.inimigo = inimigo
 
-    def _create_bar(self, current: int, maximum: int, color: str) -> str:
-        """Cria uma barra de texto para representar HP, MP, etc."""
+    def _create_bar(self, current: int, maximum: int, bar_type: str) -> str:
+        """Cria uma barra de texto monocromatica para representar HP, MP, etc."""
         percent = current / maximum if maximum > 0 else 0
         width = 15  # Largura da barra em caracteres
         filled_width = int(percent * width)
-        bar = f"[{color}]" + "█" * filled_width + "[/]" + "░" * (width - filled_width)
+        # Usando apenas caracteres ASCII simples em tons de cinza
+        bar = "█" * filled_width + "░" * (width - filled_width)
         return f"{bar} {current}/{maximum}"
 
     def compose(self) -> ComposeResult:
@@ -121,23 +122,23 @@ class CombatScreen(Screen):
     
     def on_mount(self) -> None:
         self.update_character_panels()
-        self.log_message(f"Um [b red]{self.inimigo.nome}[/b red] selvagem aparece!")
+        self.log_message(f"Um [b]{self.inimigo.nome}[/b] selvagem aparece!")
 
     def update_character_panels(self):
         # --- Painel do Jogador ---
-        hp_bar = self._create_bar(self.jogador.hp, self.jogador.hp_max, "green")
-        mp_bar = self._create_bar(self.jogador.mp, self.jogador.mp_max, "blue")
+        hp_bar = self._create_bar(self.jogador.hp, self.jogador.hp_max, "hp")
+        mp_bar = self._create_bar(self.jogador.mp, self.jogador.mp_max, "mp")
         
         player_status = ""
         if self.jogador.turnos_veneno > 0:
-            player_status += f"[magenta]Envenenado ({self.jogador.turnos_veneno}t) [/magenta]"
+            player_status += f"Envenenado ({self.jogador.turnos_veneno}t) "
         if self.jogador.turnos_buff_defesa > 0:
-            player_status += f"[cyan]Defesa+ ({self.jogador.turnos_buff_defesa}t)[/cyan]"
+            player_status += f"Defesa+ ({self.jogador.turnos_buff_defesa}t)"
         if player_status:
             player_status = f"\nStatus: {player_status}"
 
         player_content = f"""
-[b cyan]Manu (Nível {self.jogador.nivel})[/b cyan]
+[b]Manu (Nivel {self.jogador.nivel})[/b]
 HP: {hp_bar}
 MP: {mp_bar}
 Ataque: {self.jogador.ataque_total}   Defesa: {self.jogador.defesa_total}{player_status}
@@ -148,16 +149,16 @@ Ataque: {self.jogador.ataque_total}   Defesa: {self.jogador.defesa_total}{player
         player_box.mount(Static(player_content))
 
         # --- Painel do Inimigo ---
-        enemy_hp_bar = self._create_bar(self.inimigo.hp, self.inimigo.hp_max, "red")
+        enemy_hp_bar = self._create_bar(self.inimigo.hp, self.inimigo.hp_max, "enemy_hp")
         
         enemy_status = ""
         if self.inimigo.turnos_veneno > 0:
-            enemy_status += f"[magenta]Envenenado ({self.inimigo.turnos_veneno}t)[/magenta]"
+            enemy_status += f"Envenenado ({self.inimigo.turnos_veneno}t)"
         if enemy_status:
             enemy_status = f"\nStatus: {enemy_status}"
 
         enemy_content = f"""
-[b red]{self.inimigo.nome}[/b red]
+[b]{self.inimigo.nome}[/b]
 HP: {enemy_hp_bar}
 Ataque: {self.inimigo.ataque_total}   Defesa: {self.inimigo.defesa_total}{enemy_status}
         """
@@ -193,13 +194,13 @@ Ataque: {self.inimigo.ataque_total}   Defesa: {self.inimigo.defesa_total}{enemy_
         self.update_character_panels()
 
         if self.inimigo.hp <= 0:
-            self.log_message(f"[b green]{self.inimigo.nome} foi derrotado![/b green]")
+            self.log_message(f"[b]{self.inimigo.nome} foi derrotado![/b]")
             await asyncio.sleep(1)
             self.dismiss(True)
             return
 
         # --- Turno do Inimigo ---
-        turn_indicator.update(f"Vez de [b red]{self.inimigo.nome}[/b red]...")
+        turn_indicator.update(f"Vez de [b]{self.inimigo.nome}[/b]...")
         await asyncio.sleep(1)
 
         enemy_box = self.query_one("#enemy_box")
@@ -216,7 +217,7 @@ Ataque: {self.inimigo.ataque_total}   Defesa: {self.inimigo.defesa_total}{enemy_
         self.update_character_panels()
 
         if self.jogador.hp <= 0:
-            self.log_message("[b red]Você foi derrotado...[/b red]")
+            self.log_message("[b]Voce foi derrotado...[/b]")
             await asyncio.sleep(1)
             self.dismiss(False)
             return

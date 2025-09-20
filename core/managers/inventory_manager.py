@@ -107,7 +107,7 @@ class InventoryManager(BaseManager):
         if item.cura_hp > 0:
             heal_amount = player.heal(item.cura_hp)
             if heal_amount > 0:
-                messages.append(f"🧪 {player.nome} usa {item_name} e recupera [b green]{heal_amount} HP[/b green]!")
+                messages.append(f"{player.nome} usa {item_name} e recupera [b]{heal_amount} HP[/b]!")
                 effects_applied = True
             else:
                 messages.append(f"{player.nome} usa {item_name}, mas sua vida já está cheia.")
@@ -115,7 +115,7 @@ class InventoryManager(BaseManager):
         if item.cura_mp > 0:
             mp_amount = player.restore_mp(item.cura_mp)
             if mp_amount > 0:
-                messages.append(f"🧪 {player.nome} usa {item_name} e recupera [b blue]{mp_amount} MP[/b blue]!")
+                messages.append(f"{player.nome} usa {item_name} e recupera [b]{mp_amount} MP[/b]!")
                 effects_applied = True
             else:
                 messages.append(f"{player.nome} usa {item_name}, mas seu MP já está cheio.")
@@ -123,7 +123,7 @@ class InventoryManager(BaseManager):
         if item.cura_veneno > 0 and player.is_poisoned:
             player.turnos_veneno = 0
             player.dano_por_turno_veneno = 0
-            messages.append(f"🧪 {player.nome} usa {item_name} e se cura do [b magenta]veneno[/b magenta]!")
+            messages.append(f"{player.nome} usa {item_name} e se cura do veneno!")
             effects_applied = True
 
         if not effects_applied:
@@ -155,17 +155,17 @@ class InventoryManager(BaseManager):
         if equipment.is_weapon:
             old_equipment = player.arma_equipada
             player.arma_equipada = equipment
-            messages.append(f"⚔️ {equipment_name} equipado como arma!")
+            messages.append(f"{equipment_name} equipado como arma!")
 
         elif equipment.is_armor:
             old_equipment = player.armadura_equipada
             player.armadura_equipada = equipment
-            messages.append(f"🛡️ {equipment_name} equipado como armadura!")
+            messages.append(f"{equipment_name} equipado como armadura!")
 
         elif equipment.is_shield:
             old_equipment = player.escudo_equipada
             player.escudo_equipada = equipment
-            messages.append(f"🛡️ {equipment_name} equipado como escudo!")
+            messages.append(f"{equipment_name} equipado como escudo!")
 
         else:
             raise InvalidActionError(f"Tipo de equipamento desconhecido: {equipment.tipo}")
