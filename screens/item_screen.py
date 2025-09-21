@@ -73,7 +73,6 @@ class ItemScreen(Screen):
 
     .item_name {
         text-style: bold;
-        color: cyan;
     }
 
     .item_description {
@@ -82,7 +81,6 @@ class ItemScreen(Screen):
     }
 
     .item_type {
-        color: yellow;
     }
 
     .filter_buttons {

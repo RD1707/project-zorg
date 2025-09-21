@@ -36,7 +36,6 @@ class SettingsScreen(Screen):
     #settings_header {
         text-align: center;
         text-style: bold;
-        color: cyan;
         margin-bottom: 2;
     }
 
@@ -59,7 +58,6 @@ class SettingsScreen(Screen):
 
     .section_header {
         text-style: bold;
-        color: yellow;
         margin-top: 1;
         margin-bottom: 1;
     }
@@ -80,9 +78,9 @@ class SettingsScreen(Screen):
         yield Header(name="Configurações do Jogo")
 
         with Vertical(id="settings_container"):
-            yield Static("⚙️ Configurações", id="settings_header")
+            yield Static("Configurações", id="settings_header")
 
-            yield Static("🎮 Gameplay", classes="section_header")
+            yield Static("Gameplay", classes="section_header")
 
             with Horizontal(classes="setting_row"):
                 yield Static("Velocidade do texto:", classes="setting_label")
@@ -105,7 +103,7 @@ class SettingsScreen(Screen):
                 yield Switch(value=self.settings.get("confirm_actions", True),
                            id="confirm_actions", classes="setting_control")
 
-            yield Static("🔊 Audio", classes="section_header")
+            yield Static("Audio", classes="section_header")
 
             with Horizontal(classes="setting_row"):
                 yield Static("Música de fundo:", classes="setting_label")
@@ -128,7 +126,7 @@ class SettingsScreen(Screen):
                 ], value=str(self.settings.get("master_volume", "75")),
                 id="master_volume", classes="setting_control")
 
-            yield Static("🎨 Interface", classes="section_header")
+            yield Static("Interface", classes="section_header")
 
             with Horizontal(classes="setting_row"):
                 yield Static("Tema:", classes="setting_label")
@@ -144,7 +142,7 @@ class SettingsScreen(Screen):
                 yield Switch(value=self.settings.get("show_tooltips", True),
                            id="show_tooltips", classes="setting_control")
 
-            yield Button("💾 Salvar Configurações", id="save_button", variant="success")
+            yield Button("Salvar Configurações", id="save_button", variant="success")
 
         yield Footer()
 
@@ -173,14 +171,14 @@ class SettingsScreen(Screen):
             success = self.settings.save()
 
             if success:
-                self.app.notify("✅ Configurações salvas com sucesso!")
+                self.app.notify("Configurações salvas com sucesso!")
                 # Aplicar configurações imediatamente
                 self._apply_settings()
             else:
-                self.app.notify("❌ Erro ao salvar configurações!", timeout=5)
+                self.app.notify("Erro ao salvar configurações!", timeout=5)
 
         except Exception as e:
-            self.app.notify(f"❌ Erro: {e}", timeout=5)
+            self.app.notify(f"Erro: {e}", timeout=5)
 
     def _apply_settings(self) -> None:
         """Aplica as configurações ao jogo."""

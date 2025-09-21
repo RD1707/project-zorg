@@ -42,11 +42,48 @@ class SaveManager(BaseManager):
 
             self._validate_save_data(save_data)
 
+            # Operação atômica melhorada
             temp_file = self._save_file.with_suffix('.tmp')
-            with open(temp_file, "w", encoding="utf-8") as f:
-                json.dump(save_data, f, indent=2, ensure_ascii=False)
+            backup_file = self._save_file.with_suffix('.backup')
 
-            temp_file.replace(self._save_file)
+            try:
+                # Criar backup do arquivo atual se existir
+                if self._save_file.exists():
+                    import shutil
+                    shutil.copy2(self._save_file, backup_file)
+
+                # Escrever dados no arquivo temporário
+                with open(temp_file, "w", encoding="utf-8") as f:
+                    json.dump(save_data, f, indent=2, ensure_ascii=False)
+
+                # Verificar integridade do arquivo temporário
+                with open(temp_file, "r", encoding="utf-8") as f:
+                    verification_data = json.load(f)
+                    self._validate_save_data(verification_data)
+
+                # Se chegou aqui, o arquivo temporário é válido
+                # Fazer a substituição atômica
+                if hasattr(temp_file, 'replace'):
+                    temp_file.replace(self._save_file)
+                else:
+                    # Fallback para sistemas mais antigos
+                    import shutil
+                    shutil.move(str(temp_file), str(self._save_file))
+
+                # Remover backup se tudo deu certo
+                if backup_file.exists():
+                    backup_file.unlink()
+
+            except Exception as e:
+                # Em caso de erro, restaurar backup se necessário
+                if temp_file.exists():
+                    temp_file.unlink()
+
+                if backup_file.exists() and not self._save_file.exists():
+                    backup_file.replace(self._save_file)
+
+                self.logger.error(f"Erro durante save atômico: {e}")
+                raise
 
             emit_event(EventType.SAVE_GAME, {
                 "player_name": player.nome,
@@ -71,6 +108,9 @@ class SaveManager(BaseManager):
         try:
             with open(self._save_file, "r", encoding="utf-8") as f:
                 save_data = json.load(f)
+
+            # Migrar dados se necessário
+            save_data = self._migrate_save_data(save_data)
 
             # Usar o SaveFileValidator para validação de segurança completa
             SaveFileValidator.validate_save_data(save_data)
@@ -146,6 +186,59 @@ class SaveManager(BaseManager):
 
         return save_data
 
+    def _migrate_save_data(self, save_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Migra dados de save para versões mais recentes."""
+        current_version = save_data.get("version", "1.0.0")
+        target_version = "1.0.1"  # Versão atual do jogo
+
+        if current_version == target_version:
+            return save_data
+
+        self.logger.info(f"Migrando save de {current_version} para {target_version}")
+
+        # Migração da versão 1.0.0 para 1.0.1
+        if current_version == "1.0.0":
+            save_data = self._migrate_1_0_0_to_1_0_1(save_data)
+
+        # Atualizar versão
+        save_data["version"] = target_version
+
+        # Recriar checksum para dados migrados
+        checksum_data = json.dumps(save_data["player"], sort_keys=True)
+        save_data["checksum"] = hashlib.sha256(checksum_data.encode()).hexdigest()
+
+        self.logger.info("Migração concluída com sucesso")
+        return save_data
+
+    def _migrate_1_0_0_to_1_0_1(self, save_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Migração específica da versão 1.0.0 para 1.0.1."""
+        player_data = save_data.get("player", {})
+
+        # Adicionar campos que podem estar faltando
+        if "fase_atual" not in player_data:
+            player_data["fase_atual"] = 1
+
+        if "ouro" not in player_data:
+            player_data["ouro"] = 0
+
+        # Garantir que status effects existam
+        if "status_effects" not in player_data:
+            player_data["status_effects"] = []
+
+        # Garantir que habilidades conhecidas existam
+        if "habilidades_conhecidas" not in player_data:
+            player_data["habilidades_conhecidas"] = []
+
+        # Adicionar campos de metadados se não existirem
+        if "metadata" not in save_data:
+            save_data["metadata"] = {
+                "timestamp": datetime.now().isoformat(),
+                "version": "1.0.1",
+                "auto_save": False
+            }
+
+        return save_data
+
     def _validate_save_data(self, save_data: Dict[str, Any]) -> None:
         required_fields = ["version", "metadata", "player", "checksum"]
         for field in required_fields:
@@ -175,7 +268,7 @@ class SaveManager(BaseManager):
             raise DataValidationError("Nível inválido")
 
     def _reconstruct_player(self, save_data: Dict[str, Any]) -> Personagem:
-        from copy import deepcopy
+        from core.object_factory import get_object_factory
 
         player_data = save_data["player"]
 
@@ -209,11 +302,12 @@ class SaveManager(BaseManager):
         player.armadura_equipada = DB_EQUIPAMENTOS.get(player_data.get("armadura_equipada"))
         player.escudo_equipada = DB_EQUIPAMENTOS.get(player_data.get("escudo_equipada"))
 
+        factory = get_object_factory()
         player.inventario = []
         for item_data in player_data.get("inventario", []):
             item_template = DB_ITENS.get(item_data["nome"])
             if item_template:
-                item = deepcopy(item_template)
+                item = factory.create_item(item_template)
                 item.quantidade = item_data["quantidade"]
                 player.inventario.append(item)
 
@@ -351,7 +445,7 @@ class SaveManager(BaseManager):
                 save_data = json.load(f)
 
             self._validate_save_data(save_data)
-            player = self._deserialize_player(save_data["player"])
+            player = self._reconstruct_player(save_data["player"])
 
             emit_event(EventType.LOAD_GAME, {
                 "slot": slot,

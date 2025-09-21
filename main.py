@@ -14,10 +14,9 @@ from ui.styles.global_styles import get_global_css
 class ZorgApp(App):
     """A aplicação principal do jogo ZORG construída com Textual."""
 
-    # --- 2. VERIFIQUE SE OS TAMANHOS ESTÃO DEFINIDOS AQUI ---
-    # Devem estar DENTRO da classe, mas FORA de qualquer método.
-    MIN_SIZE = Size(139, 42)
-    MAX_SIZE = Size(139, 42)
+    # Tamanhos responsivos com limites mínimos para uma boa experiência
+    MIN_SIZE = Size(80, 25)  # Tamanho mínimo para o terminal
+    # MAX_SIZE removido para permitir redimensionamento livre
 
     CSS = get_global_css()
 

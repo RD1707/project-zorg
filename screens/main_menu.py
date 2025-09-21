@@ -6,6 +6,7 @@ from textual.binding import Binding
 
 from .story_screen import StoryScreen
 from .game_screen import GameScreen
+from .character_creation_screen import CharacterCreationScreen
 
 # Arte ASCII para o título.
 ZORG_TITLE = r"""
@@ -109,8 +110,7 @@ class MainMenuScreen(Screen):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Chamado quando um botão é pressionado."""
         if event.button.id == "new_game":
-            self.app.engine.inicializar_novo_jogo()
-            self.app.push_screen(StoryScreen(STORY_INTRODUCTION), self.start_game)
+            self.app.push_screen(CharacterCreationScreen(), self._handle_character_creation)
             
         elif event.button.id == "load_game":
             sucesso = self.app.engine.load_game_state()
@@ -130,6 +130,16 @@ class MainMenuScreen(Screen):
         elif event.button.id == "settings":
             from .settings_screen import SettingsScreen
             self.app.push_screen(SettingsScreen())
+
+    def _handle_character_creation(self, character_data):
+        """Callback para lidar com a criação de personagem."""
+        if character_data is None:
+            # Usuário cancelou a criação
+            return
+
+        # Inicializar novo jogo com os dados do personagem
+        self.app.engine.inicializar_novo_jogo(character_data)
+        self.app.push_screen(StoryScreen(STORY_INTRODUCTION), self.start_game)
 
     def start_game(self, _):
         """Callback que inicia a tela principal do jogo."""

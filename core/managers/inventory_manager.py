@@ -52,8 +52,9 @@ class InventoryManager(BaseManager):
             self.logger.debug(f"Item {item_name} x{quantity} empilhado no inventário de {player.nome}")
             return True
 
-        from copy import deepcopy
-        new_item = deepcopy(item_template)
+        from core.object_factory import get_object_factory
+        factory = get_object_factory()
+        new_item = factory.create_item(item_template)
         new_item.quantidade = quantity
         player.inventario.append(new_item)
 

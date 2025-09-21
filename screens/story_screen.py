@@ -31,12 +31,10 @@ class StoryScreen(Screen):
     #story_text {
         height: auto;
         margin-bottom: 1;
-        color: #ddd;
     }
 
     #prompt {
         text-align: right;
-        color: #888;
         text-style: italic;
     }
     """

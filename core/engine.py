@@ -1,5 +1,5 @@
 import random
-from copy import deepcopy
+from core.object_factory import get_object_factory
 from typing import Optional, List, Dict, Any
 import threading
 
@@ -144,16 +144,27 @@ class GameEngine:
         return False
 
     @handle_exceptions(reraise=True)
-    def inicializar_novo_jogo(self) -> None:
+    def inicializar_novo_jogo(self, character_data: dict = None) -> None:
         """Cria uma nova instância do jogador para um novo jogo."""
+        if character_data is None:
+            # Valores padrão para compatibilidade
+            character_data = {
+                "nome": "Manuella",
+                "hp_max": 50,
+                "mp_max": 20,
+                "ataque_base": 7,
+                "defesa_base": 2,
+                "xp_proximo_nivel": 100
+            }
+
         self.jogador = Personagem(
-            nome="Manu",
-            hp_max=50,
-            mp_max=20,
-            ataque_base=7,
-            defesa_base=2
+            nome=character_data.get("nome", "Manuella"),
+            hp_max=character_data.get("hp_max", 50),
+            mp_max=character_data.get("mp_max", 20),
+            ataque_base=character_data.get("ataque_base", 7),
+            defesa_base=character_data.get("defesa_base", 2)
         )
-        self.jogador.xp_proximo_nivel = 100
+        self.jogador.xp_proximo_nivel = character_data.get("xp_proximo_nivel", 100)
         self.jogador.ouro = 0
         self.jogador.fase_atual = 1
 
@@ -220,7 +231,8 @@ class GameEngine:
             self._cache_manager.set(cache_key, enemy_template, "resources")
 
         # Retornar cópia do template
-        enemy_copy = deepcopy(enemy_template)
+        factory = get_object_factory()
+        enemy_copy = factory.create_enemy(enemy_template)
         self.logger.debug(f"Inimigo criado: {nome_inimigo}")
         return enemy_copy
 
@@ -254,14 +266,15 @@ class GameEngine:
             self._cache_manager.set(f"equipment_template_{nome_equipamento}", equipamento_template, "resources")
 
         # Equipar item se o slot estiver vazio
+        factory = get_object_factory()
         if equipamento_template.is_weapon and self.jogador.arma_equipada is None:
-            self.jogador.arma_equipada = deepcopy(equipamento_template)
+            self.jogador.arma_equipada = factory.create_equipment(equipamento_template)
             return self.jogador.arma_equipada
         elif equipamento_template.is_armor and self.jogador.armadura_equipada is None:
-            self.jogador.armadura_equipada = deepcopy(equipamento_template)
+            self.jogador.armadura_equipada = factory.create_equipment(equipamento_template)
             return self.jogador.armadura_equipada
         elif equipamento_template.is_shield and self.jogador.escudo_equipada is None:
-            self.jogador.escudo_equipada = deepcopy(equipamento_template)
+            self.jogador.escudo_equipada = factory.create_equipment(equipamento_template)
             return self.jogador.escudo_equipada
         
         # Se o slot estiver ocupado, adiciona ao inventário
@@ -295,13 +308,30 @@ class GameEngine:
         Verifica se o jogador tem XP suficiente para subir de nível.
         Se sim, atualiza os status e retorna um dicionário com os bônus.
         """
+        # Definir nível máximo para evitar overflow
+        MAX_LEVEL = 100
+        MAX_XP_NEXT_LEVEL = 1_000_000_000  # 1 bilhão como limite
+
         if not self.jogador or self.jogador.xp < self.jogador.xp_proximo_nivel:
+            return None
+
+        # Verificar se já atingiu o nível máximo
+        if self.jogador.nivel >= MAX_LEVEL:
+            self.logger.info(f"Jogador {self.jogador.nome} já atingiu o nível máximo ({MAX_LEVEL})")
             return None
 
         old_level = self.jogador.nivel
         self.jogador.nivel += 1
         self.jogador.xp -= self.jogador.xp_proximo_nivel
-        self.jogador.xp_proximo_nivel = int(self.jogador.xp_proximo_nivel * 1.5)
+
+        # Calcular próximo XP necessário com proteção contra overflow
+        new_xp_requirement = int(self.jogador.xp_proximo_nivel * 1.5)
+        if new_xp_requirement > MAX_XP_NEXT_LEVEL or new_xp_requirement < 0:
+            # Se houver overflow ou valor inválido, usar um valor fixo alto
+            self.jogador.xp_proximo_nivel = MAX_XP_NEXT_LEVEL
+            self.logger.warning(f"XP requirement would overflow, setting to maximum: {MAX_XP_NEXT_LEVEL}")
+        else:
+            self.jogador.xp_proximo_nivel = new_xp_requirement
 
         # Bônus escaláveis baseados no nível
         hp_bonus = 15 + (self.jogador.nivel * 2)

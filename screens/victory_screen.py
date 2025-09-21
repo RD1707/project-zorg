@@ -21,14 +21,13 @@ class VictoryScreen(Screen):
         width: 60;
         height: auto;
         padding: 2;
-        border: double yellow;
+        border: double white;
         background: #1e1e1e;
         align: center middle;
     }
     
     #victory_title {
         text-style: bold;
-        color: yellow;
     }
 
     .reward_line {
@@ -38,13 +37,13 @@ class VictoryScreen(Screen):
     #level_up_box {
         margin-top: 1;
         padding: 1;
-        border: round green;
+        border: round white;
     }
 
     .new_reward_box {
         margin-top: 1;
         padding: 1;
-        border: round cyan;
+        border: round white;
     }
     """
 

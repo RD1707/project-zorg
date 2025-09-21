@@ -360,10 +360,11 @@ class CombatManager(BaseManager):
             player = self._current_combat.get("player")
             enemy = self._current_combat.get("enemy")
 
-            # Validar que os personagens existem
-            if not player or not enemy:
-                self.logger.error("Combate corrompido: personagens inválidos")
-                self._current_combat = None
+            # Validação robusta do estado de combate
+            validation_result = self._validate_combat_state(player, enemy)
+            if not validation_result["valid"]:
+                self.logger.error(f"Combate corrompido: {validation_result['reason']}")
+                self._handle_corrupted_combat()
                 return
 
             if player.is_dead:
@@ -412,3 +413,105 @@ class CombatManager(BaseManager):
     def is_combat_active(self) -> bool:
         """Verifica se há um combate ativo."""
         return self._current_combat is not None and self._current_combat["result"] == CombatResult.ONGOING
+
+    def _validate_combat_state(self, player, enemy) -> Dict[str, Any]:
+        """Valida o estado atual do combate."""
+        if not player:
+            return {"valid": False, "reason": "Player não encontrado"}
+
+        if not enemy:
+            return {"valid": False, "reason": "Enemy não encontrado"}
+
+        # Verificar se os objetos têm os atributos necessários
+        required_player_attrs = ["nome", "hp", "hp_max", "mp", "mp_max"]
+        for attr in required_player_attrs:
+            if not hasattr(player, attr):
+                return {"valid": False, "reason": f"Player sem atributo '{attr}'"}
+
+        required_enemy_attrs = ["nome", "hp", "hp_max", "ataque_base", "defesa_base"]
+        for attr in required_enemy_attrs:
+            if not hasattr(enemy, attr):
+                return {"valid": False, "reason": f"Enemy sem atributo '{attr}'"}
+
+        # Verificar valores válidos
+        if player.hp < 0:
+            return {"valid": False, "reason": "Player HP negativo"}
+
+        if enemy.hp < 0:
+            return {"valid": False, "reason": "Enemy HP negativo"}
+
+        if player.hp_max <= 0:
+            return {"valid": False, "reason": "Player HP máximo inválido"}
+
+        if enemy.hp_max <= 0:
+            return {"valid": False, "reason": "Enemy HP máximo inválido"}
+
+        # Verificar se o combat dict está íntegro
+        if not isinstance(self._current_combat, dict):
+            return {"valid": False, "reason": "Estrutura de combate corrompida"}
+
+        required_combat_keys = ["player", "enemy", "turn_count", "log", "result"]
+        for key in required_combat_keys:
+            if key not in self._current_combat:
+                return {"valid": False, "reason": f"Chave de combate '{key}' ausente"}
+
+        return {"valid": True, "reason": "Estado válido"}
+
+    def _handle_corrupted_combat(self):
+        """Lida com estado de combate corrompido."""
+        try:
+            # Tentar recuperar dados válidos
+            backup_data = {
+                "player": self._current_combat.get("player") if self._current_combat else None,
+                "enemy": self._current_combat.get("enemy") if self._current_combat else None,
+                "turn_count": self._current_combat.get("turn_count", 0) if self._current_combat else 0
+            }
+
+            # Log dos dados para debug
+            self.logger.warning(f"Tentando recuperar combate corrompido: {backup_data}")
+
+            # Emitir evento de erro
+            emit_event(EventType.COMBAT_ERROR, {
+                "error_type": "corrupted_state",
+                "backup_data": backup_data,
+                "timestamp": datetime.now().isoformat()
+            })
+
+            # Limpar estado corrompido
+            self._current_combat = None
+
+        except Exception as e:
+            self.logger.critical(f"Erro crítico ao lidar com combate corrompido: {e}")
+            # Força limpeza
+            self._current_combat = None
+
+    def recover_combat_state(self, player, enemy):
+        """Tenta recuperar um estado de combate válido."""
+        try:
+            if not player or not enemy:
+                return False
+
+            self.logger.info("Tentando recuperar estado de combate...")
+
+            # Recriar combate com dados válidos
+            self._current_combat = {
+                "player": player,
+                "enemy": enemy,
+                "turn_count": 0,
+                "log": ["Combate recuperado após erro."],
+                "result": CombatResult.ONGOING,
+                "start_time": datetime.now()
+            }
+
+            emit_event(EventType.COMBAT_START, {
+                "player_name": getattr(player, 'nome', 'Desconhecido'),
+                "enemy_name": getattr(enemy, 'nome', 'Desconhecido'),
+                "recovered": True
+            })
+
+            self.logger.info("Estado de combate recuperado com sucesso")
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Erro ao recuperar estado de combate: {e}")
+            return False

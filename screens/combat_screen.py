@@ -48,12 +48,10 @@ class CombatScreen(Screen):
     }
 
     #player_box {
-        border-title-color: cyan;
         border-title-align: center;
     }
     
     #enemy_box {
-        border-title-color: red;
         border-title-align: center;
     }
 
@@ -68,7 +66,6 @@ class CombatScreen(Screen):
         width: 90%;
         text-align: center;
         text-style: bold;
-        color: yellow;
         margin-bottom: 1;
     }
 
@@ -172,69 +169,131 @@ Ataque: {self.inimigo.ataque_total}   Defesa: {self.inimigo.defesa_total}{enemy_
 
     async def processar_turno_completo(self, acao: str, **kwargs):
         """Função centralizada para processar um turno completo (jogador e inimigo)."""
-        turn_indicator = self.query_one("#turn_indicator")
-        
-        # --- Turno do Jogador ---
-        turn_indicator.update("Sua Vez!")
-        for btn in self.query(Button):
-            btn.disabled = True
+        try:
+            # Verificar estado do combate antes de processar
+            if not self.jogador or not self.inimigo:
+                self.app.notify("Erro: Estado de combate inválido!", timeout=5)
+                self.dismiss(False)
+                return
 
-        if acao == "attack" or acao == "skill":
-            player_box = self.query_one("#player_box")
-            player_box.styles.offset = (2, 0)
-            await asyncio.sleep(0.08)
-            player_box.styles.offset = (0, 0)
-            await asyncio.sleep(0.1)
+            turn_indicator = self.query_one("#turn_indicator")
 
-        player_messages = self.engine.processar_turno_jogador(acao, self.inimigo, **kwargs)
-        for msg in player_messages:
-            self.log_message(msg)
-            await asyncio.sleep(0.5)
-        
-        self.update_character_panels()
+            # --- Turno do Jogador ---
+            try:
+                turn_indicator.update("Sua Vez!")
+                for btn in self.query(Button):
+                    if hasattr(btn, 'disabled'):
+                        btn.disabled = True
 
-        if self.inimigo.hp <= 0:
-            self.log_message(f"[b]{self.inimigo.nome} foi derrotado![/b]")
-            await asyncio.sleep(1)
-            self.dismiss(True)
-            return
+                # Animação de ataque se necessário
+                if acao in ("attack", "skill"):
+                    try:
+                        player_box = self.query_one("#player_box")
+                        player_box.styles.offset = (2, 0)
+                        await asyncio.sleep(0.08)
+                        player_box.styles.offset = (0, 0)
+                        await asyncio.sleep(0.1)
+                    except Exception as e:
+                        # Se a animação falhar, continuar sem ela
+                        pass
 
-        # --- Turno do Inimigo ---
-        turn_indicator.update(f"Vez de [b]{self.inimigo.nome}[/b]...")
-        await asyncio.sleep(1)
+                # Processar turno do jogador
+                player_messages = self.engine.processar_turno_jogador(acao, self.inimigo, **kwargs)
+                for msg in player_messages:
+                    self.log_message(msg)
+                    await asyncio.sleep(0.5)
 
-        enemy_box = self.query_one("#enemy_box")
-        enemy_box.styles.offset = (-2, 0)
-        await asyncio.sleep(0.08)
-        enemy_box.styles.offset = (0, 0)
-        await asyncio.sleep(0.1)
-        
-        enemy_messages = self.engine.processar_turno_inimigo(self.inimigo)
-        for msg in enemy_messages:
-            self.log_message(msg)
-            await asyncio.sleep(0.5)
-        
-        self.update_character_panels()
+                self.update_character_panels()
 
-        if self.jogador.hp <= 0:
-            self.log_message("[b]Voce foi derrotado...[/b]")
-            await asyncio.sleep(1)
-            self.dismiss(False)
-            return
+                # Verificar se inimigo foi derrotado
+                if self.inimigo.hp <= 0:
+                    self.log_message(f"[b]{self.inimigo.nome} foi derrotado![/b]")
+                    await asyncio.sleep(1)
+                    self.dismiss(True)
+                    return
 
-        # --- Fim do Turno ---
-        turn_indicator.update("Sua Vez!")
-        for btn in self.query(Button):
-            btn.disabled = False
+            except Exception as e:
+                self.app.notify(f"Erro no turno do jogador: {str(e)}", timeout=5)
+                self._safe_enable_buttons()
+                return
+
+            # --- Turno do Inimigo ---
+            try:
+                turn_indicator.update(f"Vez de [b]{self.inimigo.nome}[/b]...")
+                await asyncio.sleep(1)
+
+                # Animação do inimigo
+                try:
+                    enemy_box = self.query_one("#enemy_box")
+                    enemy_box.styles.offset = (-2, 0)
+                    await asyncio.sleep(0.08)
+                    enemy_box.styles.offset = (0, 0)
+                    await asyncio.sleep(0.1)
+                except Exception:
+                    # Se a animação falhar, continuar sem ela
+                    pass
+
+                # Processar turno do inimigo
+                enemy_messages = self.engine.processar_turno_inimigo(self.inimigo)
+                for msg in enemy_messages:
+                    self.log_message(msg)
+                    await asyncio.sleep(0.5)
+
+                self.update_character_panels()
+
+                # Verificar se jogador foi derrotado
+                if self.jogador.hp <= 0:
+                    self.log_message("[b]Voce foi derrotado...[/b]")
+                    await asyncio.sleep(1)
+                    self.dismiss(False)
+                    return
+
+            except Exception as e:
+                self.app.notify(f"Erro no turno do inimigo: {str(e)}", timeout=5)
+                self._safe_enable_buttons()
+                return
+
+            # --- Fim do Turno ---
+            try:
+                turn_indicator.update("Sua Vez!")
+                self._safe_enable_buttons()
+            except Exception as e:
+                self.app.notify(f"Erro ao finalizar turno: {str(e)}", timeout=5)
+
+        except Exception as e:
+            # Capturar qualquer erro não tratado
+            self.app.notify(f"Erro crítico no combate: {str(e)}", timeout=10)
+            self._safe_enable_buttons()
+            self.log_message("[b]Erro no combate! Reabilitando controles...[/b]")
+
+    def _safe_enable_buttons(self):
+        """Reabilita botões de forma segura."""
+        try:
+            for btn in self.query(Button):
+                if hasattr(btn, 'disabled'):
+                    btn.disabled = False
+        except Exception:
+            # Se falhar, pelo menos tentar notificar o usuário
+            pass
 
     async def on_button_pressed(self, event: Button.Pressed) -> None:
         """Lida com cliques nos botões de ação."""
-        if event.button.id == "attack":
-            await self.processar_turno_completo("attack")
-        elif event.button.id == "item":
-            self.app.push_screen(ItemScreen(self.jogador), self.on_item_selected)
-        elif event.button.id == "skill":
-            self.app.push_screen(SkillScreen(self.jogador), self.on_skill_selected)
+        try:
+            if event.button.id == "attack":
+                await self.processar_turno_completo("attack")
+            elif event.button.id == "item":
+                try:
+                    self.app.push_screen(ItemScreen(self.jogador), self.on_item_selected)
+                except Exception as e:
+                    self.app.notify(f"Erro ao abrir inventário: {str(e)}", timeout=5)
+            elif event.button.id == "skill":
+                try:
+                    self.app.push_screen(SkillScreen(self.jogador), self.on_skill_selected)
+                except Exception as e:
+                    self.app.notify(f"Erro ao abrir habilidades: {str(e)}", timeout=5)
+        except Exception as e:
+            self.app.notify(f"Erro ao processar ação: {str(e)}", timeout=5)
+            self._safe_enable_buttons()
 
     async def on_item_selected(self, item_selecionado: str):
         """Callback: chamado quando a ItemScreen é fechada."""

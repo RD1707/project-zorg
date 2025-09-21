@@ -40,7 +40,6 @@ class NPCScreen(Screen):
 
     #npc_name {
         text-style: bold;
-        color: cyan;
         margin-bottom: 1;
     }
 
@@ -50,7 +49,6 @@ class NPCScreen(Screen):
     }
 
     #npc_greeting {
-        color: yellow;
         text-style: italic;
         margin-bottom: 1;
     }
@@ -113,7 +111,7 @@ class NPCScreen(Screen):
             # Seção de missões
             if self.npc.quests:
                 with Vertical(id="quests_section"):
-                    yield Static("📜 Missões:", classes="quest_header")
+                    yield Static("Missões:", classes="quest_header")
                     for quest in self.npc.quests:
                         quest_class = f"quest_{quest.status.value}"
                         status_icon = self._get_quest_status_icon(quest.status)
@@ -122,7 +120,7 @@ class NPCScreen(Screen):
                         if quest.status == QuestStatus.ACTIVE:
                             quest_info += f"\nProgresso: {quest.progress}/{quest.max_progress}"
                         elif quest.status == QuestStatus.COMPLETED:
-                            quest_info += "\n✅ Concluída!"
+                            quest_info += "\nConcluída!"
 
                         yield Static(quest_info, classes=f"quest_item {quest_class}")
 
@@ -131,12 +129,12 @@ class NPCScreen(Screen):
     def _get_quest_status_icon(self, status: QuestStatus) -> str:
         """Retorna o ícone apropriado para o status da missão."""
         icons = {
-            QuestStatus.AVAILABLE: "❗",
-            QuestStatus.ACTIVE: "⏳",
-            QuestStatus.COMPLETED: "✅",
-            QuestStatus.FAILED: "❌"
+            QuestStatus.AVAILABLE: "!",
+            QuestStatus.ACTIVE: "-",
+            QuestStatus.COMPLETED: "✓",
+            QuestStatus.FAILED: "X"
         }
-        return icons.get(status, "❓")
+        return icons.get(status, "?")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Lida com as opções de diálogo."""
@@ -216,7 +214,6 @@ class NPCLocationScreen(Screen):
     #location_header {
         text-align: center;
         text-style: bold;
-        color: cyan;
         margin-bottom: 2;
     }
 
@@ -239,11 +236,11 @@ class NPCLocationScreen(Screen):
     def compose(self) -> ComposeResult:
         """Cria os widgets da tela de localização."""
         location_names = {
-            "docas": "🚢 Docas do Porto",
-            "praca_central": "🏛️ Praça Central",
-            "taverna": "🍺 Taverna 'O Pescador Cansado'",
-            "entrada_cidade": "🚪 Portão da Cidade",
-            "biblioteca": "📚 Biblioteca Antiga"
+            "docas": "Docas do Porto",
+            "praca_central": "Praça Central",
+            "taverna": "Taverna 'O Pescador Cansado'",
+            "entrada_cidade": "Portão da Cidade",
+            "biblioteca": "Biblioteca Antiga"
         }
 
         location_title = location_names.get(self.location, self.location.title())
@@ -263,9 +260,9 @@ class NPCLocationScreen(Screen):
                         active_quests = npc.get_active_quests()
 
                         if available_quests:
-                            quest_indicator = " ❗"
+                            quest_indicator = " !"
                         elif active_quests:
-                            quest_indicator = " ⏳"
+                            quest_indicator = " -"
 
                         button_text = f"{npc.name}{quest_indicator}"
                         yield Button(button_text, id=f"npc_{npc.id}", variant="primary")

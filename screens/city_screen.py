@@ -26,7 +26,6 @@ class CityScreen(Screen):
         text-align: center;
         padding: 1 0;
         text-style: bold;
-        color: cyan;
     }
 
     #player_status_bar {
