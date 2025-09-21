@@ -47,6 +47,7 @@ class StoryScreen(Screen):
         self.story_segments = story_segments
         self.current_segment_index = 0
         self.is_typing = False
+        self.current_typing_task = None
 
     def compose(self) -> ComposeResult:
         """Cria os widgets da tela."""
@@ -61,7 +62,10 @@ class StoryScreen(Screen):
         Exibe o primeiro segmento da história.
         """
         if self.story_segments:
-            await self.type_text(self.story_segments[self.current_segment_index])
+            self.current_typing_task = asyncio.create_task(
+                self.type_text(self.story_segments[self.current_segment_index])
+            )
+            await self.current_typing_task
         else:
             # Se não houver história, simplesmente permite fechar
             self.query_one("#story_text", Static).update("...")
@@ -74,13 +78,20 @@ class StoryScreen(Screen):
         prompt = self.query_one("#prompt")
         prompt.visible = False
         story_text_widget.update("") # Limpa o texto anterior
-        
-        for char in text:
-            story_text_widget.update(story_text_widget.render() + char)
-            await asyncio.sleep(0.025) # Ajuste este valor para mudar a velocidade
-        
+
+        try:
+            current_text = ""
+            for char in text:
+                current_text += char
+                story_text_widget.update(current_text)
+                await asyncio.sleep(0.025) # Ajuste este valor para mudar a velocidade
+        except asyncio.CancelledError:
+            # Se foi cancelado, mostra o texto completo imediatamente
+            story_text_widget.update(text)
+
         prompt.visible = True
         self.is_typing = False
+        self.current_typing_task = None
 
     async def action_advance_story(self) -> None:
         """
@@ -88,15 +99,18 @@ class StoryScreen(Screen):
         Avança para o próximo segmento da história.
         """
         # Se o texto ainda está a ser escrito, completa-o imediatamente
-        if self.is_typing:
-            # Esta é uma simplificação. A implementação completa exigiria
-            # cancelar a tarefa de digitação e mostrar o texto completo.
-            # Por agora, vamos manter simples e não fazer nada.
+        if self.is_typing and self.current_typing_task:
+            self.current_typing_task.cancel()
+            # Aguarda um pouco para que o texto seja completado
+            await asyncio.sleep(0.1)
             return
 
         self.current_segment_index += 1
-        
+
         if self.current_segment_index < len(self.story_segments):
-            await self.type_text(self.story_segments[self.current_segment_index])
+            self.current_typing_task = asyncio.create_task(
+                self.type_text(self.story_segments[self.current_segment_index])
+            )
+            await self.current_typing_task
         else:
             self.dismiss()

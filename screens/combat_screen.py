@@ -56,10 +56,7 @@ class CombatScreen(Screen):
     }
 
     #combat_log {
-        width: 90%;
-        height: 70%;
-        border: round #555;
-        margin-bottom: 1;
+        display: none;
     }
     
     #turn_indicator {
@@ -72,15 +69,24 @@ class CombatScreen(Screen):
     #action_buttons {
         width: 90%;
         height: auto;
-        layout: grid;
-        grid-size: 3;
-        grid-gutter: 1;
+        layout: horizontal;
+        align: center middle;
     }
-    
+
     Button {
-        width: 100%;
+        width: 1fr;
+        height: 3;
+        margin: 0 1;
+        background: #1e1e1e;
+        color: white;
+        border: tall #555;
     }
-    
+
+    Button:hover {
+        background: #333;
+        border: tall white;
+    }
+
     Button.-disabled {
         background: #333;
         color: #555;
@@ -95,13 +101,26 @@ class CombatScreen(Screen):
         self.inimigo = inimigo
 
     def _create_bar(self, current: int, maximum: int, bar_type: str) -> str:
-        """Cria uma barra de texto monocromatica para representar HP, MP, etc."""
+        """Cria uma barra de texto com bordas para representar HP, MP, etc."""
         percent = current / maximum if maximum > 0 else 0
         width = 15  # Largura da barra em caracteres
         filled_width = int(percent * width)
-        # Usando apenas caracteres ASCII simples em tons de cinza
-        bar = "█" * filled_width + "░" * (width - filled_width)
-        return f"{bar} {current}/{maximum}"
+
+        # Diferentes estilos de borda para HP e MP
+        if bar_type == "hp":
+            # Barra de HP com borda vermelha
+            bar_content = "█" * filled_width + "░" * (width - filled_width)
+            bordered_bar = f"[red]│[/red]{bar_content}[red]│[/red]"
+        elif bar_type == "mp":
+            # Barra de MP com borda azul
+            bar_content = "█" * filled_width + "░" * (width - filled_width)
+            bordered_bar = f"[blue]│[/blue]{bar_content}[blue]│[/blue]"
+        else:
+            # Padrão para outros tipos (inimigos)
+            bar_content = "█" * filled_width + "░" * (width - filled_width)
+            bordered_bar = f"[white]│[/white]{bar_content}[white]│[/white]"
+
+        return f"{bordered_bar} {current}/{maximum}"
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="combat_layout"):

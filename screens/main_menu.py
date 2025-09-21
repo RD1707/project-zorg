@@ -6,7 +6,6 @@ from textual.binding import Binding
 
 from .story_screen import StoryScreen
 from .game_screen import GameScreen
-from .character_creation_screen import CharacterCreationScreen
 
 # Arte ASCII para o título.
 ZORG_TITLE = r"""
@@ -110,7 +109,18 @@ class MainMenuScreen(Screen):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Chamado quando um botão é pressionado."""
         if event.button.id == "new_game":
-            self.app.push_screen(CharacterCreationScreen(), self._handle_character_creation)
+            # Criar personagem Manu diretamente sem tela de criação
+            character_data = {
+                "nome": "Manu",
+                "hp_max": 50,
+                "mp_max": 20,
+                "ataque_base": 7,
+                "defesa_base": 2,
+                "nivel": 1,
+                "xp": 0,
+                "xp_proximo_nivel": 100
+            }
+            self._handle_character_creation(character_data)
             
         elif event.button.id == "load_game":
             sucesso = self.app.engine.load_game_state()
