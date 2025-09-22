@@ -1,16 +1,18 @@
 import asyncio
+
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import Horizontal, Vertical, Container
+from textual.containers import Container, Horizontal, Vertical
 from textual.screen import Screen
 from textual.widgets import Button, RichLog, Static
 
-from core.models import Personagem
 from core.engine import GameEngine
+from core.models import Personagem
 
 # Importa as telas modais que o combate pode chamar
 from .item_screen import ItemScreen
 from .skill_screen import SkillScreen
+
 
 class CombatScreen(Screen):
     """A tela principal onde o combate do jogo acontece."""
@@ -50,7 +52,7 @@ class CombatScreen(Screen):
     #player_box {
         border-title-align: center;
     }
-    
+
     #enemy_box {
         border-title-align: center;
     }
@@ -58,7 +60,7 @@ class CombatScreen(Screen):
     #combat_log {
         display: none;
     }
-    
+
     #turn_indicator {
         width: 90%;
         text-align: center;
@@ -135,7 +137,7 @@ class CombatScreen(Screen):
                     yield Button("Atacar (A)", id="attack", variant="primary")
                     yield Button("Habilidade (H)", id="skill", variant="warning")
                     yield Button("Item (I)", id="item", variant="success")
-    
+
     def on_mount(self) -> None:
         self.update_character_panels()
         self.log_message(f"Um [b]{self.inimigo.nome}[/b] selvagem aparece!")
@@ -144,7 +146,7 @@ class CombatScreen(Screen):
         # --- Painel do Jogador ---
         hp_bar = self._create_bar(self.jogador.hp, self.jogador.hp_max, "hp")
         mp_bar = self._create_bar(self.jogador.mp, self.jogador.mp_max, "mp")
-        
+
         player_status = ""
         if self.jogador.turnos_veneno > 0:
             player_status += f"Envenenado ({self.jogador.turnos_veneno}t) "
@@ -165,8 +167,10 @@ Ataque: {self.jogador.ataque_total}   Defesa: {self.jogador.defesa_total}{player
         player_box.mount(Static(player_content))
 
         # --- Painel do Inimigo ---
-        enemy_hp_bar = self._create_bar(self.inimigo.hp, self.inimigo.hp_max, "enemy_hp")
-        
+        enemy_hp_bar = self._create_bar(
+            self.inimigo.hp, self.inimigo.hp_max, "enemy_hp"
+        )
+
         enemy_status = ""
         if self.inimigo.turnos_veneno > 0:
             enemy_status += f"Envenenado ({self.inimigo.turnos_veneno}t)"
@@ -182,7 +186,7 @@ Ataque: {self.inimigo.ataque_total}   Defesa: {self.inimigo.defesa_total}{enemy_
         enemy_box.border_title = self.inimigo.nome
         enemy_box.remove_children()
         enemy_box.mount(Static(enemy_content))
-    
+
     def log_message(self, message: str):
         self.query_one(RichLog).write(message)
 
@@ -201,7 +205,7 @@ Ataque: {self.inimigo.ataque_total}   Defesa: {self.inimigo.defesa_total}{enemy_
             try:
                 turn_indicator.update("Sua Vez!")
                 for btn in self.query(Button):
-                    if hasattr(btn, 'disabled'):
+                    if hasattr(btn, "disabled"):
                         btn.disabled = True
 
                 # Animação de ataque se necessário
@@ -212,12 +216,14 @@ Ataque: {self.inimigo.ataque_total}   Defesa: {self.inimigo.defesa_total}{enemy_
                         await asyncio.sleep(0.08)
                         player_box.styles.offset = (0, 0)
                         await asyncio.sleep(0.1)
-                    except Exception as e:
+                    except Exception:
                         # Se a animação falhar, continuar sem ela
                         pass
 
                 # Processar turno do jogador
-                player_messages = self.engine.processar_turno_jogador(acao, self.inimigo, **kwargs)
+                player_messages = self.engine.processar_turno_jogador(
+                    acao, self.inimigo, **kwargs
+                )
                 for msg in player_messages:
                     self.log_message(msg)
                     await asyncio.sleep(0.5)
@@ -289,7 +295,7 @@ Ataque: {self.inimigo.ataque_total}   Defesa: {self.inimigo.defesa_total}{enemy_
         """Reabilita botões de forma segura."""
         try:
             for btn in self.query(Button):
-                if hasattr(btn, 'disabled'):
+                if hasattr(btn, "disabled"):
                     btn.disabled = False
         except Exception:
             # Se falhar, pelo menos tentar notificar o usuário
@@ -302,12 +308,16 @@ Ataque: {self.inimigo.ataque_total}   Defesa: {self.inimigo.defesa_total}{enemy_
                 await self.processar_turno_completo("attack")
             elif event.button.id == "item":
                 try:
-                    self.app.push_screen(ItemScreen(self.jogador), self.on_item_selected)
+                    self.app.push_screen(
+                        ItemScreen(self.jogador), self.on_item_selected
+                    )
                 except Exception as e:
                     self.app.notify(f"Erro ao abrir inventário: {str(e)}", timeout=5)
             elif event.button.id == "skill":
                 try:
-                    self.app.push_screen(SkillScreen(self.jogador), self.on_skill_selected)
+                    self.app.push_screen(
+                        SkillScreen(self.jogador), self.on_skill_selected
+                    )
                 except Exception as e:
                     self.app.notify(f"Erro ao abrir habilidades: {str(e)}", timeout=5)
         except Exception as e:
@@ -321,19 +331,21 @@ Ataque: {self.inimigo.ataque_total}   Defesa: {self.inimigo.defesa_total}{enemy_
             await self.processar_turno_completo("item", item_name=item_nome_real)
         else:
             self.log_message("Você decidiu não usar um item.")
-    
+
     async def on_skill_selected(self, habilidade_selecionada: str):
         """Callback: chamado quando a SkillScreen é fechada."""
         if habilidade_selecionada:
             habilidade_nome_real = habilidade_selecionada.replace("_", " ")
-            await self.processar_turno_completo("skill", skill_name=habilidade_nome_real)
+            await self.processar_turno_completo(
+                "skill", skill_name=habilidade_nome_real
+            )
         else:
             self.log_message("Você decidiu não usar uma habilidade.")
-            
+
     def action_attack(self):
         if not self.query_one("#attack", Button).disabled:
             self.query_one("#attack", Button).press()
-    
+
     def action_item(self):
         if not self.query_one("#item", Button).disabled:
             self.query_one("#item", Button).press()

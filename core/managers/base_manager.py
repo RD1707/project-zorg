@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
-import logging
+from typing import Any, Dict
 
 from utils.logging_config import get_logger
 

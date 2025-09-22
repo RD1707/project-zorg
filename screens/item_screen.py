@@ -1,11 +1,12 @@
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import VerticalScroll, Horizontal, Vertical
+from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.screen import Screen
-from textual.widgets import Button, Static, TabbedContent, TabPane, Input
+from textual.widgets import Button, Input, Static, TabbedContent, TabPane
 
 from core.models import Personagem
 from data.items import DB_ITENS
+
 
 class ItemScreen(Screen):
     """Uma tela modal para selecionar um item do inventário em combate."""
@@ -115,8 +116,12 @@ class ItemScreen(Screen):
                 yield Input(placeholder="Buscar item...", id="filter_input")
                 with Horizontal(classes="filter_buttons"):
                     yield Button("Todos", id="filter_all", variant="primary")
-                    yield Button("Consumíveis", id="filter_consumable", variant="default")
-                    yield Button("Equipamentos", id="filter_equipment", variant="default")
+                    yield Button(
+                        "Consumíveis", id="filter_consumable", variant="default"
+                    )
+                    yield Button(
+                        "Equipamentos", id="filter_equipment", variant="default"
+                    )
                     yield Button("Cura", id="filter_healing", variant="default")
 
             with TabbedContent():
@@ -136,12 +141,19 @@ class ItemScreen(Screen):
         inventory_list.remove_children()
 
         if not self.jogador.inventario:
-            inventory_list.mount(Static("Seu inventário está vazio.", classes="message"))
+            inventory_list.mount(
+                Static("Seu inventário está vazio.", classes="message")
+            )
         else:
             filtered_items = self.filter_items(self.jogador.inventario)
 
             if not filtered_items:
-                inventory_list.mount(Static("Nenhum item encontrado com os filtros atuais.", classes="message"))
+                inventory_list.mount(
+                    Static(
+                        "Nenhum item encontrado com os filtros atuais.",
+                        classes="message",
+                    )
+                )
             else:
                 for item in filtered_items:
                     item_template = DB_ITENS.get(item.nome)
@@ -156,7 +168,7 @@ class ItemScreen(Screen):
         equipment_slots = [
             ("Arma", self.jogador.arma_equipada),
             ("Armadura", self.jogador.armadura_equipada),
-            ("Escudo", self.jogador.escudo_equipada)
+            ("Escudo", self.jogador.escudo_equipada),
         ]
 
         has_equipment = False
@@ -166,24 +178,42 @@ class ItemScreen(Screen):
                 self.create_equipment_row(equipped_list, slot_name, equipment)
 
         if not has_equipment:
-            equipped_list.mount(Static("Nenhum equipamento equipado.", classes="message"))
+            equipped_list.mount(
+                Static("Nenhum equipamento equipado.", classes="message")
+            )
 
     def create_item_row(self, container, item, item_template, is_inventory=True):
         """Cria uma linha de item com informações detalhadas."""
         with container:
             with Horizontal(classes="item_row"):
                 with Vertical(classes="item_info"):
-                    yield Static(f"{item.nome} (x{item.quantidade})", classes="item_name")
+                    yield Static(
+                        f"{item.nome} (x{item.quantidade})", classes="item_name"
+                    )
                     yield Static(item_template.descricao, classes="item_description")
                     yield Static(f"Tipo: {item_template.tipo}", classes="item_type")
 
                 with Vertical(classes="item_details"):
-                    if hasattr(item_template, 'valor_cura') and item_template.valor_cura > 0:
-                        yield Static(f"Cura: {item_template.valor_cura} HP", classes="item_stat")
-                    if hasattr(item_template, 'valor_mp') and item_template.valor_mp > 0:
-                        yield Static(f"MP: +{item_template.valor_mp}", classes="item_stat")
+                    if (
+                        hasattr(item_template, "valor_cura")
+                        and item_template.valor_cura > 0
+                    ):
+                        yield Static(
+                            f"Cura: {item_template.valor_cura} HP", classes="item_stat"
+                        )
+                    if (
+                        hasattr(item_template, "valor_mp")
+                        and item_template.valor_mp > 0
+                    ):
+                        yield Static(
+                            f"MP: +{item_template.valor_mp}", classes="item_stat"
+                        )
                     if is_inventory:
-                        yield Button("Usar", id=f"use_{item.nome.replace(' ', '_')}", variant="success")
+                        yield Button(
+                            "Usar",
+                            id=f"use_{item.nome.replace(' ', '_')}",
+                            variant="success",
+                        )
 
     def create_equipment_row(self, container, slot_name, equipment):
         """Cria uma linha de equipamento com estatísticas."""
@@ -195,9 +225,13 @@ class ItemScreen(Screen):
 
                 with Vertical(classes="item_details"):
                     if equipment.bonus_ataque > 0:
-                        yield Static(f"Ataque: +{equipment.bonus_ataque}", classes="item_stat")
+                        yield Static(
+                            f"Ataque: +{equipment.bonus_ataque}", classes="item_stat"
+                        )
                     if equipment.bonus_defesa > 0:
-                        yield Static(f"Defesa: +{equipment.bonus_defesa}", classes="item_stat")
+                        yield Static(
+                            f"Defesa: +{equipment.bonus_defesa}", classes="item_stat"
+                        )
 
     def filter_items(self, items):
         """Filtra itens baseado no filtro atual e texto de busca."""
@@ -205,7 +239,11 @@ class ItemScreen(Screen):
 
         # Filtrar por texto
         if self.filter_text:
-            filtered = [item for item in filtered if self.filter_text.lower() in item.nome.lower()]
+            filtered = [
+                item
+                for item in filtered
+                if self.filter_text.lower() in item.nome.lower()
+            ]
 
         # Filtrar por categoria
         if self.current_filter != "all":
@@ -213,11 +251,22 @@ class ItemScreen(Screen):
             for item in items:
                 item_template = DB_ITENS.get(item.nome)
                 if item_template:
-                    if self.current_filter == "consumable" and item_template.tipo == "Consumível":
+                    if (
+                        self.current_filter == "consumable"
+                        and item_template.tipo == "Consumível"
+                    ):
                         filtered.append(item)
-                    elif self.current_filter == "equipment" and item_template.tipo in ["Arma", "Armadura", "Escudo"]:
+                    elif self.current_filter == "equipment" and item_template.tipo in [
+                        "Arma",
+                        "Armadura",
+                        "Escudo",
+                    ]:
                         filtered.append(item)
-                    elif self.current_filter == "healing" and hasattr(item_template, 'valor_cura') and item_template.valor_cura > 0:
+                    elif (
+                        self.current_filter == "healing"
+                        and hasattr(item_template, "valor_cura")
+                        and item_template.valor_cura > 0
+                    ):
                         filtered.append(item)
 
         return filtered

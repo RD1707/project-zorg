@@ -6,6 +6,7 @@ from textual.widgets import Button, Static
 
 from core.models import Personagem
 
+
 class SkillScreen(Screen):
     """Uma tela modal para selecionar uma habilidade em combate."""
 
@@ -40,7 +41,7 @@ class SkillScreen(Screen):
         width: 100%;
         margin-top: 1;
     }
-    
+
     Button.-disabled {
         background: #333;
         color: #555;
@@ -57,19 +58,19 @@ class SkillScreen(Screen):
         """Cria os widgets da tela."""
         with VerticalScroll(id="skill_list_container"):
             yield Static("--- HABILIDADES ---", id="skill_list_title")
-            
+
             if not self.jogador.habilidades_conhecidas:
                 yield Static("Você não conhece nenhuma habilidade.")
             else:
                 for habilidade in self.jogador.habilidades_conhecidas:
                     # Verifica se o jogador tem MP suficiente para usar a habilidade
                     tem_mp_suficiente = self.jogador.mp >= habilidade.custo_mp
-                    
+
                     yield Button(
-                        f"{habilidade.nome} (Custo: {habilidade.custo_mp} MP)", 
-                        id=habilidade.nome.replace(" ", "_"), 
+                        f"{habilidade.nome} (Custo: {habilidade.custo_mp} MP)",
+                        id=habilidade.nome.replace(" ", "_"),
                         variant="warning",
-                        disabled=not tem_mp_suficiente # Desativa o botão se não houver MP
+                        disabled=not tem_mp_suficiente,  # Desativa o botão se não houver MP
                     )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:

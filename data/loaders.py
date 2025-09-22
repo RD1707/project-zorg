@@ -2,12 +2,19 @@
 Sistema de carregamento de dados JSON para o jogo ZORG.
 Mantém compatibilidade com o sistema Python existente.
 """
+
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional
-from copy import deepcopy
+from typing import Any, Dict
 
-from core.models import Personagem, Item, Habilidade, TipoHabilidade, Equipamento, TipoEquipamento
+from core.models import (
+    Equipamento,
+    Habilidade,
+    Item,
+    Personagem,
+    TipoEquipamento,
+    TipoHabilidade,
+)
 from utils.logging_config import get_logger
 
 logger = get_logger("data_loaders")
@@ -27,7 +34,7 @@ class DataLoader:
 
         file_path = self.data_dir / filename
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 self._cache[filename] = data
                 logger.debug(f"Loaded JSON data from {filename}")
@@ -51,6 +58,7 @@ class DataLoader:
                 for skill_name in enemy_data.get("habilidades_conhecidas", []):
                     # Importação tardia para evitar dependência circular
                     from data.abilities import DB_HABILIDADES
+
                     if skill_name in DB_HABILIDADES:
                         habilidades.append(DB_HABILIDADES[skill_name])
 
@@ -63,7 +71,7 @@ class DataLoader:
                     xp_dado=enemy_data["xp_dado"],
                     ouro_dado=enemy_data["ouro_dado"],
                     dano_por_turno_veneno=enemy_data.get("dano_por_turno_veneno", 0),
-                    habilidades_conhecidas=habilidades
+                    habilidades_conhecidas=habilidades,
                 )
 
                 enemies[enemy_id] = enemy
@@ -89,7 +97,7 @@ class DataLoader:
                     cura_veneno=item_data["cura_veneno"],
                     preco_venda=item_data["preco_venda"],
                     stack_max=item_data.get("stack_max", 99),
-                    categoria=item_data.get("tipo", "consumível")
+                    categoria=item_data.get("tipo", "consumível"),
                 )
 
                 # Adicionar propriedades extras do JSON
@@ -97,7 +105,7 @@ class DataLoader:
                 item.rarity = item_data.get("rarity", "common")
                 item.effects = item_data.get("effects", [])
                 item.valor_cura = item_data["cura_hp"]  # Alias para compatibilidade
-                item.valor_mp = item_data["cura_mp"]    # Alias para compatibilidade
+                item.valor_mp = item_data["cura_mp"]  # Alias para compatibilidade
 
                 items[item_id] = item
 
@@ -134,7 +142,7 @@ class DataLoader:
                     valor_efeito=ability_data["valor_efeito"],
                     cooldown=ability_data.get("cooldown", 0),
                     nivel_requerido=ability_data.get("nivel_requerido", 1),
-                    elemento=ability_data.get("elemento", "neutro")
+                    elemento=ability_data.get("elemento", "neutro"),
                 )
 
                 # Adicionar propriedades extras do JSON
@@ -162,7 +170,7 @@ class DataLoader:
                     "arma": TipoEquipamento.ARMA,
                     "armadura": TipoEquipamento.ARMADURA,
                     "escudo": TipoEquipamento.ESCUDO,
-                    "acessorio": TipoEquipamento.ACESSORIO
+                    "acessorio": TipoEquipamento.ACESSORIO,
                 }
 
                 equip = Equipamento(
@@ -172,7 +180,7 @@ class DataLoader:
                     bonus_defesa=equip_data["bonus_defesa"],
                     descricao=equip_data["descricao"],
                     preco=equip_data["preco"],
-                    raridade=equip_data["raridade"]
+                    raridade=equip_data["raridade"],
                 )
 
                 # Adicionar propriedades extras do JSON
@@ -230,10 +238,10 @@ def create_hybrid_databases():
 
     # Importar dados Python existentes
     try:
-        from data.enemies import DB_INIMIGOS as python_enemies
-        from data.items import DB_ITENS as python_items
         from data.abilities import DB_HABILIDADES as python_abilities
+        from data.enemies import DB_INIMIGOS as python_enemies
         from data.equipment import DB_EQUIPAMENTOS as python_equipment
+        from data.items import DB_ITENS as python_items
     except ImportError:
         python_enemies = {}
         python_items = {}
@@ -246,9 +254,11 @@ def create_hybrid_databases():
     hybrid_abilities = {**python_abilities, **json_abilities}
     hybrid_equipment = {**python_equipment, **json_equipment}
 
-    logger.info(f"Created hybrid databases: {len(hybrid_enemies)} enemies, "
-                f"{len(hybrid_items)} items, {len(hybrid_abilities)} abilities, "
-                f"{len(hybrid_equipment)} equipment")
+    logger.info(
+        f"Created hybrid databases: {len(hybrid_enemies)} enemies, "
+        f"{len(hybrid_items)} items, {len(hybrid_abilities)} abilities, "
+        f"{len(hybrid_equipment)} equipment"
+    )
 
     return hybrid_enemies, hybrid_items, hybrid_abilities, hybrid_equipment
 
@@ -300,7 +310,9 @@ def validate_json_data():
             if enemy.hp_max <= 0:
                 errors.append(f"Enemy {enemy_name} has invalid HP: {enemy.hp_max}")
             if enemy.ataque_base < 0:
-                errors.append(f"Enemy {enemy_name} has invalid attack: {enemy.ataque_base}")
+                errors.append(
+                    f"Enemy {enemy_name} has invalid attack: {enemy.ataque_base}"
+                )
     except Exception as e:
         errors.append(f"Error validating enemies: {e}")
 
@@ -309,9 +321,13 @@ def validate_json_data():
         items = loader.load_items()
         for item_name, item in items.items():
             if item.cura_hp < 0:
-                errors.append(f"Item {item_name} has invalid HP healing: {item.cura_hp}")
+                errors.append(
+                    f"Item {item_name} has invalid HP healing: {item.cura_hp}"
+                )
             if item.preco_venda < 0:
-                errors.append(f"Item {item_name} has invalid sell price: {item.preco_venda}")
+                errors.append(
+                    f"Item {item_name} has invalid sell price: {item.preco_venda}"
+                )
     except Exception as e:
         errors.append(f"Error validating items: {e}")
 
@@ -320,9 +336,13 @@ def validate_json_data():
         abilities = loader.load_abilities()
         for ability_name, ability in abilities.items():
             if ability.custo_mp < 0:
-                errors.append(f"Ability {ability_name} has invalid MP cost: {ability.custo_mp}")
+                errors.append(
+                    f"Ability {ability_name} has invalid MP cost: {ability.custo_mp}"
+                )
             if ability.nivel_requerido <= 0:
-                errors.append(f"Ability {ability_name} has invalid level requirement: {ability.nivel_requerido}")
+                errors.append(
+                    f"Ability {ability_name} has invalid level requirement: {ability.nivel_requerido}"
+                )
     except Exception as e:
         errors.append(f"Error validating abilities: {e}")
 
@@ -331,11 +351,17 @@ def validate_json_data():
         equipment = loader.load_equipment()
         for equip_name, equip in equipment.items():
             if equip.bonus_ataque < 0:
-                errors.append(f"Equipment {equip_name} has invalid attack bonus: {equip.bonus_ataque}")
+                errors.append(
+                    f"Equipment {equip_name} has invalid attack bonus: {equip.bonus_ataque}"
+                )
             if equip.bonus_defesa < 0:
-                errors.append(f"Equipment {equip_name} has invalid defense bonus: {equip.bonus_defesa}")
+                errors.append(
+                    f"Equipment {equip_name} has invalid defense bonus: {equip.bonus_defesa}"
+                )
             if equip.preco < 0:
-                errors.append(f"Equipment {equip_name} has invalid price: {equip.preco}")
+                errors.append(
+                    f"Equipment {equip_name} has invalid price: {equip.preco}"
+                )
     except Exception as e:
         errors.append(f"Error validating equipment: {e}")
 

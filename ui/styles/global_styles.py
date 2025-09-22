@@ -7,29 +7,26 @@ Sistema de cores limitado a preto, branco e tons de cinza.
 # === CORES MONOCROMATICAS ===
 COLORS = {
     # Cores principais
-    "background": "#000000",        # Preto puro
-    "surface": "#1a1a1a",          # Cinza muito escuro
+    "background": "#000000",  # Preto puro
+    "surface": "#1a1a1a",  # Cinza muito escuro
     "surface_variant": "#2d2d2d",  # Cinza escuro
-    "border": "#555555",           # Cinza medio
-    "border_active": "#777777",    # Cinza medio claro
-
+    "border": "#555555",  # Cinza medio
+    "border_active": "#777777",  # Cinza medio claro
     # Texto
-    "text_primary": "#ffffff",     # Branco puro
-    "text_secondary": "#cccccc",   # Cinza claro
-    "text_disabled": "#888888",    # Cinza medio
-
+    "text_primary": "#ffffff",  # Branco puro
+    "text_secondary": "#cccccc",  # Cinza claro
+    "text_disabled": "#888888",  # Cinza medio
     # Estados - todos em tons de cinza
-    "success": "#aaaaaa",          # Cinza claro (era verde)
-    "warning": "#cccccc",          # Cinza muito claro (era laranja)
-    "error": "#999999",            # Cinza medio (era vermelho)
-    "info": "#bbbbbb",             # Cinza claro (era azul)
-
+    "success": "#aaaaaa",  # Cinza claro (era verde)
+    "warning": "#cccccc",  # Cinza muito claro (era laranja)
+    "error": "#999999",  # Cinza medio (era vermelho)
+    "info": "#bbbbbb",  # Cinza claro (era azul)
     # Elementos especiais - tons de cinza
-    "accent": "#dddddd",           # Cinza muito claro (era ciano)
-    "highlight": "#eeeeee",        # Quase branco (era amarelo)
-    "hp_color": "#aaaaaa",         # Cinza claro (era verde)
-    "mp_color": "#bbbbbb",         # Cinza claro (era azul)
-    "xp_color": "#cccccc",         # Cinza muito claro (era amarelo)
+    "accent": "#dddddd",  # Cinza muito claro (era ciano)
+    "highlight": "#eeeeee",  # Quase branco (era amarelo)
+    "hp_color": "#aaaaaa",  # Cinza claro (era verde)
+    "mp_color": "#bbbbbb",  # Cinza claro (era azul)
+    "xp_color": "#cccccc",  # Cinza muito claro (era amarelo)
 }
 
 # === DIMENSOES ===
@@ -331,7 +328,6 @@ COMPONENT_STYLES = {
         padding: {SIZES["padding_medium"]};
     }}
     """,
-
     "status_display": f"""
     .status_row {{
         height: 3;
@@ -350,7 +346,6 @@ COMPONENT_STYLES = {
         text-style: bold;
     }}
     """,
-
     "dialog_box": f"""
     .dialog_container {{
         width: 80%;
@@ -372,7 +367,6 @@ COMPONENT_STYLES = {
         margin-bottom: {SIZES["margin_medium"]};
     }}
     """,
-
     "menu_list": f"""
     .menu_container {{
         width: 60%;
@@ -389,21 +383,26 @@ COMPONENT_STYLES = {
     """,
 }
 
+
 def get_global_css() -> str:
     """Retorna o CSS global completo."""
     return GLOBAL_CSS
+
 
 def get_component_css(component_name: str) -> str:
     """Retorna o CSS de um componente especifico."""
     return COMPONENT_STYLES.get(component_name, "")
 
+
 def get_all_component_css() -> str:
     """Retorna todos os estilos de componentes combinados."""
     return "\n".join(COMPONENT_STYLES.values())
 
+
 def get_color(color_name: str) -> str:
     """Retorna uma cor especifica."""
     return COLORS.get(color_name, "#ffffff")
+
 
 def get_size(size_name: str) -> str:
     """Retorna um tamanho especifico."""

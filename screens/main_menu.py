@@ -1,23 +1,22 @@
 from textual.app import ComposeResult
+from textual.containers import Vertical
 from textual.screen import Screen
 from textual.widgets import Button, Static
-from textual.containers import Vertical
-from textual.binding import Binding
 
-from .story_screen import StoryScreen
 from .game_screen import GameScreen
+from .story_screen import StoryScreen
 
 # Arte ASCII para o título.
 ZORG_TITLE = r"""
-   .-') _             _  .-')               
-  (  OO) )           ( \( -O )              
-,(_)----. .-'),-----. ,------.   ,----.     
-|       |( OO'  .-.  '|   /`. ' '  .-./-')  
-'--.   / /   |  | |  ||  /  | | |  |_( O- ) 
-(_/   /  \_) |  |\|  ||  |_.' | |  | .--, \ 
- /   /___  \ |  | |  ||  .  '.'(|  | '. (_/ 
-|        |  `'  '-'  '|  |\  \  |  '--'  |  
-`--------'    `-----' `--' '--'  `------'   
+   .-') _             _  .-')
+  (  OO) )           ( \( -O )
+,(_)----. .-'),-----. ,------.   ,----.
+|       |( OO'  .-.  '|   /`. ' '  .-./-')
+'--.   / /   |  | |  ||  /  | | |  |_( O- )
+(_/   /  \_) |  |\|  ||  |_.' | |  | .--, \
+ /   /___  \ |  | |  ||  .  '.'(|  | '. (_/
+|        |  `'  '-'  '|  |\  \  |  '--'  |
+`--------'    `-----' `--' '--'  `------'
 """
 
 # A história de introdução do jogo.
@@ -26,15 +25,15 @@ STORY_INTRODUCTION = [
     "Seu amor era como um algoritmo perfeito - sem bugs, sem falhas, sem fim. Mas nas sombras, o feiticeiro Zorg observava com inveja corrosiva. Seu coracao era um void - vazio, corrompido, incapaz de amar.",
     "'Se eu nao posso ter amor', ele sussurrou, 'ninguem pode ter.' Em uma noite sem lua, Zorg atacou. Com magia negra, ele aprisionou Ramon num loop infinito no topo da temível Torre do Ponteiro Nulo.",
     "Com o coracao despedaçado mas o espirito inabalavel, Manuella ergue-se. Nao mais apenas uma artesa. Ela é agora uma HEROINA. E nada vai impedi-la de reescrever este destino cruel.",
-    "A jornada começa AGORA."
+    "A jornada começa AGORA.",
 ]
 
 
 class MainMenuScreen(Screen):
     """A tela do menu principal do jogo, com um design aprimorado e minimalista."""
-    
+
     # BINDINGS e Footer foram removidos para uma interface mais limpa.
-    
+
     CSS = """
     MainMenuScreen {
         align: center middle;
@@ -78,14 +77,13 @@ class MainMenuScreen(Screen):
         border: tall #222222;
     }
     
-    Button:hover {
-        background: #222222;
-        border: tall white;
-        color: white;
-    }
+        Button:hover {
+            background: #222222;
+            border: tall white;
+            color: white;
+        }
     
-    #quit {
-        display: none;
+        #quit {        display: none;
     }
     """
 
@@ -94,11 +92,13 @@ class MainMenuScreen(Screen):
         with Vertical(id="main_menu_container"):
             yield Static(ZORG_TITLE, id="title")
             yield Static("Onde o código encontra a coragem.", id="subtitle")
-            
+
             with Vertical(id="menu"):
                 yield Button("Novo Jogo", id="new_game", variant="primary")
                 yield Button("Carregar Jogo", id="load_game", variant="default")
-                yield Button("Salvar Jogo", id="save_game", variant="success", disabled=True)
+                yield Button(
+                    "Salvar Jogo", id="save_game", variant="success", disabled=True
+                )
                 yield Button("Configurações", id="settings", variant="default")
 
     def on_mount(self) -> None:
@@ -118,27 +118,33 @@ class MainMenuScreen(Screen):
                 "defesa_base": 2,
                 "nivel": 1,
                 "xp": 0,
-                "xp_proximo_nivel": 100
+                "xp_proximo_nivel": 100,
             }
             self._handle_character_creation(character_data)
-            
+
         elif event.button.id == "load_game":
             sucesso = self.app.engine.load_game_state()
             if sucesso:
                 self.app.notify("Jogo carregado com sucesso!")
                 self.start_game(None)
             else:
-                self.app.notify("[b]Erro:[/b] Nenhum jogo salvo encontrado ou o ficheiro esta corrompido.", timeout=5)
+                self.app.notify(
+                    "[b]Erro:[/b] Nenhum jogo salvo encontrado ou o ficheiro esta corrompido.",
+                    timeout=5,
+                )
 
         elif event.button.id == "save_game":
             sucesso = self.app.engine.save_game_state()
             if sucesso:
                 self.app.notify("Jogo salvo com sucesso!")
             else:
-                self.app.notify("[b]Erro:[/b] Nao foi possivel salvar o jogo.", timeout=5)
+                self.app.notify(
+                    "[b]Erro:[/b] Nao foi possivel salvar o jogo.", timeout=5
+                )
 
         elif event.button.id == "settings":
             from .settings_screen import SettingsScreen
+
             self.app.push_screen(SettingsScreen())
 
     def _handle_character_creation(self, character_data):

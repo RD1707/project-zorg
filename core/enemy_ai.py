@@ -1,10 +1,11 @@
 """
 Sistema de IA para inimigos com comportamentos definidos em JSON.
 """
+
 import random
-from typing import Dict, List, Any, Optional
-from enum import Enum
 from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 from utils.logging_config import get_logger
 
@@ -94,7 +95,7 @@ class EnemyAI:
                 pattern = AIPattern(
                     condition=pattern_data["condition"],
                     actions=pattern_data["actions"],
-                    weight=pattern_data.get("weight", 1.0)
+                    weight=pattern_data.get("weight", 1.0),
                 )
                 patterns.append(pattern)
 
@@ -104,7 +105,7 @@ class EnemyAI:
                 condition = AISpecialCondition(
                     trigger=cond_data["trigger"],
                     action=cond_data["action"],
-                    text=cond_data["text"]
+                    text=cond_data["text"],
                 )
                 special_conditions.append(condition)
 
@@ -116,7 +117,7 @@ class EnemyAI:
                 weaknesses=ai_data.get("weaknesses", []),
                 preferred_range=ai_data.get("preferred_range", "close"),
                 aggression_level=ai_data.get("aggression_level", 0.5),
-                intelligence_level=ai_data.get("intelligence_level", 0.5)
+                intelligence_level=ai_data.get("intelligence_level", 0.5),
             )
 
         except Exception as e:
@@ -129,12 +130,12 @@ class EnemyAI:
             personality=AIPersonality.AGGRESSIVE,
             attack_patterns=[
                 AIPattern("hp_above_50", ["basic_attack"]),
-                AIPattern("hp_below_50", ["basic_attack", "defend"])
+                AIPattern("hp_below_50", ["basic_attack", "defend"]),
             ],
             special_conditions=[],
             resistances=[],
             weaknesses=[],
-            preferred_range="close"
+            preferred_range="close",
         )
 
     def get_next_action(self, enemy, player) -> Dict[str, Any]:
@@ -174,9 +175,14 @@ class EnemyAI:
 
             if condition.trigger == "first_turn" and self.turn_count == 1:
                 should_trigger = True
-            elif condition.trigger == "low_hp" and self._get_hp_percentage(enemy) < 0.25:
+            elif (
+                condition.trigger == "low_hp" and self._get_hp_percentage(enemy) < 0.25
+            ):
                 should_trigger = True
-            elif condition.trigger == "player_low_hp" and self._get_hp_percentage(player) < 0.3:
+            elif (
+                condition.trigger == "player_low_hp"
+                and self._get_hp_percentage(player) < 0.3
+            ):
                 should_trigger = True
 
             if should_trigger:
@@ -184,7 +190,7 @@ class EnemyAI:
                 return {
                     "type": condition.action,
                     "target": "player",
-                    "text": condition.text
+                    "text": condition.text,
                 }
 
         return None
@@ -217,21 +223,21 @@ class EnemyAI:
             "first_turn": self.turn_count == 1,
             "player_hp_low": player_hp_pct < 0.3,
             "player_hp_high": player_hp_pct > 0.7,
-            "always": True
+            "always": True,
         }
 
         return condition_map.get(condition, False)
 
     def _get_hp_percentage(self, character) -> float:
         """Calcula percentual de HP atual."""
-        if hasattr(character, 'hp_atual') and hasattr(character, 'hp_max'):
+        if hasattr(character, "hp_atual") and hasattr(character, "hp_max"):
             if character.hp_max > 0:
                 return character.hp_atual / character.hp_max
         return 1.0
 
     def _get_mp_percentage(self, character) -> float:
         """Calcula percentual de MP atual."""
-        if hasattr(character, 'mp_atual') and hasattr(character, 'mp_max'):
+        if hasattr(character, "mp_atual") and hasattr(character, "mp_max"):
             if character.mp_max > 0:
                 return character.mp_atual / character.mp_max
         return 1.0
@@ -255,7 +261,9 @@ class EnemyAI:
 
         return patterns[-1]
 
-    def _choose_action_from_pattern(self, pattern: AIPattern, enemy, player) -> Dict[str, Any]:
+    def _choose_action_from_pattern(
+        self, pattern: AIPattern, enemy, player
+    ) -> Dict[str, Any]:
         """Escolhe uma ação específica do padrão."""
         if not pattern.actions:
             return {"type": "basic_attack", "target": "player"}
@@ -290,14 +298,20 @@ class EnemyAI:
             # Varia estratégias, evita repetir ações
             if self.action_history:
                 recent_actions = self.action_history[-2:]
-                available = [a for a in actions if a not in [act.get("type") for act in recent_actions]]
+                available = [
+                    a
+                    for a in actions
+                    if a not in [act.get("type") for act in recent_actions]
+                ]
                 if available:
                     return random.choice(available)
 
         elif personality == AIPersonality.BERSERKER:
             # Mais agressivo quando ferido
             if self._get_hp_percentage(enemy) < 0.5:
-                aggressive_actions = [a for a in actions if "attack" in a or "charge" in a]
+                aggressive_actions = [
+                    a for a in actions if "attack" in a or "charge" in a
+                ]
                 if aggressive_actions:
                     return random.choice(aggressive_actions)
 
@@ -308,25 +322,41 @@ class EnemyAI:
         """Cria dicionário de ação baseado no nome."""
         action_map = {
             "basic_attack": {"type": "attack", "target": "player"},
-            "use_ability": {"type": "ability", "target": "player", "ability": self._choose_ability(enemy)},
+            "use_ability": {
+                "type": "ability",
+                "target": "player",
+                "ability": self._choose_ability(enemy),
+            },
             "defend": {"type": "defend", "target": "self"},
             "heal": {"type": "heal", "target": "self"},
-            "taunt": {"type": "taunt", "target": "player", "text": "O inimigo provoca você!"},
-            "intimidate": {"type": "intimidate", "target": "player", "text": "O inimigo tenta intimidá-lo!"},
-            "flee_attempt": {"type": "flee", "target": "self", "text": "O inimigo tenta fugir!"},
+            "taunt": {
+                "type": "taunt",
+                "target": "player",
+                "text": "O inimigo provoca você!",
+            },
+            "intimidate": {
+                "type": "intimidate",
+                "target": "player",
+                "text": "O inimigo tenta intimidá-lo!",
+            },
+            "flee_attempt": {
+                "type": "flee",
+                "target": "self",
+                "text": "O inimigo tenta fugir!",
+            },
             "charge_attack": {"type": "charge_attack", "target": "player"},
-            "special_move": {"type": "special", "target": "player"}
+            "special_move": {"type": "special", "target": "player"},
         }
 
         return action_map.get(action_name, {"type": "attack", "target": "player"})
 
     def _choose_ability(self, enemy) -> Optional[str]:
         """Escolhe uma habilidade para usar."""
-        if hasattr(enemy, 'habilidades_conhecidas') and enemy.habilidades_conhecidas:
+        if hasattr(enemy, "habilidades_conhecidas") and enemy.habilidades_conhecidas:
             # Filtrar habilidades que podem ser usadas
             available_abilities = []
             for ability in enemy.habilidades_conhecidas:
-                if hasattr(ability, 'custo_mp') and enemy.mp_atual >= ability.custo_mp:
+                if hasattr(ability, "custo_mp") and enemy.mp_atual >= ability.custo_mp:
                     available_abilities.append(ability.nome)
 
             if available_abilities:
@@ -350,7 +380,7 @@ class EnemyAI:
             AIPersonality.CUNNING: "Este inimigo é esperto e adapta suas estratégias.",
             AIPersonality.BERSERKER: "Este inimigo luta com fúria descontrolada.",
             AIPersonality.TACTICAL: "Este inimigo planeja cuidadosamente seus movimentos.",
-            AIPersonality.COWARDLY: "Este inimigo prefere evitar confrontos diretos."
+            AIPersonality.COWARDLY: "Este inimigo prefere evitar confrontos diretos.",
         }
         return descriptions.get(self.ai_behavior.personality, "Comportamento padrão.")
 

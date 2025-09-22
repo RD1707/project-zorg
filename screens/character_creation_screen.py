@@ -1,12 +1,13 @@
 """
 Tela de criação de personagem.
 """
+
 from textual.app import ComposeResult
-from textual.screen import Screen
-from textual.widgets import Button, Static, Header, Footer, Input, Label
-from textual.containers import Vertical, Horizontal
 from textual.binding import Binding
+from textual.containers import Horizontal, Vertical
+from textual.screen import Screen
 from textual.validation import Length
+from textual.widgets import Button, Footer, Header, Input, Label, Static
 
 from ui.styles.global_styles import get_global_css
 
@@ -99,7 +100,7 @@ class CharacterCreationScreen(Screen):
             "defesa_base": 2,
             "nivel": 1,
             "xp": 0,
-            "xp_proximo_nivel": 100
+            "xp_proximo_nivel": 100,
         }
 
     def compose(self) -> ComposeResult:
@@ -116,17 +117,25 @@ class CharacterCreationScreen(Screen):
                     placeholder="Digite o nome do seu personagem...",
                     validators=[Length(minimum=2, maximum=20)],
                     id="name_input",
-                    classes="form_input"
+                    classes="form_input",
                 )
 
             # Preview do personagem
             with Vertical(id="character_preview"):
                 yield Static("Preview do Personagem:", classes="preview_stat")
-                yield Static(f"Nome: {self.character_data['nome'] or 'Não definido'}", id="preview_name")
+                yield Static(
+                    f"Nome: {self.character_data['nome'] or 'Não definido'}",
+                    id="preview_name",
+                )
                 yield Static(f"HP: {self.character_data['hp_max']}", id="preview_hp")
                 yield Static(f"MP: {self.character_data['mp_max']}", id="preview_mp")
-                yield Static(f"Ataque: {self.character_data['ataque_base']}", id="preview_attack")
-                yield Static(f"Defesa: {self.character_data['defesa_base']}", id="preview_defense")
+                yield Static(
+                    f"Ataque: {self.character_data['ataque_base']}", id="preview_attack"
+                )
+                yield Static(
+                    f"Defesa: {self.character_data['defesa_base']}",
+                    id="preview_defense",
+                )
 
             # Botões
             with Horizontal(id="buttons_container"):
@@ -149,7 +158,9 @@ class CharacterCreationScreen(Screen):
         """Atualiza o preview do personagem."""
         try:
             preview_name = self.query_one("#preview_name", Static)
-            preview_name.update(f"Nome: {self.character_data['nome'] or 'Não definido'}")
+            preview_name.update(
+                f"Nome: {self.character_data['nome'] or 'Não definido'}"
+            )
         except Exception:
             pass  # Widget pode não estar montado ainda
 
@@ -185,8 +196,15 @@ class CharacterCreationScreen(Screen):
             return False
 
         # Verificar caracteres válidos
-        if not self.character_name.replace(" ", "").replace("-", "").replace("_", "").isalnum():
-            error_msg.update("Nome deve conter apenas letras, números, espaços, hífens e underscores!")
+        if (
+            not self.character_name.replace(" ", "")
+            .replace("-", "")
+            .replace("_", "")
+            .isalnum()
+        ):
+            error_msg.update(
+                "Nome deve conter apenas letras, números, espaços, hífens e underscores!"
+            )
             return False
 
         return True

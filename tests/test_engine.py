@@ -1,12 +1,11 @@
 """
 Testes para o GameEngine do ZORG.
 """
+
 import pytest
-from unittest.mock import patch, MagicMock
 
 from core.engine import GameEngine, get_game_engine
 from core.exceptions import GameEngineError, ResourceNotFoundError
-from core.models import Personagem
 from core.managers.event_manager import EventType
 
 
@@ -25,7 +24,7 @@ class TestGameEngine:
 
     def test_engine_initialization(self, game_engine):
         """Testa inicialização do engine."""
-        assert game_engine._initialized == True
+        assert game_engine._initialized is True
         assert game_engine.jogador is None
 
         # Verificar se todos os managers foram inicializados
@@ -75,7 +74,7 @@ class TestGameEngine:
         game_engine.inicializar_novo_jogo()
 
         result = game_engine.adicionar_item_inventario("Test Item", 3)
-        assert result == True
+        assert result is True
 
         # Verificar se item foi adicionado
         assert any(item.nome == "Test Item" for item in game_engine.jogador.inventario)
@@ -90,14 +89,17 @@ class TestGameEngine:
         game_engine.inicializar_novo_jogo()
 
         result = game_engine.aprender_habilidade("Test Skill")
-        assert result == True
+        assert result is True
 
         # Verificar se habilidade foi aprendida
-        assert any(skill.nome == "Test Skill" for skill in game_engine.jogador.habilidades_conhecidas)
+        assert any(
+            skill.nome == "Test Skill"
+            for skill in game_engine.jogador.habilidades_conhecidas
+        )
 
         # Teste de habilidade já conhecida
         result = game_engine.aprender_habilidade("Test Skill")
-        assert result == False
+        assert result is False
 
         # Teste com habilidade inexistente
         with pytest.raises(ResourceNotFoundError):
@@ -154,18 +156,18 @@ class TestGameEngine:
         """Testa obtenção do status do engine."""
         status = game_engine.get_engine_status()
 
-        assert status["initialized"] == True
+        assert status["initialized"] is True
         assert "managers" in status
         assert "combat" in status["managers"]
         assert "inventory" in status["managers"]
 
     def test_engine_shutdown(self, game_engine):
         """Testa finalização do engine."""
-        assert GameEngine._initialized == True
+        assert GameEngine._initialized is True
 
         game_engine.shutdown()
 
-        assert GameEngine._initialized == False
+        assert GameEngine._initialized is False
         assert GameEngine._instance is None
 
     def test_save_load_integration(self, game_engine, mock_db_data):
@@ -181,7 +183,7 @@ class TestGameEngine:
 
         # Salvar
         result = game_engine.save_game_state()
-        assert result == True
+        assert result is True
 
         # Criar novo jogo e verificar que mudou
         game_engine.inicializar_novo_jogo()
@@ -189,7 +191,7 @@ class TestGameEngine:
 
         # Carregar save
         result = game_engine.load_game_state()
-        assert result == True
+        assert result is True
         assert game_engine.jogador.nivel == 5
         assert game_engine.jogador.xp == 200
 
@@ -279,4 +281,4 @@ class TestGameEnginePerformance:
 
         # Inicialização deve ser rápida (menos de 1 segundo)
         assert initialization_time < 1.0
-        assert engine._initialized == True
+        assert engine._initialized is True

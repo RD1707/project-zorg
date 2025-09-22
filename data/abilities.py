@@ -10,14 +10,14 @@ DB_HABILIDADES = {
         tipo=TipoHabilidade.ATAQUE,
         valor_efeito=20,
         nivel_requerido=1,
-        elemento="físico"
+        elemento="físico",
     ),
     "Lanca de Gelo": Habilidade(
         nome="Lanca de Gelo",
         descricao="Cria um espinho de gelo que perfura o inimigo e pode congelar.",
         custo_mp=12,
         tipo=TipoHabilidade.ATAQUE,
-        valor_efeito=25
+        valor_efeito=25,
     ),
     "Toque Restaurador": Habilidade(
         nome="Toque Restaurador",
@@ -26,7 +26,7 @@ DB_HABILIDADES = {
         tipo=TipoHabilidade.CURA,
         valor_efeito=50,
         nivel_requerido=2,
-        elemento="divino"
+        elemento="divino",
     ),
     "Postura Defensiva": Habilidade(
         nome="Postura Defensiva",
@@ -35,65 +35,64 @@ DB_HABILIDADES = {
         tipo=TipoHabilidade.BUFF_DEFESA,
         valor_efeito=10,
         nivel_requerido=1,
-        elemento="neutro"
+        elemento="neutro",
     ),
     "Furia Berserker": Habilidade(
         nome="Furia Berserker",
         descricao="Entra em fúria, aumentando ataque por 4 turnos mas perdendo defesa.",
         custo_mp=20,
         tipo=TipoHabilidade.FURIA,
-        valor_efeito=0 # O efeito é tratado na lógica de combate, não por um valor direto.
+        valor_efeito=0,  # O efeito é tratado na lógica de combate, não por um valor direto.
     ),
     "Regeneracao Vital": Habilidade(
         nome="Regeneracao Vital",
         descricao="Ativa regeneração que cura HP a cada turno por 5 turnos.",
         custo_mp=25,
         tipo=TipoHabilidade.REGENERACAO,
-        valor_efeito=0
+        valor_efeito=0,
     ),
     "Golpe Flamejante": Habilidade(
         nome="Golpe Flamejante",
         descricao="Ataque de fogo que causa dano contínuo.",
         custo_mp=18,
         tipo=TipoHabilidade.ATAQUE,
-        valor_efeito=30
+        valor_efeito=30,
     ),
     "Combo Devastador": Habilidade(
         nome="Combo Devastador",
         descricao="Ataque especial que ganha poder com combos consecutivos.",
         custo_mp=15,
         tipo=TipoHabilidade.COMBO,
-        valor_efeito=0
+        valor_efeito=0,
     ),
     "Lâmina Sombria": Habilidade(
         nome="Lâmina Sombria",
         descricao="Ataque das sombras com alta chance de crítico.",
         custo_mp=14,
         tipo=TipoHabilidade.ATAQUE,
-        valor_efeito=22
+        valor_efeito=22,
     ),
     "Escudo de Luz": Habilidade(
         nome="Escudo de Luz",
         descricao="Cria barreira mágica que absorve dano e cura simultaneamente.",
         custo_mp=22,
         tipo=TipoHabilidade.CURA,
-        valor_efeito=30
+        valor_efeito=30,
     ),
     "Rajada Arcana": Habilidade(
         nome="Rajada Arcana",
         descricao="Múltiplos projéteis mágicos com dano variável.",
         custo_mp=16,
         tipo=TipoHabilidade.ATAQUE,
-        valor_efeito=0 # Dano é calculado dinamicamente
+        valor_efeito=0,  # Dano é calculado dinamicamente
     ),
     "Benção da Natureza": Habilidade(
         nome="Benção da Natureza",
         descricao="Remove todos os debuffs e ativa regeneração.",
         custo_mp=20,
         tipo=TipoHabilidade.CURA,
-        valor_efeito=25
+        valor_efeito=25,
     ),
-
     # Habilidades de nível intermediário
     "Bola de Fogo": Habilidade(
         nome="Bola de Fogo",
@@ -102,7 +101,7 @@ DB_HABILIDADES = {
         tipo=TipoHabilidade.ATAQUE,
         valor_efeito=28,
         nivel_requerido=3,
-        elemento="fogo"
+        elemento="fogo",
     ),
     "Escudo Mágico": Habilidade(
         nome="Escudo Mágico",
@@ -111,7 +110,7 @@ DB_HABILIDADES = {
         tipo=TipoHabilidade.BUFF_DEFESA,
         valor_efeito=15,
         nivel_requerido=3,
-        elemento="arcano"
+        elemento="arcano",
     ),
     "Drenar Vida": Habilidade(
         nome="Drenar Vida",
@@ -120,7 +119,7 @@ DB_HABILIDADES = {
         tipo=TipoHabilidade.ATAQUE,
         valor_efeito=20,
         nivel_requerido=4,
-        elemento="sombrio"
+        elemento="sombrio",
     ),
     "Raio Congelante": Habilidade(
         nome="Raio Congelante",
@@ -129,9 +128,8 @@ DB_HABILIDADES = {
         tipo=TipoHabilidade.ATAQUE,
         valor_efeito=24,
         nivel_requerido=3,
-        elemento="gelo"
+        elemento="gelo",
     ),
-
     # Habilidades avançadas
     "Meteoro": Habilidade(
         nome="Meteoro",
@@ -140,7 +138,7 @@ DB_HABILIDADES = {
         tipo=TipoHabilidade.ATAQUE,
         valor_efeito=60,
         nivel_requerido=6,
-        elemento="fogo"
+        elemento="fogo",
     ),
     "Tempestade de Gelo": Habilidade(
         nome="Tempestade de Gelo",
@@ -149,7 +147,7 @@ DB_HABILIDADES = {
         tipo=TipoHabilidade.ATAQUE,
         valor_efeito=45,
         nivel_requerido=5,
-        elemento="gelo"
+        elemento="gelo",
     ),
     "Cura Suprema": Habilidade(
         nome="Cura Suprema",
@@ -158,7 +156,7 @@ DB_HABILIDADES = {
         tipo=TipoHabilidade.CURA,
         valor_efeito=100,
         nivel_requerido=5,
-        elemento="divino"
+        elemento="divino",
     ),
     "Barreira Divina": Habilidade(
         nome="Barreira Divina",
@@ -167,6 +165,6 @@ DB_HABILIDADES = {
         tipo=TipoHabilidade.BUFF_DEFESA,
         valor_efeito=25,
         nivel_requerido=6,
-        elemento="divino"
-    )
+        elemento="divino",
+    ),
 }

@@ -1,20 +1,20 @@
+import hashlib
 import json
 import shutil
-from pathlib import Path
-from typing import Optional, Dict, Any, List
 from datetime import datetime
-import hashlib
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-from core.managers.base_manager import BaseManager
-from core.managers.event_manager import emit_event, EventType
-from core.models import Personagem, TutorialFlags
-from core.exceptions import SaveLoadError, DataValidationError
-from utils.error_handler import handle_exceptions, validate_not_none
-from utils.security import SaveFileValidator
 from config.settings import get_config, get_save_path
+from core.exceptions import DataValidationError, SaveLoadError
+from core.managers.base_manager import BaseManager
+from core.managers.event_manager import EventType, emit_event
+from core.models import Personagem, TutorialFlags
+from data.abilities import DB_HABILIDADES
 from data.equipment import DB_EQUIPAMENTOS
 from data.items import DB_ITENS
-from data.abilities import DB_HABILIDADES
+from utils.error_handler import handle_exceptions, validate_not_none
+from utils.security import SaveFileValidator
 
 
 class SaveManager(BaseManager):
@@ -31,7 +31,9 @@ class SaveManager(BaseManager):
         self._save_dir.mkdir(exist_ok=True)
 
     @handle_exceptions(reraise=True)
-    def save_game(self, player: Personagem, metadata: Optional[Dict[str, Any]] = None) -> bool:
+    def save_game(
+        self, player: Personagem, metadata: Optional[Dict[str, Any]] = None
+    ) -> bool:
         validate_not_none(player, "jogador")
 
         try:
@@ -43,13 +45,14 @@ class SaveManager(BaseManager):
             self._validate_save_data(save_data)
 
             # Operação atômica melhorada
-            temp_file = self._save_file.with_suffix('.tmp')
-            backup_file = self._save_file.with_suffix('.backup')
+            temp_file = self._save_file.with_suffix(".tmp")
+            backup_file = self._save_file.with_suffix(".backup")
 
             try:
                 # Criar backup do arquivo atual se existir
                 if self._save_file.exists():
                     import shutil
+
                     shutil.copy2(self._save_file, backup_file)
 
                 # Escrever dados no arquivo temporário
@@ -63,11 +66,12 @@ class SaveManager(BaseManager):
 
                 # Se chegou aqui, o arquivo temporário é válido
                 # Fazer a substituição atômica
-                if hasattr(temp_file, 'replace'):
+                if hasattr(temp_file, "replace"):
                     temp_file.replace(self._save_file)
                 else:
                     # Fallback para sistemas mais antigos
                     import shutil
+
                     shutil.move(str(temp_file), str(self._save_file))
 
                 # Remover backup se tudo deu certo
@@ -85,12 +89,15 @@ class SaveManager(BaseManager):
                 self.logger.error(f"Erro durante save atômico: {e}")
                 raise
 
-            emit_event(EventType.SAVE_GAME, {
-                "player_name": player.nome,
-                "level": player.nivel,
-                "phase": player.fase_atual,
-                "timestamp": save_data["metadata"]["timestamp"]
-            })
+            emit_event(
+                EventType.SAVE_GAME,
+                {
+                    "player_name": player.nome,
+                    "level": player.nivel,
+                    "phase": player.fase_atual,
+                    "timestamp": save_data["metadata"]["timestamp"],
+                },
+            )
 
             self.logger.info(f"Jogo salvo com sucesso para {player.nome}")
             return True
@@ -117,18 +124,23 @@ class SaveManager(BaseManager):
 
             player = self._reconstruct_player(save_data)
 
-            emit_event(EventType.LOAD_GAME, {
-                "player_name": player.nome,
-                "level": player.nivel,
-                "phase": player.fase_atual
-            })
+            emit_event(
+                EventType.LOAD_GAME,
+                {
+                    "player_name": player.nome,
+                    "level": player.nivel,
+                    "phase": player.fase_atual,
+                },
+            )
 
             self.logger.info(f"Jogo carregado com sucesso para {player.nome}")
             return player
 
         except json.JSONDecodeError as e:
             self.logger.error(f"Arquivo de save corrompido: {e}")
-            raise SaveLoadError("Arquivo de save está corrompido ou em formato inválido")
+            raise SaveLoadError(
+                "Arquivo de save está corrompido ou em formato inválido"
+            )
         except DataValidationError as e:
             self.logger.error(f"Dados de save inválidos: {e}")
             raise SaveLoadError(f"Arquivo de save contém dados inválidos: {str(e)}")
@@ -136,13 +148,15 @@ class SaveManager(BaseManager):
             self.logger.error(f"Erro ao carregar jogo: {e}")
             raise SaveLoadError(f"Falha ao carregar o jogo: {str(e)}")
 
-    def _prepare_save_data(self, player: Personagem, metadata: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    def _prepare_save_data(
+        self, player: Personagem, metadata: Optional[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         save_data = {
             "version": "1.0.0",
             "metadata": {
                 "timestamp": datetime.now().isoformat(),
                 "game_version": "1.0.0",
-                **(metadata or {})
+                **(metadata or {}),
             },
             "player": {
                 "nome": player.nome,
@@ -152,33 +166,35 @@ class SaveManager(BaseManager):
                 "mp_max": player.mp_max,
                 "ataque_base": player.ataque_base,
                 "defesa_base": player.defesa_base,
-
                 "nivel": player.nivel,
                 "xp": player.xp,
                 "xp_proximo_nivel": player.xp_proximo_nivel,
                 "ouro": player.ouro,
                 "fase_atual": player.fase_atual,
-
                 "turnos_veneno": player.turnos_veneno,
                 "dano_por_turno_veneno": player.dano_por_turno_veneno,
                 "turnos_buff_defesa": player.turnos_buff_defesa,
                 "turnos_furia": player.turnos_furia,
                 "turnos_regeneracao": player.turnos_regeneracao,
-
                 "ajudou_marinheiro": player.ajudou_marinheiro,
                 "tutoriais": player.tutoriais.to_dict(),
-
-                "arma_equipada": player.arma_equipada.nome if player.arma_equipada else None,
-                "armadura_equipada": player.armadura_equipada.nome if player.armadura_equipada else None,
-                "escudo_equipada": player.escudo_equipada.nome if player.escudo_equipada else None,
-
+                "arma_equipada": (
+                    player.arma_equipada.nome if player.arma_equipada else None
+                ),
+                "armadura_equipada": (
+                    player.armadura_equipada.nome if player.armadura_equipada else None
+                ),
+                "escudo_equipada": (
+                    player.escudo_equipada.nome if player.escudo_equipada else None
+                ),
                 "inventario": [
                     {"nome": item.nome, "quantidade": item.quantidade}
                     for item in player.inventario
                 ],
-
-                "habilidades_conhecidas": [hab.nome for hab in player.habilidades_conhecidas],
-            }
+                "habilidades_conhecidas": [
+                    hab.nome for hab in player.habilidades_conhecidas
+                ],
+            },
         }
 
         checksum_data = json.dumps(save_data["player"], sort_keys=True)
@@ -234,7 +250,7 @@ class SaveManager(BaseManager):
             save_data["metadata"] = {
                 "timestamp": datetime.now().isoformat(),
                 "version": "1.0.1",
-                "auto_save": False
+                "auto_save": False,
             }
 
         return save_data
@@ -251,7 +267,9 @@ class SaveManager(BaseManager):
         actual_checksum = hashlib.sha256(checksum_data.encode()).hexdigest()
 
         if expected_checksum != actual_checksum:
-            raise DataValidationError("Checksum inválido - dados podem estar corrompidos")
+            raise DataValidationError(
+                "Checksum inválido - dados podem estar corrompidos"
+            )
 
         player_required = ["nome", "hp", "hp_max", "mp", "mp_max", "nivel"]
         for field in player_required:
@@ -277,7 +295,7 @@ class SaveManager(BaseManager):
             hp_max=player_data["hp_max"],
             mp_max=player_data["mp_max"],
             ataque_base=player_data["ataque_base"],
-            defesa_base=player_data["defesa_base"]
+            defesa_base=player_data["defesa_base"],
         )
 
         player.hp = player_data["hp"]
@@ -299,7 +317,9 @@ class SaveManager(BaseManager):
             player.tutoriais = TutorialFlags.from_dict(player_data["tutoriais"])
 
         player.arma_equipada = DB_EQUIPAMENTOS.get(player_data.get("arma_equipada"))
-        player.armadura_equipada = DB_EQUIPAMENTOS.get(player_data.get("armadura_equipada"))
+        player.armadura_equipada = DB_EQUIPAMENTOS.get(
+            player_data.get("armadura_equipada")
+        )
         player.escudo_equipada = DB_EQUIPAMENTOS.get(player_data.get("escudo_equipada"))
 
         factory = get_object_factory()
@@ -336,7 +356,11 @@ class SaveManager(BaseManager):
 
     def _cleanup_old_backups(self, backup_dir: Path) -> None:
         max_backups = self._config.get("max_backups", 5)
-        backups = sorted(backup_dir.glob("zorg_save_*.json"), key=lambda x: x.stat().st_mtime, reverse=True)
+        backups = sorted(
+            backup_dir.glob("zorg_save_*.json"),
+            key=lambda x: x.stat().st_mtime,
+            reverse=True,
+        )
 
         for backup in backups[max_backups:]:
             backup.unlink()
@@ -365,11 +389,7 @@ class SaveManager(BaseManager):
 
         except Exception as e:
             self.logger.error(f"Erro ao ler informações do save: {e}")
-            return {
-                "exists": True,
-                "corrupted": True,
-                "error": str(e)
-            }
+            return {"exists": True, "corrupted": True, "error": str(e)}
 
     # === MÉTODOS PARA MÚLTIPLOS SAVES ===
 
@@ -403,26 +423,29 @@ class SaveManager(BaseManager):
                 "save_name": save_name,
                 "timestamp": datetime.now().isoformat(),
                 "game_version": "1.0.0",
-                "auto_save": False
+                "auto_save": False,
             }
 
             save_data = self._prepare_save_data(player, metadata)
             self._validate_save_data(save_data)
 
             # Salvar no slot específico
-            temp_file = slot_file.with_suffix('.tmp')
+            temp_file = slot_file.with_suffix(".tmp")
             with open(temp_file, "w", encoding="utf-8") as f:
                 json.dump(save_data, f, indent=2, ensure_ascii=False)
 
             temp_file.replace(slot_file)
 
-            emit_event(EventType.SAVE_GAME, {
-                "slot": slot,
-                "save_name": save_name,
-                "player_name": player.nome,
-                "level": player.nivel,
-                "timestamp": metadata["timestamp"]
-            })
+            emit_event(
+                EventType.SAVE_GAME,
+                {
+                    "slot": slot,
+                    "save_name": save_name,
+                    "player_name": player.nome,
+                    "level": player.nivel,
+                    "timestamp": metadata["timestamp"],
+                },
+            )
 
             self.logger.info(f"Jogo salvo no slot {slot}: {save_name}")
             return True
@@ -447,12 +470,15 @@ class SaveManager(BaseManager):
             self._validate_save_data(save_data)
             player = self._reconstruct_player(save_data["player"])
 
-            emit_event(EventType.LOAD_GAME, {
-                "slot": slot,
-                "player_name": player.nome,
-                "level": player.nivel,
-                "metadata": save_data.get("metadata", {})
-            })
+            emit_event(
+                EventType.LOAD_GAME,
+                {
+                    "slot": slot,
+                    "player_name": player.nome,
+                    "level": player.nivel,
+                    "metadata": save_data.get("metadata", {}),
+                },
+            )
 
             self.logger.info(f"Jogo carregado do slot {slot}: {player.nome}")
             return player
@@ -479,11 +505,7 @@ class SaveManager(BaseManager):
         slot_file = self.get_save_slot_path(slot)
 
         if not slot_file.exists():
-            return {
-                "slot": slot,
-                "exists": False,
-                "empty": True
-            }
+            return {"slot": slot, "exists": False, "empty": True}
 
         try:
             with open(slot_file, "r", encoding="utf-8") as f:
@@ -504,7 +526,9 @@ class SaveManager(BaseManager):
                 "timestamp": metadata.get("timestamp"),
                 "auto_save": metadata.get("auto_save", False),
                 "file_size": slot_file.stat().st_size,
-                "last_modified": datetime.fromtimestamp(slot_file.stat().st_mtime).isoformat()
+                "last_modified": datetime.fromtimestamp(
+                    slot_file.stat().st_mtime
+                ).isoformat(),
             }
 
         except Exception as e:
@@ -514,7 +538,7 @@ class SaveManager(BaseManager):
                 "exists": True,
                 "empty": False,
                 "corrupted": True,
-                "error": str(e)
+                "error": str(e),
             }
 
     def delete_save_slot(self, slot: int) -> bool:
@@ -562,7 +586,9 @@ class SaveManager(BaseManager):
         """Limpa backups antigos de um slot específico."""
         max_backups = self._config.get("max_backups", 3)
         pattern = f"slot_{slot}_backup_*.json"
-        backups = sorted(backup_dir.glob(pattern), key=lambda x: x.stat().st_mtime, reverse=True)
+        backups = sorted(
+            backup_dir.glob(pattern), key=lambda x: x.stat().st_mtime, reverse=True
+        )
 
         for backup in backups[max_backups:]:
             backup.unlink()
@@ -586,14 +612,20 @@ class SaveManager(BaseManager):
             return []
 
         backups = []
-        for backup_file in sorted(backup_dir.glob("zorg_save_*.json"), key=lambda x: x.stat().st_mtime, reverse=True):
+        for backup_file in sorted(
+            backup_dir.glob("zorg_save_*.json"),
+            key=lambda x: x.stat().st_mtime,
+            reverse=True,
+        ):
             try:
                 stat = backup_file.stat()
-                backups.append({
-                    "filename": backup_file.name,
-                    "timestamp": datetime.fromtimestamp(stat.st_mtime).isoformat(),
-                    "size": stat.st_size
-                })
+                backups.append(
+                    {
+                        "filename": backup_file.name,
+                        "timestamp": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                        "size": stat.st_size,
+                    }
+                )
             except Exception as e:
                 self.logger.warning(f"Erro ao ler backup {backup_file}: {e}")
 

@@ -1,9 +1,10 @@
 """
 NPCs da cidade de Nullhaven com diálogos e missões.
 """
+
 from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
 from enum import Enum
+from typing import List, Optional
 
 
 class NPCType(Enum):
@@ -82,18 +83,15 @@ DB_NPCS = {
         dialog_options=[
             DialogOption(
                 text="O que você sabe sobre a Torre do Ponteiro Nulo?",
-                response="A torre... *suspira* Muitos marinheiros corajosos partiram para lá. Poucos voltaram. Dizem que lá dentro há criaturas que não deveriam existir."
+                response="A torre... *suspira* Muitos marinheiros corajosos partiram para lá. Poucos voltaram. Dizem que lá dentro há criaturas que não deveriam existir.",
             ),
             DialogOption(
                 text="Precisa de ajuda com alguma coisa?",
                 response="Na verdade, sim! Tenho recebido relatos de criaturas estranhas nas docas à noite. Se você pudesse investigar...",
                 action="give_quest",
-                quest_id="investigar_docas"
+                quest_id="investigar_docas",
             ),
-            DialogOption(
-                text="Tchau!",
-                response="Que os ventos te favoreçam, jovem!"
-            )
+            DialogOption(text="Tchau!", response="Que os ventos te favoreçam, jovem!"),
         ],
         quests=[
             Quest(
@@ -104,11 +102,10 @@ DB_NPCS = {
                 reward_xp=150,
                 reward_gold=75,
                 reward_items=["Pocao de Cura", "Antidoto"],
-                max_progress=3
+                max_progress=3,
             )
-        ]
+        ],
     ),
-
     "elena_curandeira": NPC(
         id="elena_curandeira",
         name="Elena, a Curandeira",
@@ -119,18 +116,18 @@ DB_NPCS = {
         dialog_options=[
             DialogOption(
                 text="Você tem poções para vender?",
-                response="Claro! Tenho as melhores poções de cura da cidade. Cada uma feita com amor e ingredientes frescos."
+                response="Claro! Tenho as melhores poções de cura da cidade. Cada uma feita com amor e ingredientes frescos.",
             ),
             DialogOption(
                 text="Me fale sobre Nullhaven.",
-                response="Esta cidade já foi próspera, mas a aparição da Torre mudou tudo. Agora vivemos com medo, mas ainda temos esperança."
+                response="Esta cidade já foi próspera, mas a aparição da Torre mudou tudo. Agora vivemos com medo, mas ainda temos esperança.",
             ),
             DialogOption(
                 text="Você conhece alguma receita especial?",
                 response="Ah, sim! Se você me trouxer 3 Ervas Raras, posso te ensinar a fazer uma Poção de Vigor Supremo!",
                 action="give_quest",
-                quest_id="ervas_raras"
-            )
+                quest_id="ervas_raras",
+            ),
         ],
         quests=[
             Quest(
@@ -141,11 +138,10 @@ DB_NPCS = {
                 reward_xp=100,
                 reward_gold=50,
                 reward_items=["Pocao de Vigor Supremo"],
-                max_progress=3
+                max_progress=3,
             )
-        ]
+        ],
     ),
-
     "joao_pescador": NPC(
         id="joao_pescador",
         name="João, o Pescador",
@@ -156,20 +152,19 @@ DB_NPCS = {
         dialog_options=[
             DialogOption(
                 text="Como está a pesca?",
-                response="Terrível! Os peixes fugiram quando a Torre apareceu. Algo na água os assusta. Às vezes vejo sombras estranhas se movendo nas profundezas."
+                response="Terrível! Os peixes fugiram quando a Torre apareceu. Algo na água os assusta. Às vezes vejo sombras estranhas se movendo nas profundezas.",
             ),
             DialogOption(
                 text="Você tem alguma dica para aventureiros?",
-                response="*sussurra* Se for à Torre, leve muitas poções. E cuidado com os espelhos... eles mostram coisas que não deveriam existir."
+                response="*sussurra* Se for à Torre, leve muitas poções. E cuidado com os espelhos... eles mostram coisas que não deveriam existir.",
             ),
             DialogOption(
                 text="Obrigada pelas dicas!",
-                response="De nada! E boa sorte, jovem heroína!"
-            )
+                response="De nada! E boa sorte, jovem heroína!",
+            ),
         ],
-        quests=[]
+        quests=[],
     ),
-
     "marcus_guarda": NPC(
         id="marcus_guarda",
         name="Guarda Marcus",
@@ -180,18 +175,18 @@ DB_NPCS = {
         dialog_options=[
             DialogOption(
                 text="A cidade está segura?",
-                response="Fazemos o nosso melhor, mas as criaturas da Torre às vezes se aventuram até aqui. Fique alerta, especialmente à noite."
+                response="Fazemos o nosso melhor, mas as criaturas da Torre às vezes se aventuram até aqui. Fique alerta, especialmente à noite.",
             ),
             DialogOption(
                 text="Precisa de ajuda para patrulhar?",
                 response="Na verdade... temos tido problemas com lobos corrompidos nos arredores. Se você pudesse lidar com eles...",
                 action="give_quest",
-                quest_id="lobos_corrompidos"
+                quest_id="lobos_corrompidos",
             ),
             DialogOption(
                 text="Entendido, obrigada.",
-                response="Mantenha-se vigilante, aventureira."
-            )
+                response="Mantenha-se vigilante, aventureira.",
+            ),
         ],
         quests=[
             Quest(
@@ -202,11 +197,10 @@ DB_NPCS = {
                 reward_xp=200,
                 reward_gold=100,
                 reward_items=["Espada de Ferro", "Escudo de Ferro"],
-                max_progress=5
+                max_progress=5,
             )
-        ]
+        ],
     ),
-
     "sabio_aldric": NPC(
         id="sabio_aldric",
         name="Sábio Aldric",
@@ -217,18 +211,18 @@ DB_NPCS = {
         dialog_options=[
             DialogOption(
                 text="O que você sabe sobre a Torre?",
-                response="A Torre do Ponteiro Nulo é uma aberração no tecido da realidade. Ela apareceu de repente, trazendo consigo horrores inimagináveis."
+                response="A Torre do Ponteiro Nulo é uma aberração no tecido da realidade. Ela apareceu de repente, trazendo consigo horrores inimagináveis.",
             ),
             DialogOption(
                 text="Como posso me preparar para enfrentá-la?",
                 response="Conhecimento é poder, jovem. Se você puder me trazer 3 Pergaminhos Antigos, posso te ensinar magias poderosas.",
                 action="give_quest",
-                quest_id="pergaminhos_antigos"
+                quest_id="pergaminhos_antigos",
             ),
             DialogOption(
                 text="Tem algum conselho sábio?",
-                response="Lembre-se: nem sempre a força bruta resolve. Às vezes, a inteligência e a compaixão são as armas mais poderosas."
-            )
+                response="Lembre-se: nem sempre a força bruta resolve. Às vezes, a inteligência e a compaixão são as armas mais poderosas.",
+            ),
         ],
         quests=[
             Quest(
@@ -239,8 +233,8 @@ DB_NPCS = {
                 reward_xp=300,
                 reward_gold=0,
                 reward_items=["Habilidade: Bola de Fogo", "Habilidade: Escudo Mágico"],
-                max_progress=3
+                max_progress=3,
             )
-        ]
-    )
+        ],
+    ),
 }

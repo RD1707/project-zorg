@@ -2,10 +2,11 @@
 Factory para criação eficiente de objetos do jogo.
 Substitui o uso excessivo de deepcopy por criação otimizada.
 """
-from typing import Dict, Any, Type, Optional
-import logging
 
-from core.models import Item, Equipamento, Personagem
+import logging
+from typing import Any, Dict, Optional
+
+from core.models import Equipamento, Item, Personagem
 
 
 class ObjectFactory:
@@ -27,8 +28,8 @@ class ObjectFactory:
             cura_veneno=item_template.cura_veneno,
             preco_venda=item_template.preco_venda,
             quantidade=1,  # Sempre criar com quantidade 1
-            stack_max=getattr(item_template, 'stack_max', 99),
-            categoria=getattr(item_template, 'categoria', 'consumível')
+            stack_max=getattr(item_template, "stack_max", 99),
+            categoria=getattr(item_template, "categoria", "consumível"),
         )
 
     def create_equipment(self, equipment_template: Equipamento) -> Equipamento:
@@ -39,13 +40,13 @@ class ObjectFactory:
             descricao=equipment_template.descricao,
             preco=equipment_template.preco,
             efeito=equipment_template.efeito,
-            ataque_bonus=getattr(equipment_template, 'ataque_bonus', 0),
-            defesa_bonus=getattr(equipment_template, 'defesa_bonus', 0),
-            hp_bonus=getattr(equipment_template, 'hp_bonus', 0),
-            mp_bonus=getattr(equipment_template, 'mp_bonus', 0),
-            raridade=getattr(equipment_template, 'raridade', 'comum'),
-            durabilidade=getattr(equipment_template, 'durabilidade', 100),
-            durabilidade_max=getattr(equipment_template, 'durabilidade_max', 100)
+            ataque_bonus=getattr(equipment_template, "ataque_bonus", 0),
+            defesa_bonus=getattr(equipment_template, "defesa_bonus", 0),
+            hp_bonus=getattr(equipment_template, "hp_bonus", 0),
+            mp_bonus=getattr(equipment_template, "mp_bonus", 0),
+            raridade=getattr(equipment_template, "raridade", "comum"),
+            durabilidade=getattr(equipment_template, "durabilidade", 100),
+            durabilidade_max=getattr(equipment_template, "durabilidade_max", 100),
         )
 
     def create_enemy(self, enemy_template: Personagem) -> Personagem:
@@ -55,23 +56,27 @@ class ObjectFactory:
             hp_max=enemy_template.hp_max,
             mp_max=enemy_template.mp_max,
             ataque_base=enemy_template.ataque_base,
-            defesa_base=enemy_template.defesa_base
+            defesa_base=enemy_template.defesa_base,
         )
 
         # Copiar atributos específicos de inimigo
-        if hasattr(enemy_template, 'xp_reward'):
+        if hasattr(enemy_template, "xp_reward"):
             enemy.xp_reward = enemy_template.xp_reward
-        if hasattr(enemy_template, 'gold_reward'):
+        if hasattr(enemy_template, "gold_reward"):
             enemy.gold_reward = enemy_template.gold_reward
-        if hasattr(enemy_template, 'descricao'):
+        if hasattr(enemy_template, "descricao"):
             enemy.descricao = enemy_template.descricao
-        if hasattr(enemy_template, 'tipo'):
+        if hasattr(enemy_template, "tipo"):
             enemy.tipo = enemy_template.tipo
-        if hasattr(enemy_template, 'habilidades'):
-            enemy.habilidades = list(enemy_template.habilidades)  # Shallow copy da lista
-        if hasattr(enemy_template, 'resistencias'):
-            enemy.resistencias = dict(enemy_template.resistencias)  # Shallow copy do dict
-        if hasattr(enemy_template, 'fraquezas'):
+        if hasattr(enemy_template, "habilidades"):
+            enemy.habilidades = list(
+                enemy_template.habilidades
+            )  # Shallow copy da lista
+        if hasattr(enemy_template, "resistencias"):
+            enemy.resistencias = dict(
+                enemy_template.resistencias
+            )  # Shallow copy do dict
+        if hasattr(enemy_template, "fraquezas"):
             enemy.fraquezas = dict(enemy_template.fraquezas)
 
         # Inicializar HP e MP como máximo
@@ -91,7 +96,7 @@ class ObjectFactory:
             preco_venda=item_data.get("preco_venda", 0),
             quantidade=item_data.get("quantidade", 1),
             stack_max=item_data.get("stack_max", 99),
-            categoria=item_data.get("categoria", "consumível")
+            categoria=item_data.get("categoria", "consumível"),
         )
 
     def create_equipment_from_data(self, eq_data: Dict[str, Any]) -> Equipamento:
@@ -108,7 +113,7 @@ class ObjectFactory:
             mp_bonus=eq_data.get("mp_bonus", 0),
             raridade=eq_data.get("raridade", "comum"),
             durabilidade=eq_data.get("durabilidade", 100),
-            durabilidade_max=eq_data.get("durabilidade_max", 100)
+            durabilidade_max=eq_data.get("durabilidade_max", 100),
         )
 
     def clear_cache(self):

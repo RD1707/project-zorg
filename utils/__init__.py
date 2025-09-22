@@ -13,9 +13,4 @@ try:
 except ImportError:
     SecurityManager = None
 
-__all__ = [
-    'handle_exceptions',
-    'validate_not_none',
-    'get_logger',
-    'SecurityManager'
-]
+__all__ = ["handle_exceptions", "validate_not_none", "get_logger", "SecurityManager"]

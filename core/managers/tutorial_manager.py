@@ -2,9 +2,10 @@
 Sistema de tutorial completo para o jogo ZORG.
 Gerencia dicas contextuais e tutoriais baseados em TutorialFlags.
 """
-from typing import Dict, List, Any, Optional
+
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 from core.managers.base_manager import BaseManager
 from core.models import TutorialFlags
@@ -74,12 +75,12 @@ class TutorialManager(BaseManager):
                         "• [A]tacar - Usa seu ataque básico",
                         "• [H]abilidades - Usa habilidades especiais (requer MP)",
                         "• [I]tens - Usa itens do inventário",
-                        "• [F]ugir - Tenta escapar do combate"
+                        "• [F]ugir - Tenta escapar do combate",
                     ],
-                    visual_hint="Escolha sua acao sabiamente!"
+                    visual_hint="Escolha sua acao sabiamente!",
                 )
             ],
-            priority=10
+            priority=10,
         )
 
         # Tutorial de habilidades
@@ -96,12 +97,12 @@ class TutorialManager(BaseManager):
                         "• Ataque - Causam dano extra",
                         "• Cura - Restauram HP",
                         "• Buff - Melhoram suas estatísticas",
-                        "• Debuff - Enfraquecem inimigos"
+                        "• Debuff - Enfraquecem inimigos",
                     ],
-                    visual_hint="Use MP sabiamente - ele nao se regenera automaticamente!"
+                    visual_hint="Use MP sabiamente - ele nao se regenera automaticamente!",
                 )
             ],
-            priority=8
+            priority=8,
         )
 
         # Tutorial de itens
@@ -118,12 +119,12 @@ class TutorialManager(BaseManager):
                         "• Poções de Cura - Restauram HP",
                         "• Poções de Mana - Restauram MP",
                         "• Antídotos - Curam envenenamento",
-                        "• Itens de Buff - Melhoram temporariamente suas stats"
+                        "• Itens de Buff - Melhoram temporariamente suas stats",
                     ],
-                    visual_hint="Dica: Use itens estrategicamente - alguns sao raros!"
+                    visual_hint="Dica: Use itens estrategicamente - alguns sao raros!",
                 )
             ],
-            priority=7
+            priority=7,
         )
 
         # Tutorial de level up
@@ -139,12 +140,12 @@ class TutorialManager(BaseManager):
                         "• HP e MP máximos aumentam",
                         "• Ataque e defesa melhoram",
                         "• Novas habilidades podem ser desbloqueadas",
-                        "• Acesso a equipamentos melhores"
+                        "• Acesso a equipamentos melhores",
                     ],
-                    visual_hint="Continue derrotando inimigos para ganhar mais XP!"
+                    visual_hint="Continue derrotando inimigos para ganhar mais XP!",
                 )
             ],
-            priority=9
+            priority=9,
         )
 
         # Tutorial de equipamentos
@@ -160,12 +161,12 @@ class TutorialManager(BaseManager):
                         "• Armas - Aumentam seu ataque",
                         "• Armaduras - Aumentam sua defesa",
                         "• Escudos - Proteção extra",
-                        "• Acessórios - Bônus especiais"
+                        "• Acessórios - Bônus especiais",
                     ],
-                    visual_hint="Visite a loja para comprar equipamentos melhores!"
+                    visual_hint="Visite a loja para comprar equipamentos melhores!",
                 )
             ],
-            priority=6
+            priority=6,
         )
 
         # Tutorial de save/load
@@ -181,12 +182,12 @@ class TutorialManager(BaseManager):
                         "• Use o menu da cidade para salvar",
                         "• Seus saves ficam protegidos contra corrupção",
                         "• Você pode carregar um save a qualquer momento",
-                        "• O jogo salva automaticamente em momentos críticos"
+                        "• O jogo salva automaticamente em momentos críticos",
                     ],
-                    visual_hint="Nao deixe para salvar so no final - acidentes acontecem!"
+                    visual_hint="Nao deixe para salvar so no final - acidentes acontecem!",
                 )
             ],
-            priority=5
+            priority=5,
         )
 
         # Tutorial de cidade
@@ -202,12 +203,12 @@ class TutorialManager(BaseManager):
                         "• Loja - Compre itens e equipamentos",
                         "• NPCs - Conversem e aceitem missões",
                         "• Save/Load - Gerencie seus saves",
-                        "• Status - Veja estatísticas detalhadas"
+                        "• Status - Veja estatísticas detalhadas",
                     ],
-                    visual_hint="Explore e converse com todos os NPCs!"
+                    visual_hint="Explore e converse com todos os NPCs!",
                 )
             ],
-            priority=4
+            priority=4,
         )
 
         # Tutorial de status effects
@@ -223,12 +224,12 @@ class TutorialManager(BaseManager):
                         "• Buffs - Melhoram suas capacidades",
                         "• Debuffs - Prejudicam voce ou inimigos",
                         "• Veneno - Causa dano continuo",
-                        "• Regeneracao - Cura HP gradualmente"
+                        "• Regeneracao - Cura HP gradualmente",
                     ],
-                    visual_hint="Todos os efeitos tem duracao limitada!"
+                    visual_hint="Todos os efeitos tem duracao limitada!",
                 )
             ],
-            priority=3
+            priority=3,
         )
 
         # Tutorial de quests
@@ -244,17 +245,19 @@ class TutorialManager(BaseManager):
                         "• Converse com NPCs para descobrir missões",
                         "• Complete objetivos para ganhar recompensas",
                         "• XP, ouro e itens especiais te aguardam",
-                        "• Algumas missões desbloqueiam novas áreas"
+                        "• Algumas missões desbloqueiam novas áreas",
                     ],
-                    visual_hint="Verifique seus objetivos no menu de status!"
+                    visual_hint="Verifique seus objetivos no menu de status!",
                 )
             ],
-            priority=2
+            priority=2,
         )
 
         return tutorials
 
-    def check_trigger(self, trigger: TutorialTrigger, player_tutorials: TutorialFlags, **context) -> Optional[Tutorial]:
+    def check_trigger(
+        self, trigger: TutorialTrigger, player_tutorials: TutorialFlags, **context
+    ) -> Optional[Tutorial]:
         """Verifica se algum tutorial deve ser ativado."""
         for tutorial in self.tutorials.values():
             if tutorial.trigger == trigger:
@@ -301,15 +304,19 @@ class TutorialManager(BaseManager):
             "content": step.content,
             "visual_hint": step.visual_hint,
             "action_required": step.action_required,
-            "can_skip": True
+            "can_skip": True,
         }
 
-    def should_show_tutorial(self, trigger: TutorialTrigger, player_tutorials: TutorialFlags) -> bool:
+    def should_show_tutorial(
+        self, trigger: TutorialTrigger, player_tutorials: TutorialFlags
+    ) -> bool:
         """Verifica se deve mostrar tutorial para um trigger específico."""
         tutorial = self.check_trigger(trigger, player_tutorials)
         return tutorial is not None
 
-    def get_contextual_hint(self, context: str, player_tutorials: TutorialFlags) -> Optional[str]:
+    def get_contextual_hint(
+        self, context: str, player_tutorials: TutorialFlags
+    ) -> Optional[str]:
         """Retorna dica contextual baseada na situação atual."""
         hints = {
             "low_hp": "Dica: Use uma Pocao de Cura quando seu HP estiver baixo!",
@@ -318,7 +325,7 @@ class TutorialManager(BaseManager):
             "boss_approaching": "Cuidado: Um chefe poderoso se aproxima! Prepare-se bem.",
             "new_area": "Voce entrou em uma nova area. Explore com cuidado!",
             "status_poisoned": "Voce esta envenenado! Use um Antidoto rapidamente.",
-            "equipment_damaged": "Seus equipamentos estao danificados. Visite um ferreiro."
+            "equipment_damaged": "Seus equipamentos estao danificados. Visite um ferreiro.",
         }
 
         # Verificar se já mostrou tutoriais relacionados
@@ -337,7 +344,7 @@ class TutorialManager(BaseManager):
             "Itens": player_tutorials.itens_mostrado,
             "Level Up": player_tutorials.level_up_mostrado,
             "Equipamentos": player_tutorials.equipamentos_mostrado,
-            "Save/Load": player_tutorials.save_load_mostrado
+            "Save/Load": player_tutorials.save_load_mostrado,
         }
 
     def reset_all_tutorials(self, player_tutorials: TutorialFlags):
@@ -357,7 +364,9 @@ def create_tutorial_manager() -> TutorialManager:
     return TutorialManager()
 
 
-def check_tutorial_trigger(trigger: TutorialTrigger, player_tutorials: TutorialFlags, manager: TutorialManager) -> Optional[Dict[str, Any]]:
+def check_tutorial_trigger(
+    trigger: TutorialTrigger, player_tutorials: TutorialFlags, manager: TutorialManager
+) -> Optional[Dict[str, Any]]:
     """Função helper para verificar e obter tutorial."""
     tutorial = manager.check_trigger(trigger, player_tutorials)
     if tutorial:

@@ -1,30 +1,32 @@
 """
 Sistema de conquistas/achievements para o jogo ZORG.
 """
-from dataclasses import dataclass, field
-from typing import Dict, List, Callable, Any, Optional
-from enum import Enum
-from datetime import datetime
-import json
-from pathlib import Path
 
-from core.managers.event_manager import subscribe_to_event, EventType
+import json
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
+
 from config.settings import SAVE_DIR
+from core.managers.event_manager import EventType, subscribe_to_event
 from utils.logging_config import get_logger
 
 
 class AchievementType(Enum):
     """Tipos de conquistas."""
-    PROGRESS = "progress"      # Conquistas de progresso (matar X inimigos)
-    MILESTONE = "milestone"    # Marcos importantes (chegar na fase X)
+
+    PROGRESS = "progress"  # Conquistas de progresso (matar X inimigos)
+    MILESTONE = "milestone"  # Marcos importantes (chegar na fase X)
     COLLECTION = "collection"  # Coleção (ter X itens)
-    SKILL = "skill"           # Habilidades (usar X vezes uma habilidade)
-    SECRET = "secret"         # Conquistas secretas
-    STORY = "story"           # Relacionadas à história
+    SKILL = "skill"  # Habilidades (usar X vezes uma habilidade)
+    SECRET = "secret"  # Conquistas secretas
+    STORY = "story"  # Relacionadas à história
 
 
 class AchievementRarity(Enum):
     """Raridade das conquistas."""
+
     COMMON = "common"
     UNCOMMON = "uncommon"
     RARE = "rare"
@@ -35,6 +37,7 @@ class AchievementRarity(Enum):
 @dataclass
 class Achievement:
     """Representa uma conquista do jogo."""
+
     id: str
     name: str
     description: str
@@ -47,7 +50,9 @@ class Achievement:
     progress_current: int = 0
     unlocked: bool = False
     unlock_date: Optional[str] = None
-    condition_check: Optional[Callable[[Dict[str, Any]], bool]] = field(default=None, compare=False)
+    condition_check: Optional[Callable[[Dict[str, Any]], bool]] = field(
+        default=None, compare=False
+    )
 
     def __post_init__(self):
         """Inicialização após criação."""
@@ -86,11 +91,13 @@ class Achievement:
             "id": self.id,
             "progress_current": self.progress_current,
             "unlocked": self.unlocked,
-            "unlock_date": self.unlock_date
+            "unlock_date": self.unlock_date,
         }
 
     @classmethod
-    def from_dict(cls, achievement_template: 'Achievement', data: Dict[str, Any]) -> 'Achievement':
+    def from_dict(
+        cls, achievement_template: "Achievement", data: Dict[str, Any]
+    ) -> "Achievement":
         """Cria uma conquista a partir de dados salvos."""
         achievement = Achievement(
             id=achievement_template.id,
@@ -102,7 +109,7 @@ class Achievement:
             icon=achievement_template.icon,
             hidden=achievement_template.hidden,
             progress_max=achievement_template.progress_max,
-            condition_check=achievement_template.condition_check
+            condition_check=achievement_template.condition_check,
         )
 
         achievement.progress_current = data.get("progress_current", 0)
@@ -140,90 +147,106 @@ class AchievementManager:
     def _initialize_achievements(self) -> None:
         """Inicializa todas as conquistas do jogo."""
         # Conquistas de progresso
-        self.add_achievement(Achievement(
-            id="first_blood",
-            name="Primeiro Sangue",
-            description="Derrote seu primeiro inimigo",
-            type=AchievementType.MILESTONE,
-            rarity=AchievementRarity.COMMON,
-            points=10,
-            icon="[X]"  # X para combate
-        ))
+        self.add_achievement(
+            Achievement(
+                id="first_blood",
+                name="Primeiro Sangue",
+                description="Derrote seu primeiro inimigo",
+                type=AchievementType.MILESTONE,
+                rarity=AchievementRarity.COMMON,
+                points=10,
+                icon="[X]",  # X para combate
+            )
+        )
 
-        self.add_achievement(Achievement(
-            id="monster_slayer",
-            name="Caçador de Monstros",
-            description="Derrote 10 inimigos",
-            type=AchievementType.PROGRESS,
-            rarity=AchievementRarity.COMMON,
-            points=25,
-            icon="[#]",  # Hash para matador
-            progress_max=10
-        ))
+        self.add_achievement(
+            Achievement(
+                id="monster_slayer",
+                name="Caçador de Monstros",
+                description="Derrote 10 inimigos",
+                type=AchievementType.PROGRESS,
+                rarity=AchievementRarity.COMMON,
+                points=25,
+                icon="[#]",  # Hash para matador
+                progress_max=10,
+            )
+        )
 
-        self.add_achievement(Achievement(
-            id="level_up_5",
-            name="Crescimento",
-            description="Alcance o nível 5",
-            type=AchievementType.MILESTONE,
-            rarity=AchievementRarity.COMMON,
-            points=20,
-            icon="[+]"  # Plus para progresso
-        ))
+        self.add_achievement(
+            Achievement(
+                id="level_up_5",
+                name="Crescimento",
+                description="Alcance o nível 5",
+                type=AchievementType.MILESTONE,
+                rarity=AchievementRarity.COMMON,
+                points=20,
+                icon="[+]",  # Plus para progresso
+            )
+        )
 
-        self.add_achievement(Achievement(
-            id="phase_5_complete",
-            name="Meio do Caminho",
-            description="Complete a Fase 5",
-            type=AchievementType.STORY,
-            rarity=AchievementRarity.UNCOMMON,
-            points=50,
-            icon="[>]"  # Seta para exploracao
-        ))
+        self.add_achievement(
+            Achievement(
+                id="phase_5_complete",
+                name="Meio do Caminho",
+                description="Complete a Fase 5",
+                type=AchievementType.STORY,
+                rarity=AchievementRarity.UNCOMMON,
+                points=50,
+                icon="[>]",  # Seta para exploracao
+            )
+        )
 
-        self.add_achievement(Achievement(
-            id="game_complete",
-            name="Herói de Zorg",
-            description="Complete o jogo e salve Ramon",
-            type=AchievementType.STORY,
-            rarity=AchievementRarity.LEGENDARY,
-            points=200,
-            icon="[@]"  # Arroba para realizacao final
-        ))
+        self.add_achievement(
+            Achievement(
+                id="game_complete",
+                name="Herói de Zorg",
+                description="Complete o jogo e salve Ramon",
+                type=AchievementType.STORY,
+                rarity=AchievementRarity.LEGENDARY,
+                points=200,
+                icon="[@]",  # Arroba para realizacao final
+            )
+        )
 
-        self.add_achievement(Achievement(
-            id="spell_master",
-            name="Mestre da Magia",
-            description="Use habilidades 25 vezes",
-            type=AchievementType.SKILL,
-            rarity=AchievementRarity.RARE,
-            points=75,
-            icon="[~]",  # Til para magia
-            progress_max=25
-        ))
+        self.add_achievement(
+            Achievement(
+                id="spell_master",
+                name="Mestre da Magia",
+                description="Use habilidades 25 vezes",
+                type=AchievementType.SKILL,
+                rarity=AchievementRarity.RARE,
+                points=75,
+                icon="[~]",  # Til para magia
+                progress_max=25,
+            )
+        )
 
-        self.add_achievement(Achievement(
-            id="potion_addict",
-            name="Viciado em Poções",
-            description="Use 20 poções",
-            type=AchievementType.COLLECTION,
-            rarity=AchievementRarity.UNCOMMON,
-            points=30,
-            icon="[=]",  # Igual para pocoes
-            progress_max=20
-        ))
+        self.add_achievement(
+            Achievement(
+                id="potion_addict",
+                name="Viciado em Poções",
+                description="Use 20 poções",
+                type=AchievementType.COLLECTION,
+                rarity=AchievementRarity.UNCOMMON,
+                points=30,
+                icon="[=]",  # Igual para pocoes
+                progress_max=20,
+            )
+        )
 
         # Conquista secreta
-        self.add_achievement(Achievement(
-            id="secret_explorer",
-            name="Explorador Secreto",
-            description="Descubra todos os segredos do jogo",
-            type=AchievementType.SECRET,
-            rarity=AchievementRarity.EPIC,
-            points=100,
-            icon="[?]",  # Interrogacao para colecionador
-            hidden=True
-        ))
+        self.add_achievement(
+            Achievement(
+                id="secret_explorer",
+                name="Explorador Secreto",
+                description="Descubra todos os segredos do jogo",
+                type=AchievementType.SECRET,
+                rarity=AchievementRarity.EPIC,
+                points=100,
+                icon="[?]",  # Interrogacao para colecionador
+                hidden=True,
+            )
+        )
 
     def add_achievement(self, achievement: Achievement) -> None:
         """Adiciona uma conquista ao sistema."""
@@ -242,12 +265,16 @@ class AchievementManager:
 
         # Emitir evento de conquista desbloqueada
         from core.managers.event_manager import emit_event
-        emit_event(EventType.ACHIEVEMENT_UNLOCKED, {
-            "achievement_id": achievement_id,
-            "achievement_name": achievement.name,
-            "points": achievement.points,
-            "rarity": achievement.rarity.value
-        })
+
+        emit_event(
+            EventType.ACHIEVEMENT_UNLOCKED,
+            {
+                "achievement_id": achievement_id,
+                "achievement_name": achievement.name,
+                "points": achievement.points,
+                "rarity": achievement.rarity.value,
+            },
+        )
 
         return True
 
@@ -260,11 +287,15 @@ class AchievementManager:
         unlocked = achievement.update_progress(amount)
         if unlocked:
             self.unlocked_achievements.append(achievement_id)
-            self.logger.info(f"Conquista desbloqueada por progresso: {achievement.name}")
+            self.logger.info(
+                f"Conquista desbloqueada por progresso: {achievement.name}"
+            )
 
         return unlocked
 
-    def get_achievements_by_type(self, achievement_type: AchievementType) -> List[Achievement]:
+    def get_achievements_by_type(
+        self, achievement_type: AchievementType
+    ) -> List[Achievement]:
         """Retorna conquistas de um tipo específico."""
         return [a for a in self.achievements.values() if a.type == achievement_type]
 
@@ -272,7 +303,9 @@ class AchievementManager:
         """Retorna todas as conquistas desbloqueadas."""
         return [a for a in self.achievements.values() if a.unlocked]
 
-    def get_locked_achievements(self, include_hidden: bool = False) -> List[Achievement]:
+    def get_locked_achievements(
+        self, include_hidden: bool = False
+    ) -> List[Achievement]:
         """Retorna conquistas ainda bloqueadas."""
         achievements = [a for a in self.achievements.values() if not a.unlocked]
         if not include_hidden:
@@ -297,10 +330,10 @@ class AchievementManager:
                     aid: achievement.to_dict()
                     for aid, achievement in self.achievements.items()
                 },
-                "last_updated": datetime.now().isoformat()
+                "last_updated": datetime.now().isoformat(),
             }
 
-            with open(self.save_file, 'w', encoding='utf-8') as f:
+            with open(self.save_file, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
 
         except Exception as e:
@@ -312,7 +345,7 @@ class AchievementManager:
             return
 
         try:
-            with open(self.save_file, 'r', encoding='utf-8') as f:
+            with open(self.save_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
             achievements_data = data.get("achievements", {})
@@ -320,12 +353,16 @@ class AchievementManager:
             for achievement_id, achievement_data in achievements_data.items():
                 if achievement_id in self.achievements:
                     template = self.achievements[achievement_id]
-                    self.achievements[achievement_id] = Achievement.from_dict(template, achievement_data)
+                    self.achievements[achievement_id] = Achievement.from_dict(
+                        template, achievement_data
+                    )
 
                     if self.achievements[achievement_id].unlocked:
                         self.unlocked_achievements.append(achievement_id)
 
-            self.logger.info(f"Progresso das conquistas carregado: {len(self.unlocked_achievements)} desbloqueadas")
+            self.logger.info(
+                f"Progresso das conquistas carregado: {len(self.unlocked_achievements)} desbloqueadas"
+            )
 
         except Exception as e:
             self.logger.error(f"Erro ao carregar progresso das conquistas: {e}")

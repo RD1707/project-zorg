@@ -4,11 +4,11 @@ Screens package do jogo ZORG.
 Contem todas as telas da interface do usuario.
 """
 
-from .main_menu import MainMenuScreen
-from .game_screen import GameScreen
 from .combat_screen import CombatScreen
-from .story_screen import StoryScreen
+from .game_screen import GameScreen
+from .main_menu import MainMenuScreen
 from .shop_screen import ShopScreen
+from .story_screen import StoryScreen
 from .victory_screen import VictoryScreen
 
 # Importacoes opcionais para screens que podem existir
@@ -28,13 +28,13 @@ except ImportError:
     SkillScreen = None
 
 __all__ = [
-    'MainMenuScreen',
-    'GameScreen',
-    'CombatScreen',
-    'StoryScreen',
-    'ShopScreen',
-    'VictoryScreen',
-    'SettingsScreen',
-    'ItemScreen',
-    'SkillScreen'
+    "MainMenuScreen",
+    "GameScreen",
+    "CombatScreen",
+    "StoryScreen",
+    "ShopScreen",
+    "VictoryScreen",
+    "SettingsScreen",
+    "ItemScreen",
+    "SkillScreen",
 ]

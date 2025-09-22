@@ -1,15 +1,15 @@
 # main.py
 
-from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer
+from textual.app import App
 from textual.geometry import Size  # <--- 1. VERIFIQUE SE ESTA IMPORTAÇÃO ESTÁ AQUI
 
 # Imports do seu projeto
 from core.engine import GameEngine
-from core.managers.event_manager import subscribe_to_event, EventType
+from core.managers.event_manager import EventType, subscribe_to_event
 from screens.main_menu import MainMenuScreen
 from screens.shop_screen import ShopScreen
 from ui.styles.global_styles import get_global_css
+
 
 class ZorgApp(App):
     """A aplicação principal do jogo ZORG construída com Textual."""
@@ -38,7 +38,7 @@ class ZorgApp(App):
         subscribe_to_event(EventType.SHOW_SHOP_SCREEN, self._handle_show_shop)
 
         # Iniciar música de menu
-        if hasattr(self.engine, 'audio_manager'):
+        if hasattr(self.engine, "audio_manager"):
             self.engine.audio_manager.play_music("main_menu_theme")
 
         self.push_screen(MainMenuScreen())
@@ -51,15 +51,16 @@ class ZorgApp(App):
 
     def action_quit(self) -> None:
         # Limpar recursos do engine antes de sair
-        if hasattr(self, 'engine') and self.engine:
+        if hasattr(self, "engine") and self.engine:
             self.engine.shutdown()
         self.exit()
 
     def on_exit(self) -> None:
         """Chamado quando a aplicação está sendo finalizada."""
         # Garantir que o engine seja limpo na saída
-        if hasattr(self, 'engine') and self.engine:
+        if hasattr(self, "engine") and self.engine:
             self.engine.shutdown()
+
 
 if __name__ == "__main__":
     app = ZorgApp()

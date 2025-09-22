@@ -4,10 +4,10 @@ Data package do jogo ZORG.
 Contem todos os bancos de dados de itens, equipamentos, inimigos, habilidades, etc.
 """
 
-from .equipment import DB_EQUIPAMENTOS
-from .items import DB_ITENS
 from .abilities import DB_HABILIDADES
 from .enemies import DB_INIMIGOS
+from .equipment import DB_EQUIPAMENTOS
+from .items import DB_ITENS
 
 # Importacoes opcionais para modulos que podem existir
 try:
@@ -21,10 +21,10 @@ except ImportError:
     DB_REWARD_TABLES = {}
 
 __all__ = [
-    'DB_EQUIPAMENTOS',
-    'DB_ITENS',
-    'DB_HABILIDADES',
-    'DB_INIMIGOS',
-    'DB_NPCS',
-    'DB_REWARD_TABLES'
+    "DB_EQUIPAMENTOS",
+    "DB_ITENS",
+    "DB_HABILIDADES",
+    "DB_INIMIGOS",
+    "DB_NPCS",
+    "DB_REWARD_TABLES",
 ]

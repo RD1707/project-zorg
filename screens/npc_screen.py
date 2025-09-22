@@ -1,14 +1,14 @@
 """
 Tela de interação com NPCs.
 """
+
 from textual.app import ComposeResult
+from textual.containers import ScrollableContainer, Vertical
 from textual.screen import Screen
-from textual.widgets import Button, Static, Header, Footer
-from textual.containers import ScrollableContainer, Vertical 
-from typing import Optional
+from textual.widgets import Button, Footer, Header, Static
 
 from core.engine import GameEngine
-from data.npcs import NPC, DialogOption, QuestStatus
+from data.npcs import NPC, QuestStatus
 
 
 class NPCScreen(Screen):
@@ -118,7 +118,9 @@ class NPCScreen(Screen):
 
                         quest_info = f"{status_icon} {quest.name}\n{quest.description}"
                         if quest.status == QuestStatus.ACTIVE:
-                            quest_info += f"\nProgresso: {quest.progress}/{quest.max_progress}"
+                            quest_info += (
+                                f"\nProgresso: {quest.progress}/{quest.max_progress}"
+                            )
                         elif quest.status == QuestStatus.COMPLETED:
                             quest_info += "\nConcluída!"
 
@@ -132,7 +134,7 @@ class NPCScreen(Screen):
             QuestStatus.AVAILABLE: "!",
             QuestStatus.ACTIVE: "-",
             QuestStatus.COMPLETED: "✓",
-            QuestStatus.FAILED: "X"
+            QuestStatus.FAILED: "X",
         }
         return icons.get(status, "?")
 
@@ -179,7 +181,9 @@ class NPCScreen(Screen):
             # Verificar level up
             level_up_info = self.engine.verificar_level_up()
 
-            reward_text = f"Missão completada!\n+{quest.reward_xp} XP, +{quest.reward_gold} Ouro"
+            reward_text = (
+                f"Missão completada!\n+{quest.reward_xp} XP, +{quest.reward_gold} Ouro"
+            )
             if quest.reward_items:
                 reward_text += f"\nItens: {', '.join(quest.reward_items)}"
 
@@ -240,7 +244,7 @@ class NPCLocationScreen(Screen):
             "praca_central": "Praça Central",
             "taverna": "Taverna 'O Pescador Cansado'",
             "entrada_cidade": "Portão da Cidade",
-            "biblioteca": "Biblioteca Antiga"
+            "biblioteca": "Biblioteca Antiga",
         }
 
         location_title = location_names.get(self.location, self.location.title())
@@ -252,7 +256,10 @@ class NPCLocationScreen(Screen):
 
             with Vertical(id="npcs_list"):
                 if not self.npcs:
-                    yield Static("Não há ninguém interessante por aqui no momento.", classes="empty_message")
+                    yield Static(
+                        "Não há ninguém interessante por aqui no momento.",
+                        classes="empty_message",
+                    )
                 else:
                     for npc in self.npcs:
                         quest_indicator = ""

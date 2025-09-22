@@ -1,14 +1,27 @@
 from textual.screen import Screen
 
-# 1. Importar TODOS os scripts de fase
-from scenes.phase_scripts import phase1, phase2, phase3, phase4, phase5, phase6, phase7, phase8, phase9, phase10 
 from core.engine import GameEngine
+
+# 1. Importar TODOS os scripts de fase
+from scenes.phase_scripts import (
+    phase1,
+    phase2,
+    phase3,
+    phase4,
+    phase5,
+    phase6,
+    phase7,
+    phase8,
+    phase9,
+    phase10,
+)
+
+from .city_screen import CityScreen
+from .combat_screen import CombatScreen
 
 # Importa as telas que este gestor irá controlar
 from .story_screen import StoryScreen
-from .combat_screen import CombatScreen
 from .victory_screen import VictoryScreen
-from .city_screen import CityScreen
 
 # Mapeia o número da fase para a função geradora correspondente
 PHASE_MAP = {
@@ -38,7 +51,7 @@ class GameScreen(Screen):
         super().__init__()
         self.engine = engine
         self.phase_generator = None
-        self.current_enemy = None 
+        self.current_enemy = None
         self.victory_text = ""
         # Lista para armazenar as recompensas pendentes
         self._pending_rewards = []
@@ -61,24 +74,29 @@ class GameScreen(Screen):
             # Se não houver mais fases, termina
             self.app.pop_screen()
             return
-        
+
     def process_next_event(self, _=None):
         """
         Pega o próximo evento do gerador da fase e apresenta a tela correspondente.
         """
         try:
             event = next(self.phase_generator)
-            
+
             if event["type"] == "show_text":
                 story_segments = event.get("segments", [])
-                self.app.push_screen(StoryScreen(story_segments), self.process_next_event)
+                self.app.push_screen(
+                    StoryScreen(story_segments), self.process_next_event
+                )
 
             elif event["type"] == "combat":
                 enemy_name = event.get("enemy_name")
                 self.current_enemy = self.engine.criar_inimigo(enemy_name)
                 self.victory_text = event.get("victory_text")
                 if self.current_enemy:
-                    self.app.push_screen(CombatScreen(self.engine, self.current_enemy), self.on_combat_finished)
+                    self.app.push_screen(
+                        CombatScreen(self.engine, self.current_enemy),
+                        self.on_combat_finished,
+                    )
 
             elif event["type"] == "enter_hub":
                 self.app.push_screen(CityScreen(self.engine), self.on_hub_closed)
@@ -90,7 +108,7 @@ class GameScreen(Screen):
                 elif "ability" in event:
                     self._pending_rewards.append(event["ability"])
                 self.process_next_event()
-            
+
             elif event["type"] == "phase_end":
                 self.engine.jogador.fase_atual += 1
                 self.start_phase(self.engine.jogador.fase_atual)
@@ -100,7 +118,6 @@ class GameScreen(Screen):
                 # Sai da tela de jogo e volta para o menu principal
                 self.app.pop_screen()
 
-
         except StopIteration:
             self.app.pop_screen()
 
@@ -108,16 +125,20 @@ class GameScreen(Screen):
         """Callback: chamado quando a CombatScreen é fechada."""
         if combat_result:
             # Processar vitória com recompensas pendentes centralizadamente no GameEngine
-            victory_data = self.engine.processar_vitoria(self.current_enemy, self._pending_rewards)
-            self._pending_rewards = [] # Limpar a lista
+            victory_data = self.engine.processar_vitoria(
+                self.current_enemy, self._pending_rewards
+            )
+            self._pending_rewards = []  # Limpar a lista
             self.app.push_screen(VictoryScreen(victory_data), self.on_victory_closed)
         else:
-            self.app.pop_screen() 
+            self.app.pop_screen()
 
     def on_victory_closed(self, _):
         """Callback: chamado após a tela de vitória ser fechada."""
         if self.victory_text:
-            self.app.push_screen(StoryScreen([self.victory_text]), self.process_next_event)
+            self.app.push_screen(
+                StoryScreen([self.victory_text]), self.process_next_event
+            )
         else:
             self.process_next_event()
 

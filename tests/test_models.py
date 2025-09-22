@@ -1,12 +1,19 @@
 """
 Testes para os modelos do jogo ZORG.
 """
+
 import pytest
-from core.models import (
-    Personagem, Item, Equipamento, Habilidade, TutorialFlags,
-    TipoEquipamento, TipoHabilidade
-)
+
 from core.exceptions import CharacterStateError
+from core.models import (
+    Equipamento,
+    Habilidade,
+    Item,
+    Personagem,
+    TipoEquipamento,
+    TipoHabilidade,
+    TutorialFlags,
+)
 
 
 class TestPersonagem:
@@ -15,16 +22,12 @@ class TestPersonagem:
     def test_personagem_creation(self):
         """Testa a criação de um personagem."""
         player = Personagem(
-            nome="TestPlayer",
-            hp_max=100,
-            mp_max=50,
-            ataque_base=10,
-            defesa_base=5
+            nome="TestPlayer", hp_max=100, mp_max=50, ataque_base=10, defesa_base=5
         )
 
         assert player.nome == "TestPlayer"
         assert player.hp == 100  # HP inicializado com máximo
-        assert player.mp == 50   # MP inicializado com máximo
+        assert player.mp == 50  # MP inicializado com máximo
         assert player.ataque_base == 10
         assert player.defesa_base == 5
         assert player.nivel == 1
@@ -33,13 +36,7 @@ class TestPersonagem:
     def test_personagem_invalid_values(self):
         """Testa criação com valores inválidos."""
         with pytest.raises(ValueError):
-            Personagem(
-                nome="",
-                hp_max=100,
-                mp_max=50,
-                ataque_base=10,
-                defesa_base=5
-            )
+            Personagem(nome="", hp_max=100, mp_max=50, ataque_base=10, defesa_base=5)
 
         with pytest.raises(ValueError):
             Personagem(
@@ -47,7 +44,7 @@ class TestPersonagem:
                 hp_max=-10,  # Inválido
                 mp_max=50,
                 ataque_base=10,
-                defesa_base=5
+                defesa_base=5,
             )
 
     def test_ataque_total_calculation(self, sample_player, sample_equipment):
@@ -98,37 +95,37 @@ class TestPersonagem:
 
     def test_spend_mp(self, sample_player):
         """Testa gasto de MP."""
-        assert sample_player.spend_mp(20) == True
+        assert sample_player.spend_mp(20) is True
         assert sample_player.mp == 30
 
         # Teste de MP insuficiente
-        assert sample_player.spend_mp(40) == False
+        assert sample_player.spend_mp(40) is False
         assert sample_player.mp == 30  # Não mudou
 
     def test_inventory_operations(self, sample_player, sample_item):
         """Testa operações de inventário."""
         # Adicionar item
-        assert sample_player.add_item_to_inventory(sample_item) == True
+        assert sample_player.add_item_to_inventory(sample_item) is True
         assert len(sample_player.inventario) == 1
 
         # Verificar se tem item
-        assert sample_player.has_item("Test Potion") == True
-        assert sample_player.has_item("Nonexistent Item") == False
+        assert sample_player.has_item("Test Potion") is True
+        assert sample_player.has_item("Nonexistent Item") is False
 
         # Remover item
-        assert sample_player.remove_item_from_inventory("Test Potion") == True
+        assert sample_player.remove_item_from_inventory("Test Potion") is True
         assert len(sample_player.inventario) == 0
 
     def test_skill_operations(self, sample_player, sample_skill):
         """Testa operações com habilidades."""
         sample_player.habilidades_conhecidas.append(sample_skill)
 
-        assert sample_player.knows_skill("Test Heal") == True
-        assert sample_player.can_use_skill(sample_skill) == True
+        assert sample_player.knows_skill("Test Heal") is True
+        assert sample_player.can_use_skill(sample_skill) is True
 
         # Teste com MP insuficiente
         sample_player.mp = 5
-        assert sample_player.can_use_skill(sample_skill) == False
+        assert sample_player.can_use_skill(sample_skill) is False
 
     def test_status_effects_processing(self, sample_player):
         """Testa processamento de efeitos de status."""
@@ -175,7 +172,7 @@ class TestItem:
             cura_mp=0,
             cura_veneno=0,
             preco_venda=5,
-            quantidade=5
+            quantidade=5,
         )
 
         item2 = Item(
@@ -185,11 +182,11 @@ class TestItem:
             cura_mp=0,
             cura_veneno=0,
             preco_venda=5,
-            quantidade=3
+            quantidade=3,
         )
 
-        assert item1.can_stack_with(item2) == True
-        assert item1.add_quantity(3) == True
+        assert item1.can_stack_with(item2) is True
+        assert item1.add_quantity(3) is True
         assert item1.quantidade == 8
 
     def test_item_validation(self):
@@ -201,7 +198,7 @@ class TestItem:
                 cura_hp=10,
                 cura_mp=0,
                 cura_veneno=0,
-                preco_venda=5
+                preco_venda=5,
             )
 
 
@@ -212,8 +209,8 @@ class TestEquipamento:
         """Testa criação de equipamento."""
         assert sample_equipment.nome == "Test Sword"
         assert sample_equipment.tipo == TipoEquipamento.ARMA
-        assert sample_equipment.is_weapon == True
-        assert sample_equipment.is_armor == False
+        assert sample_equipment.is_weapon is True
+        assert sample_equipment.is_armor is False
 
     def test_equipamento_types(self):
         """Testa diferentes tipos de equipamento."""
@@ -221,12 +218,12 @@ class TestEquipamento:
             nome="Test Armor",
             tipo=TipoEquipamento.ARMADURA,
             bonus_ataque=0,
-            bonus_defesa=5
+            bonus_defesa=5,
         )
 
-        assert armor.is_armor == True
-        assert armor.is_weapon == False
-        assert armor.is_shield == False
+        assert armor.is_armor is True
+        assert armor.is_weapon is False
+        assert armor.is_shield is False
 
     def test_equipamento_validation(self):
         """Testa validação de equipamento."""
@@ -235,7 +232,7 @@ class TestEquipamento:
                 nome="Test",
                 tipo=TipoEquipamento.ARMA,
                 bonus_ataque=-5,  # Inválido
-                bonus_defesa=0
+                bonus_defesa=0,
             )
 
 
@@ -246,8 +243,8 @@ class TestHabilidade:
         """Testa criação de habilidade."""
         assert sample_skill.nome == "Test Heal"
         assert sample_skill.tipo == TipoHabilidade.CURA
-        assert sample_skill.is_defensive == True
-        assert sample_skill.is_offensive == False
+        assert sample_skill.is_defensive is True
+        assert sample_skill.is_offensive is False
 
     def test_habilidade_types(self):
         """Testa diferentes tipos de habilidade."""
@@ -256,11 +253,11 @@ class TestHabilidade:
             descricao="Ataque de teste",
             custo_mp=15,
             tipo=TipoHabilidade.ATAQUE,
-            valor_efeito=20
+            valor_efeito=20,
         )
 
-        assert attack_skill.is_offensive == True
-        assert attack_skill.is_defensive == False
+        assert attack_skill.is_offensive is True
+        assert attack_skill.is_defensive is False
 
     def test_habilidade_validation(self):
         """Testa validação de habilidade."""
@@ -270,7 +267,7 @@ class TestHabilidade:
                 descricao="Test",
                 custo_mp=-5,  # Inválido
                 tipo=TipoHabilidade.ATAQUE,
-                valor_efeito=10
+                valor_efeito=10,
             )
 
 
@@ -280,18 +277,18 @@ class TestTutorialFlags:
     def test_tutorial_flags_creation(self):
         """Testa criação de flags de tutorial."""
         flags = TutorialFlags()
-        assert flags.combate_basico_mostrado == False
-        assert flags.habilidades_mostrado == False
+        assert flags.combate_basico_mostrado is False
+        assert flags.habilidades_mostrado is False
 
     def test_tutorial_flags_dict_conversion(self):
         """Testa conversão para/de dicionário."""
         flags = TutorialFlags(combate_basico_mostrado=True)
         data = flags.to_dict()
 
-        assert data["combate_basico_mostrado"] == True
-        assert data["habilidades_mostrado"] == False
+        assert data["combate_basico_mostrado"] is True
+        assert data["habilidades_mostrado"] is False
 
         # Teste de recriação
         new_flags = TutorialFlags.from_dict(data)
-        assert new_flags.combate_basico_mostrado == True
-        assert new_flags.habilidades_mostrado == False
+        assert new_flags.combate_basico_mostrado is True
+        assert new_flags.habilidades_mostrado is False

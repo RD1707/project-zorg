@@ -1,9 +1,11 @@
 import asyncio
+
 from textual.app import ComposeResult
+from textual.binding import Binding
+from textual.containers import Center, Vertical
 from textual.screen import Screen
 from textual.widgets import Static
-from textual.containers import Center, Vertical
-from textual.binding import Binding
+
 
 class StoryScreen(Screen):
     """
@@ -13,12 +15,12 @@ class StoryScreen(Screen):
     BINDINGS = [
         Binding("enter", "advance_story", "Avançar"),
     ]
-    
+
     CSS = """
     StoryScreen {
         align: center middle;
     }
-    
+
     #story_container {
         width: 80%;
         max-width: 90;
@@ -70,21 +72,20 @@ class StoryScreen(Screen):
             # Se não houver história, simplesmente permite fechar
             self.query_one("#story_text", Static).update("...")
 
-
     async def type_text(self, text: str):
         """Anima o texto letra por letra."""
         self.is_typing = True
         story_text_widget = self.query_one("#story_text", Static)
         prompt = self.query_one("#prompt")
         prompt.visible = False
-        story_text_widget.update("") # Limpa o texto anterior
+        story_text_widget.update("")  # Limpa o texto anterior
 
         try:
             current_text = ""
             for char in text:
                 current_text += char
                 story_text_widget.update(current_text)
-                await asyncio.sleep(0.025) # Ajuste este valor para mudar a velocidade
+                await asyncio.sleep(0.025)  # Ajuste este valor para mudar a velocidade
         except asyncio.CancelledError:
             # Se foi cancelado, mostra o texto completo imediatamente
             story_text_widget.update(text)

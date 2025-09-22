@@ -1,10 +1,9 @@
 """
 Sistema de recompensas balanceadas baseadas na progressão do jogo.
 """
+
 import random
-from typing import Dict, List, Any
-from data.equipment import DB_EQUIPAMENTOS
-from data.abilities import DB_HABILIDADES
+from typing import Any, Dict, List
 
 
 class RewardTable:
@@ -16,62 +15,62 @@ class RewardTable:
             "comum": ["Adaga Enferrujada", "Roupas de Pano", "Escudo de Madeira"],
             "raro": [],
             "épico": [],
-            "lendário": []
+            "lendário": [],
         },
         2: {
             "comum": ["Espada Curta", "Armadura de Couro", "Escudo de Bronze"],
             "raro": [],
             "épico": [],
-            "lendário": []
+            "lendário": [],
         },
         3: {
             "comum": ["Espada de Ferro", "Armadura de Malha", "Escudo de Ferro"],
             "raro": ["Cimitarra Enfeiticada"],
             "épico": [],
-            "lendário": []
+            "lendário": [],
         },
         4: {
             "comum": ["Espada de Ferro", "Armadura de Malha", "Escudo de Ferro"],
             "raro": ["Machado de Guerra", "Armadura de Aco Reforcado", "Escudo de Aco"],
             "épico": [],
-            "lendário": []
+            "lendário": [],
         },
         5: {
             "comum": [],
             "raro": ["Lâmina Élfica", "Manto Élfico", "Escudo Rúnico"],
             "épico": ["Espada Runica"],
-            "lendário": []
+            "lendário": [],
         },
         6: {
             "comum": [],
             "raro": ["Armadura de Placas"],
             "épico": ["Espada Runica", "Escudo Rúnico"],
-            "lendário": []
+            "lendário": [],
         },
         7: {
             "comum": [],
             "raro": [],
             "épico": ["Espada Runica", "Escudo Rúnico"],
-            "lendário": ["Excalibur"]
+            "lendário": ["Excalibur"],
         },
         8: {
             "comum": [],
             "raro": [],
             "épico": [],
-            "lendário": ["Excalibur", "Armadura Dragão"]
+            "lendário": ["Excalibur", "Armadura Dragão"],
         },
         9: {
             "comum": [],
             "raro": [],
             "épico": [],
-            "lendário": ["Excalibur", "Armadura Dragão", "Aegis Celestial"]
+            "lendário": ["Excalibur", "Armadura Dragão", "Aegis Celestial"],
         },
         10: {
             "comum": [],
             "raro": [],
             "épico": [],
-            "lendário": ["Excalibur", "Armadura Dragão", "Aegis Celestial"]
-        }
+            "lendário": ["Excalibur", "Armadura Dragão", "Aegis Celestial"],
+        },
     }
 
     ABILITIES_BY_PHASE = {
@@ -84,7 +83,7 @@ class RewardTable:
         7: ["Meteoro", "Barreira Divina", "Cura Suprema"],
         8: ["Furia Berserker", "Regeneracao Vital"],
         9: ["Escudo de Luz", "Rajada Arcana"],
-        10: ["Benção da Natureza", "Barreira Divina", "Meteoro"]
+        10: ["Benção da Natureza", "Barreira Divina", "Meteoro"],
     }
 
     # Chances de drop por raridade baseada na fase
@@ -98,11 +97,13 @@ class RewardTable:
         7: {"comum": 0.1, "raro": 0.3, "épico": 0.4, "lendário": 0.2},
         8: {"comum": 0.05, "raro": 0.2, "épico": 0.45, "lendário": 0.3},
         9: {"comum": 0.0, "raro": 0.1, "épico": 0.4, "lendário": 0.5},
-        10: {"comum": 0.0, "raro": 0.05, "épico": 0.25, "lendário": 0.7}
+        10: {"comum": 0.0, "raro": 0.05, "épico": 0.25, "lendário": 0.7},
     }
 
     @staticmethod
-    def get_equipment_reward(phase: int, player_equipment: Dict[str, Any] = None) -> str:
+    def get_equipment_reward(
+        phase: int, player_equipment: Dict[str, Any] = None
+    ) -> str:
         """
         Retorna um equipamento apropriado para a fase atual.
         Evita duplicatas se o jogador já tiver o item.
@@ -154,16 +155,22 @@ class RewardTable:
         available_abilities = RewardTable.ABILITIES_BY_PHASE.get(phase, [])
 
         # Filtrar habilidades que o jogador já conhece
-        new_abilities = [ability for ability in available_abilities
-                        if ability not in player_abilities]
+        new_abilities = [
+            ability
+            for ability in available_abilities
+            if ability not in player_abilities
+        ]
 
         # Se todas as habilidades da fase já foram aprendidas, não dar recompensa
         if not new_abilities:
             # Tentar fases anteriores como fallback
             for prev_phase in range(phase - 1, 0, -1):
                 prev_abilities = RewardTable.ABILITIES_BY_PHASE.get(prev_phase, [])
-                new_abilities = [ability for ability in prev_abilities
-                               if ability not in player_abilities]
+                new_abilities = [
+                    ability
+                    for ability in prev_abilities
+                    if ability not in player_abilities
+                ]
                 if new_abilities:
                     break
 
@@ -188,17 +195,17 @@ class RewardTable:
         equipped_items = [
             player_equipment.get("arma_equipada"),
             player_equipment.get("armadura_equipada"),
-            player_equipment.get("escudo_equipada")
+            player_equipment.get("escudo_equipada"),
         ]
 
         for item in equipped_items:
-            if item and hasattr(item, 'nome') and item.nome == item_name:
+            if item and hasattr(item, "nome") and item.nome == item_name:
                 return True
 
         # Verificar inventário se fornecido
         inventory = player_equipment.get("inventario", [])
         for item in inventory:
-            if hasattr(item, 'nome') and item.nome == item_name:
+            if hasattr(item, "nome") and item.nome == item_name:
                 return True
 
         return False
@@ -213,13 +220,29 @@ class RewardTable:
 
         # Multiplicadores balanceados por fase
         xp_multipliers = {
-            1: 1.0, 2: 1.2, 3: 1.5, 4: 1.8, 5: 2.2,
-            6: 2.7, 7: 3.3, 8: 4.0, 9: 4.8, 10: 5.7
+            1: 1.0,
+            2: 1.2,
+            3: 1.5,
+            4: 1.8,
+            5: 2.2,
+            6: 2.7,
+            7: 3.3,
+            8: 4.0,
+            9: 4.8,
+            10: 5.7,
         }
 
         gold_multipliers = {
-            1: 1.0, 2: 1.1, 3: 1.3, 4: 1.6, 5: 2.0,
-            6: 2.5, 7: 3.1, 8: 3.8, 9: 4.6, 10: 5.5
+            1: 1.0,
+            2: 1.1,
+            3: 1.3,
+            4: 1.6,
+            5: 2.0,
+            6: 2.5,
+            7: 3.1,
+            8: 3.8,
+            9: 4.6,
+            10: 5.5,
         }
 
         balanced_xp = int(base_xp * xp_multipliers[phase])
@@ -229,7 +252,9 @@ class RewardTable:
 
 
 # Função conveniente para usar no GameEngine
-def get_phase_reward(phase: int, reward_type: str, player_data: Dict[str, Any] = None) -> str:
+def get_phase_reward(
+    phase: int, reward_type: str, player_data: Dict[str, Any] = None
+) -> str:
     """
     Função conveniente para obter recompensas balanceadas.
 

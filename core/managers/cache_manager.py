@@ -1,14 +1,13 @@
-import time
-from typing import Any, Dict, Optional, Callable, TypeVar
-from functools import wraps
-from collections import OrderedDict
 import hashlib
-import pickle
+import time
+from collections import OrderedDict
+from functools import wraps
+from typing import Any, Callable, Dict, Optional, TypeVar
 
-from core.managers.base_manager import BaseManager
 from config.settings import get_config
+from core.managers.base_manager import BaseManager
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class CacheEntry:
@@ -88,7 +87,9 @@ class LRUCache:
             "size": len(self._cache),
             "max_size": self.max_size,
             "total_accesses": total_accesses,
-            "hit_rate": 0.0 if total_accesses == 0 else len(self._cache) / total_accesses
+            "hit_rate": (
+                0.0 if total_accesses == 0 else len(self._cache) / total_accesses
+            ),
         }
 
 
@@ -106,19 +107,12 @@ class CacheManager(BaseManager):
             return
 
         self._caches["main"] = LRUCache(
-            max_size=self._config.get("cache_size", 1000),
-            default_ttl=3600  
+            max_size=self._config.get("cache_size", 1000), default_ttl=3600
         )
 
-        self._caches["resources"] = LRUCache(
-            max_size=500,
-            default_ttl=None  
-        )
+        self._caches["resources"] = LRUCache(max_size=500, default_ttl=None)
 
-        self._caches["calculations"] = LRUCache(
-            max_size=200,
-            default_ttl=1800  
-        )
+        self._caches["calculations"] = LRUCache(max_size=200, default_ttl=1800)
 
         self.logger.info("Caches inicializados")
 
@@ -135,7 +129,13 @@ class CacheManager(BaseManager):
             return None
         return cache.get(key)
 
-    def set(self, key: str, value: Any, cache_name: str = "main", ttl: Optional[float] = None) -> None:
+    def set(
+        self,
+        key: str,
+        value: Any,
+        cache_name: str = "main",
+        ttl: Optional[float] = None,
+    ) -> None:
         """Define valor em um cache."""
         cache = self.get_cache(cache_name)
         if cache is not None:
@@ -191,7 +191,11 @@ def get_cache_manager() -> CacheManager:
     return _cache_manager
 
 
-def cached(cache_name: str = "main", ttl: Optional[float] = None, key_func: Optional[Callable] = None):
+def cached(
+    cache_name: str = "main",
+    ttl: Optional[float] = None,
+    key_func: Optional[Callable] = None,
+):
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
         @wraps(func)
         def wrapper(*args, **kwargs) -> T:
@@ -202,7 +206,9 @@ def cached(cache_name: str = "main", ttl: Optional[float] = None, key_func: Opti
             if key_func:
                 cache_key = key_func(*args, **kwargs)
             else:
-                cache_key = f"{func.__name__}:{manager._generate_cache_key(*args, **kwargs)}"
+                cache_key = (
+                    f"{func.__name__}:{manager._generate_cache_key(*args, **kwargs)}"
+                )
 
             cached_result = manager.get(cache_key, cache_name)
             if cached_result is not None:
@@ -213,6 +219,7 @@ def cached(cache_name: str = "main", ttl: Optional[float] = None, key_func: Opti
             return result
 
         return wrapper
+
     return decorator
 
 

@@ -2,10 +2,11 @@
 Sistema de eventos aleatórios para o jogo ZORG.
 Gera eventos inesperados durante as fases para aumentar a imersão.
 """
+
 import random
-from typing import Dict, List, Any, Optional, Callable
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 from core.managers.base_manager import BaseManager
 from utils.logging_config import get_logger
@@ -81,24 +82,31 @@ class RandomEventManager(BaseManager):
                 EventChoice(
                     text="Examinar suas mercadorias",
                     result_text="O mercador mostra itens raros e poções poderosas!",
-                    effects={"action": "open_special_shop", "items": ["Pocao de Vigor Supremo", "Cristal de Mana", "Erva Rara"]}
+                    effects={
+                        "action": "open_special_shop",
+                        "items": [
+                            "Pocao de Vigor Supremo",
+                            "Cristal de Mana",
+                            "Erva Rara",
+                        ],
+                    },
                 ),
                 EventChoice(
                     text="Conversar sobre rumores",
                     result_text="'Ouvi dizer que há tesouros escondidos na próxima área...', sussurra o mercador.",
-                    effects={"gain_info": "next_area_treasure", "xp": 25}
+                    effects={"gain_info": "next_area_treasure", "xp": 25},
                 ),
                 EventChoice(
                     text="Seguir viagem",
                     result_text="Você acena educadamente e continua sua jornada.",
-                    effects={}
-                )
+                    effects={},
+                ),
             ],
             flavor_text=[
                 "Um homem encapuzado conduz uma carroça ornamentada.",
                 "Cristais mágicos brilham em sua mercadoria.",
-                "'Olá, aventureira! Tenho exatamente o que você precisa...'"
-            ]
+                "'Olá, aventureira! Tenho exatamente o que você precisa...'",
+            ],
         )
 
         # Evento: Armadilha Antiga
@@ -113,25 +121,28 @@ class RandomEventManager(BaseManager):
                 EventChoice(
                     text="Tentar desviar rapidamente",
                     result_text="Você consegue se desviar parcialmente, mas ainda sofre alguns danos.",
-                    effects={"hp_damage": 15, "message": "Você evitou o pior da armadilha!"}
+                    effects={
+                        "hp_damage": 15,
+                        "message": "Você evitou o pior da armadilha!",
+                    },
                 ),
                 EventChoice(
                     text="Se proteger com os braços",
                     result_text="Você se protege, reduzindo o dano mas perdendo alguns itens.",
-                    effects={"hp_damage": 10, "lose_random_item": True}
+                    effects={"hp_damage": 10, "lose_random_item": True},
                 ),
                 EventChoice(
                     text="Tentar desarmar a armadilha",
                     result_text="Com cuidado, você consegue desarmar o mecanismo!",
                     effects={"xp": 50, "find_gold": 75},
-                    requirements={"min_level": 3}
-                )
+                    requirements={"min_level": 3},
+                ),
             ],
             flavor_text=[
                 "Clique! Você ouve um som mecânico ominoso.",
                 "Dardos voam em sua direção!",
-                "Pedras começam a cair do teto!"
-            ]
+                "Pedras começam a cair do teto!",
+            ],
         )
 
         # Evento: Tesouro Escondido
@@ -146,24 +157,36 @@ class RandomEventManager(BaseManager):
                 EventChoice(
                     text="Abrir o baú imediatamente",
                     result_text="O baú se abre revelando tesouros valiosos!",
-                    effects={"random_treasure": True, "gold": [100, 300], "items": ["random_rare"]}
+                    effects={
+                        "random_treasure": True,
+                        "gold": [100, 300],
+                        "items": ["random_rare"],
+                    },
                 ),
                 EventChoice(
                     text="Examinar por armadilhas primeiro",
                     result_text="Sua cautela é recompensada - você encontra e desarma uma armadilha!",
-                    effects={"random_treasure": True, "gold": [150, 350], "xp": 75, "items": ["random_rare", "random_common"]}
+                    effects={
+                        "random_treasure": True,
+                        "gold": [150, 350],
+                        "xp": 75,
+                        "items": ["random_rare", "random_common"],
+                    },
                 ),
                 EventChoice(
                     text="Ignorar o baú",
                     result_text="Você decide que não vale o risco e continua sua jornada.",
-                    effects={"xp": 25, "message": "Às vezes a prudência é a melhor escolha."}
-                )
+                    effects={
+                        "xp": 25,
+                        "message": "Às vezes a prudência é a melhor escolha.",
+                    },
+                ),
             ],
             flavor_text=[
                 "O baú é feito de madeira escura com dobradiças de ouro.",
                 "Runas antigas brilham fracamente na tampa.",
-                "Você sente uma aura mágica emanando do baú."
-            ]
+                "Você sente uma aura mágica emanando do baú.",
+            ],
         )
 
         # Evento: Fonte de Cura
@@ -178,24 +201,34 @@ class RandomEventManager(BaseManager):
                 EventChoice(
                     text="Beber da fonte",
                     result_text="A água mágica restaura sua vitalidade completamente!",
-                    effects={"heal_full": True, "restore_mp": True, "remove_debuffs": True}
+                    effects={
+                        "heal_full": True,
+                        "restore_mp": True,
+                        "remove_debuffs": True,
+                    },
                 ),
                 EventChoice(
                     text="Encher suas poções vazias",
                     result_text="Você consegue criar várias poções com a água mágica!",
-                    effects={"gain_items": ["Pocao de Cura", "Pocao de Cura", "Pocao de Mana"]}
+                    effects={
+                        "gain_items": [
+                            "Pocao de Cura",
+                            "Pocao de Cura",
+                            "Pocao de Mana",
+                        ]
+                    },
                 ),
                 EventChoice(
                     text="Apenas descansar perto da fonte",
                     result_text="O descanso perto da fonte restaura parte de sua energia.",
-                    effects={"heal_percentage": 50, "restore_mp_percentage": 30}
-                )
+                    effects={"heal_percentage": 50, "restore_mp_percentage": 30},
+                ),
             ],
             flavor_text=[
                 "A água é de um azul cristalino impossível.",
                 "Pequenas partículas de luz dançam na superfície.",
-                "Você sente uma sensação de paz absoluta."
-            ]
+                "Você sente uma sensação de paz absoluta.",
+            ],
         )
 
         # Evento: Santuário Misterioso
@@ -210,30 +243,40 @@ class RandomEventManager(BaseManager):
                 EventChoice(
                     text="Oferecer ouro ao santuário",
                     result_text="O santuário aceita sua oferenda e você se sente abençoado!",
-                    effects={"lose_gold": 100, "gain_blessing": {"type": "attack_boost", "duration": 5}},
-                    requirements={"min_gold": 100}
+                    effects={
+                        "lose_gold": 100,
+                        "gain_blessing": {"type": "attack_boost", "duration": 5},
+                    },
+                    requirements={"min_gold": 100},
                 ),
                 EventChoice(
                     text="Oferecer um item valioso",
                     result_text="O santuário brilha intensamente e retribui sua generosidade!",
-                    effects={"lose_random_valuable_item": True, "gain_blessing": {"type": "defense_boost", "duration": 5}, "xp": 100}
+                    effects={
+                        "lose_random_valuable_item": True,
+                        "gain_blessing": {"type": "defense_boost", "duration": 5},
+                        "xp": 100,
+                    },
                 ),
                 EventChoice(
                     text="Apenas fazer uma reverência",
                     result_text="Você mostra respeito e o santuário concede uma pequena bênção.",
-                    effects={"gain_blessing": {"type": "luck_boost", "duration": 3}, "xp": 50}
+                    effects={
+                        "gain_blessing": {"type": "luck_boost", "duration": 3},
+                        "xp": 50,
+                    },
                 ),
                 EventChoice(
                     text="Ignorar o santuário",
                     result_text="Você contorna o santuário, mas sente um peso em sua consciência.",
-                    effects={"lose_luck": True}
-                )
+                    effects={"lose_luck": True},
+                ),
             ],
             flavor_text=[
                 "O santuário é feito de pedra negra com veios dourados.",
                 "Uma energia antiga pulsa no ar ao redor.",
-                "Você sente que está sendo observado por olhos invisíveis."
-            ]
+                "Você sente que está sendo observado por olhos invisíveis.",
+            ],
         )
 
         # Evento: Acampamento Abandonado
@@ -248,24 +291,28 @@ class RandomEventManager(BaseManager):
                 EventChoice(
                     text="Procurar por suprimentos",
                     result_text="Você encontra alguns itens úteis deixados para trás.",
-                    effects={"random_items": 2, "gold": [20, 80]}
+                    effects={"random_items": 2, "gold": [20, 80]},
                 ),
                 EventChoice(
                     text="Ler o diário abandonado",
                     result_text="O diário contém informações valiosas sobre os perigos à frente.",
-                    effects={"gain_info": "area_dangers", "xp": 75, "temporary_insight": True}
+                    effects={
+                        "gain_info": "area_dangers",
+                        "xp": 75,
+                        "temporary_insight": True,
+                    },
                 ),
                 EventChoice(
                     text="Usar o local para descansar",
                     result_text="Você descansa no abrigo abandonado, recuperando energia.",
-                    effects={"heal_percentage": 30, "restore_mp_percentage": 25}
-                )
+                    effects={"heal_percentage": 30, "restore_mp_percentage": 25},
+                ),
             ],
             flavor_text=[
                 "Cinzas frias indicam que o acampamento foi abandonado há dias.",
                 "Equipamentos espalhados sugerem uma partida apressada.",
-                "Um diário meio queimado está entre os pertences."
-            ]
+                "Um diário meio queimado está entre os pertences.",
+            ],
         )
 
         # Evento: Emboscada de Monstros
@@ -280,30 +327,32 @@ class RandomEventManager(BaseManager):
                 EventChoice(
                     text="Lutar contra todos",
                     result_text="Você luta bravamente contra múltiplos inimigos!",
-                    effects={"start_combat": "ambush_multiple", "xp_bonus": 50}
+                    effects={"start_combat": "ambush_multiple", "xp_bonus": 50},
                 ),
                 EventChoice(
                     text="Tentar fugir",
                     result_text="Você consegue escapar, mas não sem consequências.",
-                    effects={"hp_damage": 20, "escape_success": True}
+                    effects={"hp_damage": 20, "escape_success": True},
                 ),
                 EventChoice(
                     text="Usar intimidação",
                     result_text="Seu olhar feroz faz os monstros hesitarem!",
                     effects={"start_combat": "ambush_weakened", "enemy_debuff": True},
-                    requirements={"min_level": 4}
-                )
+                    requirements={"min_level": 4},
+                ),
             ],
             flavor_text=[
                 "Olhos vermelhos brilham na escuridão!",
                 "Rosnados baixos ecoam ao seu redor.",
-                "Você está cercada!"
-            ]
+                "Você está cercada!",
+            ],
         )
 
         return events
 
-    def check_for_event(self, phase: int, player_level: int, **context) -> Optional[RandomEvent]:
+    def check_for_event(
+        self, phase: int, player_level: int, **context
+    ) -> Optional[RandomEvent]:
         """Verifica se um evento aleatório deve ocorrer."""
 
         # Aplicar cooldown global para eventos
@@ -328,7 +377,9 @@ class RandomEventManager(BaseManager):
 
         return None
 
-    def _get_available_events(self, phase: int, player_level: int, **context) -> List[RandomEvent]:
+    def _get_available_events(
+        self, phase: int, player_level: int, **context
+    ) -> List[RandomEvent]:
         """Filtra eventos disponíveis baseado nas condições atuais."""
         available = []
 
@@ -403,7 +454,7 @@ class RandomEventManager(BaseManager):
             EventRarity.COMMON: 1.0,
             EventRarity.UNCOMMON: 0.6,
             EventRarity.RARE: 0.3,
-            EventRarity.LEGENDARY: 0.1
+            EventRarity.LEGENDARY: 0.1,
         }
 
         weighted_events = []
@@ -423,7 +474,9 @@ class RandomEventManager(BaseManager):
 
         logger.info(f"Evento '{event.name}' ativado")
 
-    def process_event_choice(self, event: RandomEvent, choice_index: int, player) -> Dict[str, Any]:
+    def process_event_choice(
+        self, event: RandomEvent, choice_index: int, player
+    ) -> Dict[str, Any]:
         """Processa a escolha do jogador em um evento."""
         if choice_index >= len(event.choices):
             return {"error": "Escolha inválida"}
@@ -433,7 +486,10 @@ class RandomEventManager(BaseManager):
         # Verificar requisitos
         if choice.requirements:
             if not self._check_requirements(choice.requirements, player):
-                return {"error": "Requisitos não atendidos", "requirements": choice.requirements}
+                return {
+                    "error": "Requisitos não atendidos",
+                    "requirements": choice.requirements,
+                }
 
         # Aplicar efeitos
         results = self._apply_effects(choice.effects, player)
@@ -472,7 +528,9 @@ class RandomEventManager(BaseManager):
             elif effect_type == "heal_full":
                 healed = player.hp_max - player.hp
                 player.hp = player.hp_max
-                results["effects_applied"].append(f"HP totalmente restaurado (+{healed})")
+                results["effects_applied"].append(
+                    f"HP totalmente restaurado (+{healed})"
+                )
 
             elif effect_type == "heal_percentage":
                 heal_amount = int(player.hp_max * effect_value / 100)
@@ -482,7 +540,9 @@ class RandomEventManager(BaseManager):
             elif effect_type == "restore_mp":
                 restored = player.mp_max - player.mp
                 player.mp = player.mp_max
-                results["effects_applied"].append(f"MP totalmente restaurado (+{restored})")
+                results["effects_applied"].append(
+                    f"MP totalmente restaurado (+{restored})"
+                )
 
             elif effect_type == "restore_mp_percentage":
                 restore_amount = int(player.mp_max * effect_value / 100)
@@ -530,16 +590,18 @@ class RandomEventManager(BaseManager):
         return {
             "name": event.name,
             "description": event.description,
-            "flavor_text": random.choice(event.flavor_text) if event.flavor_text else "",
+            "flavor_text": (
+                random.choice(event.flavor_text) if event.flavor_text else ""
+            ),
             "choices": [
                 {
                     "text": choice.text,
-                    "available": True  # Verificar requisitos se necessário
+                    "available": True,  # Verificar requisitos se necessário
                 }
                 for choice in event.choices
             ],
             "rarity": event.rarity.value,
-            "type": event.event_type.value
+            "type": event.event_type.value,
         }
 
 

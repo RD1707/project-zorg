@@ -1,11 +1,11 @@
 """
 Configuração do sistema de logging para o jogo ZORG.
 """
+
 import logging
 import logging.handlers
-from pathlib import Path
-from typing import Optional
 import sys
+from typing import Optional
 
 from config.settings import LOG_CONFIG, get_log_path
 
@@ -52,7 +52,7 @@ class ZorgLogger:
                 log_file,
                 maxBytes=LOG_CONFIG["max_file_size"],
                 backupCount=LOG_CONFIG["max_log_files"],
-                encoding='utf-8'
+                encoding="utf-8",
             )
             file_handler.setLevel(logging.DEBUG)
             file_handler.setFormatter(formatter)
@@ -64,7 +64,7 @@ class ZorgLogger:
             error_file,
             maxBytes=LOG_CONFIG["max_file_size"],
             backupCount=LOG_CONFIG["max_log_files"],
-            encoding='utf-8'
+            encoding="utf-8",
         )
         error_handler.setLevel(logging.ERROR)
         error_handler.setFormatter(formatter)
@@ -89,7 +89,10 @@ def get_logger(name: str = None) -> logging.Logger:
 def log_exception(logger: logging.Logger, exception: Exception, context: str = None):
     """Loga uma exceção com contexto adicional."""
     if context:
-        logger.error(f"Exceção em {context}: {type(exception).__name__}: {exception}", exc_info=True)
+        logger.error(
+            f"Exceção em {context}: {type(exception).__name__}: {exception}",
+            exc_info=True,
+        )
     else:
         logger.error(f"Exceção: {type(exception).__name__}: {exception}", exc_info=True)
 

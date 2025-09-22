@@ -1,12 +1,14 @@
 """
 Tela de configurações do jogo.
 """
+
+from typing import Any, Dict
+
 from textual.app import ComposeResult
-from textual.screen import Screen
-from textual.widgets import Button, Static, Header, Footer, Switch, Select
-from textual.containers import Vertical, Horizontal
 from textual.binding import Binding
-from typing import Dict, Any
+from textual.containers import Horizontal, Vertical
+from textual.screen import Screen
+from textual.widgets import Button, Footer, Header, Select, Static, Switch
 
 from config.settings import GameSettings
 
@@ -84,63 +86,90 @@ class SettingsScreen(Screen):
 
             with Horizontal(classes="setting_row"):
                 yield Static("Velocidade do texto:", classes="setting_label")
-                yield Select([
-                    ("Muito Lenta", "very_slow"),
-                    ("Lenta", "slow"),
-                    ("Normal", "normal"),
-                    ("Rápida", "fast"),
-                    ("Instantânea", "instant")
-                ], value=self.settings.get("text_speed", "normal"),
-                id="text_speed", classes="setting_control")
+                yield Select(
+                    [
+                        ("Muito Lenta", "very_slow"),
+                        ("Lenta", "slow"),
+                        ("Normal", "normal"),
+                        ("Rápida", "fast"),
+                        ("Instantânea", "instant"),
+                    ],
+                    value=self.settings.get("text_speed", "normal"),
+                    id="text_speed",
+                    classes="setting_control",
+                )
 
             with Horizontal(classes="setting_row"):
                 yield Static("Auto-save:", classes="setting_label")
-                yield Switch(value=self.settings.get("auto_save", True),
-                           id="auto_save", classes="setting_control")
+                yield Switch(
+                    value=self.settings.get("auto_save", True),
+                    id="auto_save",
+                    classes="setting_control",
+                )
 
             with Horizontal(classes="setting_row"):
                 yield Static("Confirmação de ações:", classes="setting_label")
-                yield Switch(value=self.settings.get("confirm_actions", True),
-                           id="confirm_actions", classes="setting_control")
+                yield Switch(
+                    value=self.settings.get("confirm_actions", True),
+                    id="confirm_actions",
+                    classes="setting_control",
+                )
 
             yield Static("Audio", classes="section_header")
 
             with Horizontal(classes="setting_row"):
                 yield Static("Música de fundo:", classes="setting_label")
-                yield Switch(value=self.settings.get("background_music", True),
-                           id="background_music", classes="setting_control")
+                yield Switch(
+                    value=self.settings.get("background_music", True),
+                    id="background_music",
+                    classes="setting_control",
+                )
 
             with Horizontal(classes="setting_row"):
                 yield Static("Efeitos sonoros:", classes="setting_label")
-                yield Switch(value=self.settings.get("sound_effects", True),
-                           id="sound_effects", classes="setting_control")
+                yield Switch(
+                    value=self.settings.get("sound_effects", True),
+                    id="sound_effects",
+                    classes="setting_control",
+                )
 
             with Horizontal(classes="setting_row"):
                 yield Static("Volume geral:", classes="setting_label")
-                yield Select([
-                    ("Silencioso", "0"),
-                    ("Baixo", "25"),
-                    ("Médio", "50"),
-                    ("Alto", "75"),
-                    ("Máximo", "100")
-                ], value=str(self.settings.get("master_volume", "75")),
-                id="master_volume", classes="setting_control")
+                yield Select(
+                    [
+                        ("Silencioso", "0"),
+                        ("Baixo", "25"),
+                        ("Médio", "50"),
+                        ("Alto", "75"),
+                        ("Máximo", "100"),
+                    ],
+                    value=str(self.settings.get("master_volume", "75")),
+                    id="master_volume",
+                    classes="setting_control",
+                )
 
             yield Static("Interface", classes="section_header")
 
             with Horizontal(classes="setting_row"):
                 yield Static("Tema:", classes="setting_label")
-                yield Select([
-                    ("Escuro", "dark"),
-                    ("Claro", "light"),
-                    ("Contraste Alto", "high_contrast")
-                ], value=self.settings.get("theme", "dark"),
-                id="theme", classes="setting_control")
+                yield Select(
+                    [
+                        ("Escuro", "dark"),
+                        ("Claro", "light"),
+                        ("Contraste Alto", "high_contrast"),
+                    ],
+                    value=self.settings.get("theme", "dark"),
+                    id="theme",
+                    classes="setting_control",
+                )
 
             with Horizontal(classes="setting_row"):
                 yield Static("Mostrar dicas:", classes="setting_label")
-                yield Switch(value=self.settings.get("show_tooltips", True),
-                           id="show_tooltips", classes="setting_control")
+                yield Switch(
+                    value=self.settings.get("show_tooltips", True),
+                    id="show_tooltips",
+                    classes="setting_control",
+                )
 
             yield Button("Salvar Configurações", id="save_button", variant="success")
 
@@ -186,10 +215,9 @@ class SettingsScreen(Screen):
         # Por exemplo, ajustar velocidade do texto, volume, etc.
 
         # Notificar outros componentes sobre mudanças
-        from core.managers.event_manager import emit_event, EventType
-        emit_event(EventType.SETTINGS_CHANGED, {
-            "settings": dict(self.settings._data)
-        })
+        from core.managers.event_manager import EventType, emit_event
+
+        emit_event(EventType.SETTINGS_CHANGED, {"settings": dict(self.settings._data)})
 
     def action_dismiss(self) -> None:
         """Sai da tela sem salvar."""

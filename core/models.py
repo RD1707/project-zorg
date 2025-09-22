@@ -1,12 +1,18 @@
 from dataclasses import dataclass, field
-from typing import List, Optional, Union, Dict, Any
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
-from core.exceptions import DataValidationError, CharacterStateError
-from utils.error_handler import validate_positive, validate_non_negative, validate_string_not_empty
+from core.exceptions import CharacterStateError
+from utils.error_handler import (
+    validate_non_negative,
+    validate_positive,
+    validate_string_not_empty,
+)
+
 
 class TipoEquipamento(Enum):
     """Tipos válidos de equipamento."""
+
     ARMA = "arma"
     ARMADURA = "armadura"
     ESCUDO = "escudo"
@@ -14,6 +20,7 @@ class TipoEquipamento(Enum):
 
 class TipoHabilidade(Enum):
     """Tipos válidos de habilidade."""
+
     ATAQUE = "ataque"
     CURA = "cura"
     BUFF_DEFESA = "buff_defesa"
@@ -27,6 +34,7 @@ class TipoHabilidade(Enum):
 @dataclass
 class Equipamento:
     """Representa um item de equipamento que um personagem pode usar."""
+
     nome: str
     tipo: TipoEquipamento
     bonus_ataque: int
@@ -57,9 +65,11 @@ class Equipamento:
         """Verifica se é escudo."""
         return self.tipo == TipoEquipamento.ESCUDO
 
+
 @dataclass
 class Item:
     """Representa um item consumível no inventário."""
+
     nome: str
     descricao: str
     cura_hp: int
@@ -80,9 +90,12 @@ class Item:
         validate_positive(self.quantidade, "quantidade")
         validate_positive(self.stack_max, "stack máximo")
 
-    def can_stack_with(self, other: 'Item') -> bool:
+    def can_stack_with(self, other: "Item") -> bool:
         """Verifica se pode ser empilhado com outro item."""
-        return self.nome == other.nome and self.quantidade + other.quantidade <= self.stack_max
+        return (
+            self.nome == other.nome
+            and self.quantidade + other.quantidade <= self.stack_max
+        )
 
     def add_quantity(self, amount: int) -> bool:
         """Adiciona quantidade se possível."""
@@ -96,9 +109,11 @@ class Item:
         """Verifica se o stack está completo."""
         return self.quantidade >= self.stack_max
 
+
 @dataclass
 class Habilidade:
     """Representa uma habilidade ou magia que um personagem pode usar."""
+
     nome: str
     descricao: str
     custo_mp: int
@@ -124,11 +139,18 @@ class Habilidade:
     @property
     def is_defensive(self) -> bool:
         """Verifica se é uma habilidade defensiva."""
-        return self.tipo in [TipoHabilidade.CURA, TipoHabilidade.BUFF_DEFESA, TipoHabilidade.BUFF_ATAQUE, TipoHabilidade.REGENERACAO]
+        return self.tipo in [
+            TipoHabilidade.CURA,
+            TipoHabilidade.BUFF_DEFESA,
+            TipoHabilidade.BUFF_ATAQUE,
+            TipoHabilidade.REGENERACAO,
+        ]
+
 
 @dataclass
 class TutorialFlags:
     """Controla quais tutoriais já foram mostrados ao jogador."""
+
     combate_basico_mostrado: bool = False
     habilidades_mostrado: bool = False
     itens_mostrado: bool = False
@@ -148,7 +170,7 @@ class TutorialFlags:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, bool]) -> 'TutorialFlags':
+    def from_dict(cls, data: Dict[str, bool]) -> "TutorialFlags":
         """Cria instância a partir de dicionário."""
         return cls(
             combate_basico_mostrado=data.get("combate_basico_mostrado", False),
@@ -159,18 +181,20 @@ class TutorialFlags:
             save_load_mostrado=data.get("save_load_mostrado", False),
         )
 
+
 @dataclass
 class Personagem:
     """
     A classe principal que representa qualquer personagem no jogo,
     seja o jogador ou um inimigo.
     """
+
     nome: str
     hp_max: int
     mp_max: int
     ataque_base: int
     defesa_base: int
-    
+
     # Atributos específicos de inimigos
     xp_dado: int = 0
     ouro_dado: int = 0  # Renomeado de 'ouro' para evitar confusão com o ouro do jogador
@@ -178,7 +202,7 @@ class Personagem:
     # Atributos que mudam durante o jogo
     hp: int = field(init=False)
     mp: int = field(init=False)
-    
+
     # Atributos de progressão do jogador
     nivel: int = 1
     xp: int = 0
@@ -205,7 +229,7 @@ class Personagem:
     # Flags de controle
     tutoriais: TutorialFlags = field(default_factory=TutorialFlags)
     ajudou_marinheiro: bool = False
-    
+
     def __post_init__(self):
         """
         Método especial de dataclasses que é chamado após a criação do objeto.
@@ -227,18 +251,34 @@ class Personagem:
     @property
     def ataque_total(self) -> int:
         """Calcula o ataque total, incluindo o bónus da arma."""
-        bonus_arma = getattr(self.arma_equipada, 'bonus_ataque', 0) if self.arma_equipada else 0
+        bonus_arma = (
+            getattr(self.arma_equipada, "bonus_ataque", 0) if self.arma_equipada else 0
+        )
         bonus_furia = 10 if self.turnos_furia > 0 else 0
         return self.ataque_base + bonus_arma + bonus_furia
 
     @property
     def defesa_total(self) -> int:
         """Calcula a defesa total, incluindo bónus de armadura e escudo."""
-        bonus_armadura = getattr(self.armadura_equipada, 'bonus_defesa', 0) if self.armadura_equipada else 0
-        bonus_escudo = getattr(self.escudo_equipada, 'bonus_defesa', 0) if self.escudo_equipada else 0
+        bonus_armadura = (
+            getattr(self.armadura_equipada, "bonus_defesa", 0)
+            if self.armadura_equipada
+            else 0
+        )
+        bonus_escudo = (
+            getattr(self.escudo_equipada, "bonus_defesa", 0)
+            if self.escudo_equipada
+            else 0
+        )
         bonus_buff = 5 if self.turnos_buff_defesa > 0 else 0
         penalidade_furia = -5 if self.turnos_furia > 0 else 0
-        return self.defesa_base + bonus_armadura + bonus_escudo + bonus_buff + penalidade_furia
+        return (
+            self.defesa_base
+            + bonus_armadura
+            + bonus_escudo
+            + bonus_buff
+            + penalidade_furia
+        )
 
     @property
     def is_alive(self) -> bool:
@@ -339,9 +379,9 @@ class Personagem:
     def can_use_skill(self, skill: Habilidade) -> bool:
         """Verifica se pode usar uma habilidade."""
         return (
-            self.mp >= skill.custo_mp and
-            self.nivel >= skill.nivel_requerido and
-            skill in self.habilidades_conhecidas
+            self.mp >= skill.custo_mp
+            and self.nivel >= skill.nivel_requerido
+            and skill in self.habilidades_conhecidas
         )
 
     def process_status_effects(self) -> List[str]:
@@ -399,5 +439,5 @@ class Personagem:
                 "buff_defesa": self.turnos_buff_defesa,
                 "furia": self.turnos_furia,
                 "regeneracao": self.turnos_regeneracao,
-            }
+            },
         }

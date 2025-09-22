@@ -1,13 +1,13 @@
-from typing import List, Dict, Any, Optional, Tuple
 from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
-from core.managers.base_manager import BaseManager
-from core.managers.event_manager import emit_event, EventType
-from core.models import Personagem, Item, Equipamento, TipoEquipamento
 from core.exceptions import InvalidActionError, ResourceNotFoundError
-from utils.error_handler import handle_exceptions, validate_not_none, validate_positive
-from data.items import DB_ITENS
+from core.managers.base_manager import BaseManager
+from core.managers.event_manager import EventType, emit_event
+from core.models import Item, Personagem
 from data.equipment import DB_EQUIPAMENTOS
+from data.items import DB_ITENS
+from utils.error_handler import handle_exceptions, validate_not_none, validate_positive
 
 
 class InventoryAction(Enum):
@@ -23,7 +23,7 @@ class InventoryManager(BaseManager):
 
     def __init__(self):
         super().__init__("inventory_manager")
-        self._max_inventory_size = 50  
+        self._max_inventory_size = 50
 
     def _do_initialize(self) -> None:
         pass
@@ -40,36 +40,51 @@ class InventoryManager(BaseManager):
         current_slots = len(player.inventario)
         if current_slots >= self._max_inventory_size:
             if not self._try_stack_item(player, item_template, quantity):
-                raise InvalidActionError("Inventário cheio e não é possível empilhar o item")
+                raise InvalidActionError(
+                    "Inventário cheio e não é possível empilhar o item"
+                )
 
         if self._try_stack_item(player, item_template, quantity):
-            emit_event(EventType.ITEM_USED, {
-                "action": "add_stacked",
-                "item": item_name,
-                "quantity": quantity,
-                "player": player.nome
-            })
-            self.logger.debug(f"Item {item_name} x{quantity} empilhado no inventário de {player.nome}")
+            emit_event(
+                EventType.ITEM_USED,
+                {
+                    "action": "add_stacked",
+                    "item": item_name,
+                    "quantity": quantity,
+                    "player": player.nome,
+                },
+            )
+            self.logger.debug(
+                f"Item {item_name} x{quantity} empilhado no inventário de {player.nome}"
+            )
             return True
 
         from core.object_factory import get_object_factory
+
         factory = get_object_factory()
         new_item = factory.create_item(item_template)
         new_item.quantidade = quantity
         player.inventario.append(new_item)
 
-        emit_event(EventType.ITEM_USED, {
-            "action": "add_new",
-            "item": item_name,
-            "quantity": quantity,
-            "player": player.nome
-        })
+        emit_event(
+            EventType.ITEM_USED,
+            {
+                "action": "add_new",
+                "item": item_name,
+                "quantity": quantity,
+                "player": player.nome,
+            },
+        )
 
-        self.logger.debug(f"Novo item {item_name} x{quantity} adicionado ao inventário de {player.nome}")
+        self.logger.debug(
+            f"Novo item {item_name} x{quantity} adicionado ao inventário de {player.nome}"
+        )
         return True
 
     @handle_exceptions(reraise=True)
-    def remove_item(self, player: Personagem, item_name: str, quantity: int = 1) -> bool:
+    def remove_item(
+        self, player: Personagem, item_name: str, quantity: int = 1
+    ) -> bool:
         validate_not_none(player, "jogador")
         validate_positive(quantity, "quantidade")
 
@@ -80,17 +95,24 @@ class InventoryManager(BaseManager):
                     if item.quantidade <= 0:
                         player.inventario.remove(item)
 
-                    emit_event(EventType.ITEM_USED, {
-                        "action": "remove",
-                        "item": item_name,
-                        "quantity": quantity,
-                        "player": player.nome
-                    })
+                    emit_event(
+                        EventType.ITEM_USED,
+                        {
+                            "action": "remove",
+                            "item": item_name,
+                            "quantity": quantity,
+                            "player": player.nome,
+                        },
+                    )
 
-                    self.logger.debug(f"Item {item_name} x{quantity} removido do inventário de {player.nome}")
+                    self.logger.debug(
+                        f"Item {item_name} x{quantity} removido do inventário de {player.nome}"
+                    )
                     return True
                 else:
-                    raise InvalidActionError(f"Quantidade insuficiente de {item_name}: tem {item.quantidade}, precisa {quantity}")
+                    raise InvalidActionError(
+                        f"Quantidade insuficiente de {item_name}: tem {item.quantidade}, precisa {quantity}"
+                    )
 
         raise ResourceNotFoundError("item no inventário", item_name)
 
@@ -108,18 +130,26 @@ class InventoryManager(BaseManager):
         if item.cura_hp > 0:
             heal_amount = player.heal(item.cura_hp)
             if heal_amount > 0:
-                messages.append(f"{player.nome} usa {item_name} e recupera [b]{heal_amount} HP[/b]!")
+                messages.append(
+                    f"{player.nome} usa {item_name} e recupera [b]{heal_amount} HP[/b]!"
+                )
                 effects_applied = True
             else:
-                messages.append(f"{player.nome} usa {item_name}, mas sua vida já está cheia.")
+                messages.append(
+                    f"{player.nome} usa {item_name}, mas sua vida já está cheia."
+                )
 
         if item.cura_mp > 0:
             mp_amount = player.restore_mp(item.cura_mp)
             if mp_amount > 0:
-                messages.append(f"{player.nome} usa {item_name} e recupera [b]{mp_amount} MP[/b]!")
+                messages.append(
+                    f"{player.nome} usa {item_name} e recupera [b]{mp_amount} MP[/b]!"
+                )
                 effects_applied = True
             else:
-                messages.append(f"{player.nome} usa {item_name}, mas seu MP já está cheio.")
+                messages.append(
+                    f"{player.nome} usa {item_name}, mas seu MP já está cheio."
+                )
 
         if item.cura_veneno > 0 and player.is_poisoned:
             player.turnos_veneno = 0
@@ -132,18 +162,23 @@ class InventoryManager(BaseManager):
 
         self.remove_item(player, item_name, 1)
 
-        emit_event(EventType.ITEM_USED, {
-            "action": "use",
-            "item": item_name,
-            "player": player.nome,
-            "effects_applied": effects_applied
-        })
+        emit_event(
+            EventType.ITEM_USED,
+            {
+                "action": "use",
+                "item": item_name,
+                "player": player.nome,
+                "effects_applied": effects_applied,
+            },
+        )
 
         self.logger.debug(f"Item {item_name} usado por {player.nome}")
         return messages
 
     @handle_exceptions(reraise=True)
-    def equip_item(self, player: Personagem, equipment_name: str) -> Tuple[bool, List[str]]:
+    def equip_item(
+        self, player: Personagem, equipment_name: str
+    ) -> Tuple[bool, List[str]]:
         validate_not_none(player, "jogador")
 
         equipment = DB_EQUIPAMENTOS.get(equipment_name)
@@ -169,19 +204,24 @@ class InventoryManager(BaseManager):
             messages.append(f"{equipment_name} equipado como escudo!")
 
         else:
-            raise InvalidActionError(f"Tipo de equipamento desconhecido: {equipment.tipo}")
+            raise InvalidActionError(
+                f"Tipo de equipamento desconhecido: {equipment.tipo}"
+            )
 
         if old_equipment:
             self.add_item(player, old_equipment.nome, 1)
             messages.append(f"{old_equipment.nome} foi colocado no inventário.")
 
-        emit_event(EventType.EQUIPMENT_CHANGED, {
-            "action": "equip",
-            "item": equipment_name,
-            "old_item": old_equipment.nome if old_equipment else None,
-            "player": player.nome,
-            "slot": equipment.tipo.value
-        })
+        emit_event(
+            EventType.EQUIPMENT_CHANGED,
+            {
+                "action": "equip",
+                "item": equipment_name,
+                "old_item": old_equipment.nome if old_equipment else None,
+                "player": player.nome,
+                "slot": equipment.tipo.value,
+            },
+        )
 
         self.logger.debug(f"Equipamento {equipment_name} equipado por {player.nome}")
         return True, messages
@@ -210,16 +250,23 @@ class InventoryManager(BaseManager):
             raise InvalidActionError(f"Nenhum equipamento no slot {slot}")
 
         self.add_item(player, equipment_to_unequip.nome, 1)
-        messages.append(f"{equipment_to_unequip.nome} foi removido e colocado no inventário.")
+        messages.append(
+            f"{equipment_to_unequip.nome} foi removido e colocado no inventário."
+        )
 
-        emit_event(EventType.EQUIPMENT_CHANGED, {
-            "action": "unequip",
-            "item": equipment_to_unequip.nome,
-            "player": player.nome,
-            "slot": slot
-        })
+        emit_event(
+            EventType.EQUIPMENT_CHANGED,
+            {
+                "action": "unequip",
+                "item": equipment_to_unequip.nome,
+                "player": player.nome,
+                "slot": slot,
+            },
+        )
 
-        self.logger.debug(f"Equipamento {equipment_to_unequip.nome} desequipado por {player.nome}")
+        self.logger.debug(
+            f"Equipamento {equipment_to_unequip.nome} desequipado por {player.nome}"
+        )
         return True, messages
 
     def sort_inventory(self, player: Personagem, sort_by: str = "name") -> bool:
@@ -243,7 +290,9 @@ class InventoryManager(BaseManager):
         validate_not_none(player, "jogador")
 
         total_items = sum(item.quantidade for item in player.inventario)
-        total_value = sum(item.preco_venda * item.quantidade for item in player.inventario)
+        total_value = sum(
+            item.preco_venda * item.quantidade for item in player.inventario
+        )
 
         categories = {}
         for item in player.inventario:
@@ -261,23 +310,35 @@ class InventoryManager(BaseManager):
             "categories": categories,
             "equipment": {
                 "weapon": player.arma_equipada.nome if player.arma_equipada else None,
-                "armor": player.armadura_equipada.nome if player.armadura_equipada else None,
-                "shield": player.escudo_equipada.nome if player.escudo_equipada else None,
-            }
+                "armor": (
+                    player.armadura_equipada.nome if player.armadura_equipada else None
+                ),
+                "shield": (
+                    player.escudo_equipada.nome if player.escudo_equipada else None
+                ),
+            },
         }
 
-    def _try_stack_item(self, player: Personagem, item_template: Item, quantity: int) -> bool:
+    def _try_stack_item(
+        self, player: Personagem, item_template: Item, quantity: int
+    ) -> bool:
         for existing_item in player.inventario:
-            if (existing_item.nome == item_template.nome and
-                existing_item.quantidade + quantity <= existing_item.stack_max):
+            if (
+                existing_item.nome == item_template.nome
+                and existing_item.quantidade + quantity <= existing_item.stack_max
+            ):
                 existing_item.quantidade += quantity
                 return True
         return False
 
     def _find_item(self, player: Personagem, item_name: str) -> Optional[Item]:
-        return next((item for item in player.inventario if item.nome == item_name), None)
+        return next(
+            (item for item in player.inventario if item.nome == item_name), None
+        )
 
-    def can_add_item(self, player: Personagem, item_name: str, quantity: int = 1) -> bool:
+    def can_add_item(
+        self, player: Personagem, item_name: str, quantity: int = 1
+    ) -> bool:
         item_template = DB_ITENS.get(item_name)
         if not item_template:
             return False
@@ -291,7 +352,9 @@ class InventoryManager(BaseManager):
         """Retorna itens de uma categoria específica."""
         return [item for item in player.inventario if item.categoria == category]
 
+
 _inventory_manager = InventoryManager()
+
 
 def get_inventory_manager() -> InventoryManager:
     """Retorna a instância global do gerenciador de inventário."""

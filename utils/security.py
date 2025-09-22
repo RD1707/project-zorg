@@ -1,15 +1,16 @@
 """
 Utilitários de segurança para o jogo ZORG.
 """
-import re
-import json
+
 import hashlib
+import json
+import re
 import secrets
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 
-from utils.logging_config import get_logger
 from core.exceptions import DataValidationError
+from utils.logging_config import get_logger
 
 logger = get_logger("security")
 
@@ -21,9 +22,9 @@ class DataValidator:
     def sanitize_filename(filename: str) -> str:
         """Sanitiza nome de arquivo removendo caracteres perigosos."""
         # Remover caracteres perigosos
-        sanitized = re.sub(r'[<>:"/\\|?*]', '_', filename)
+        sanitized = re.sub(r'[<>:"/\\|?*]', "_", filename)
         # Remover caracteres de controle
-        sanitized = ''.join(char for char in sanitized if ord(char) >= 32)
+        sanitized = "".join(char for char in sanitized if ord(char) >= 32)
         # Limitar tamanho
         sanitized = sanitized[:100]
         # Garantir que não seja vazio
@@ -33,7 +34,9 @@ class DataValidator:
         return sanitized.strip()
 
     @staticmethod
-    def validate_json_structure(data: Dict[str, Any], required_fields: List[str]) -> bool:
+    def validate_json_structure(
+        data: Dict[str, Any], required_fields: List[str]
+    ) -> bool:
         """Valida estrutura básica de JSON."""
         if not isinstance(data, dict):
             raise DataValidationError("Dados devem ser um objeto JSON")
@@ -45,8 +48,12 @@ class DataValidator:
         return True
 
     @staticmethod
-    def validate_numeric_range(value: Union[int, float], min_val: Union[int, float],
-                             max_val: Union[int, float], field_name: str) -> bool:
+    def validate_numeric_range(
+        value: Union[int, float],
+        min_val: Union[int, float],
+        max_val: Union[int, float],
+        field_name: str,
+    ) -> bool:
         """Valida se um valor numérico está dentro do intervalo esperado."""
         if not isinstance(value, (int, float)):
             raise DataValidationError(f"{field_name} deve ser numérico")
@@ -59,7 +66,9 @@ class DataValidator:
         return True
 
     @staticmethod
-    def validate_string_length(value: str, min_len: int, max_len: int, field_name: str) -> bool:
+    def validate_string_length(
+        value: str, min_len: int, max_len: int, field_name: str
+    ) -> bool:
         """Valida comprimento de string."""
         if not isinstance(value, str):
             raise DataValidationError(f"{field_name} deve ser uma string")
@@ -75,20 +84,22 @@ class DataValidator:
     def validate_no_script_injection(value: str, field_name: str) -> bool:
         """Verifica se não há tentativas de injeção de script."""
         dangerous_patterns = [
-            r'<script',
-            r'javascript:',
-            r'eval\s*\(',
-            r'exec\s*\(',
-            r'__import__',
-            r'\.system\(',
-            r'os\.',
-            r'subprocess\.',
+            r"<script",
+            r"javascript:",
+            r"eval\s*\(",
+            r"exec\s*\(",
+            r"__import__",
+            r"\.system\(",
+            r"os\.",
+            r"subprocess\.",
         ]
 
         value_lower = value.lower()
         for pattern in dangerous_patterns:
             if re.search(pattern, value_lower, re.IGNORECASE):
-                raise DataValidationError(f"Conteúdo perigoso detectado em {field_name}")
+                raise DataValidationError(
+                    f"Conteúdo perigoso detectado em {field_name}"
+                )
 
         return True
 
@@ -124,9 +135,13 @@ class SaveFileValidator:
 
         # Validar stats
         DataValidator.validate_numeric_range(player_data["hp"], 0, 9999, "HP")
-        DataValidator.validate_numeric_range(player_data["hp_max"], 1, 9999, "HP máximo")
+        DataValidator.validate_numeric_range(
+            player_data["hp_max"], 1, 9999, "HP máximo"
+        )
         DataValidator.validate_numeric_range(player_data["mp"], 0, 9999, "MP")
-        DataValidator.validate_numeric_range(player_data["mp_max"], 1, 9999, "MP máximo")
+        DataValidator.validate_numeric_range(
+            player_data["mp_max"], 1, 9999, "MP máximo"
+        )
         DataValidator.validate_numeric_range(player_data["nivel"], 1, 100, "nível")
         DataValidator.validate_numeric_range(player_data["xp"], 0, 999999, "XP")
 
@@ -161,7 +176,9 @@ class SaveFileValidator:
 
             DataValidator.validate_string_length(item["nome"], 1, 100, "nome do item")
             DataValidator.validate_no_script_injection(item["nome"], "nome do item")
-            DataValidator.validate_numeric_range(item["quantidade"], 1, 999, "quantidade")
+            DataValidator.validate_numeric_range(
+                item["quantidade"], 1, 999, "quantidade"
+            )
 
         return True
 
@@ -177,7 +194,9 @@ class SaveFileValidator:
         expected_checksum = hashlib.sha256(checksum_data.encode()).hexdigest()
 
         if data["checksum"] != expected_checksum:
-            raise DataValidationError("Checksum inválido - dados podem estar corrompidos")
+            raise DataValidationError(
+                "Checksum inválido - dados podem estar corrompidos"
+            )
 
         return True
 
@@ -199,7 +218,7 @@ class FilePathValidator:
             raise DataValidationError("Caminho de arquivo inválido")
 
         # Verificar extensão
-        if file_path.suffix.lower() != '.json':
+        if file_path.suffix.lower() != ".json":
             raise DataValidationError("Arquivo deve ter extensão .json")
 
         # Verificar tamanho do nome
@@ -212,15 +231,15 @@ class FilePathValidator:
     def is_path_traversal_attempt(path_str: str) -> bool:
         """Detecta tentativas de path traversal."""
         dangerous_patterns = [
-            '..',
-            '~',
-            '/etc/',
-            '/root/',
-            '/home/',
-            'C:\\',
-            'D:\\',
-            '%',
-            '$'
+            "..",
+            "~",
+            "/etc/",
+            "/root/",
+            "/home/",
+            "C:\\",
+            "D:\\",
+            "%",
+            "$",
         ]
 
         path_lower = path_str.lower()
@@ -247,7 +266,7 @@ class InputSanitizer:
             name = name[:50]
 
         # Remover caracteres perigosos
-        name = re.sub(r'[<>"\'/\\]', '', name)
+        name = re.sub(r'[<>"\'/\\]', "", name)
 
         # Verificar injeção
         DataValidator.validate_no_script_injection(name, "nome")
@@ -255,7 +274,9 @@ class InputSanitizer:
         return name
 
     @staticmethod
-    def sanitize_numeric_input(value: Any, min_val: int = 0, max_val: int = 999999) -> int:
+    def sanitize_numeric_input(
+        value: Any, min_val: int = 0, max_val: int = 999999
+    ) -> int:
         """Sanitiza entrada numérica."""
         try:
             num_value = int(value)
@@ -275,13 +296,13 @@ def generate_secure_token(length: int = 32) -> str:
 
 def hash_data(data: str) -> str:
     """Cria hash seguro de dados."""
-    return hashlib.sha256(data.encode('utf-8')).hexdigest()
+    return hashlib.sha256(data.encode("utf-8")).hexdigest()
 
 
 def verify_file_integrity(file_path: Path, expected_hash: str) -> bool:
     """Verifica integridade de arquivo usando hash."""
     try:
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             file_hash = hashlib.sha256(f.read()).hexdigest()
         return file_hash == expected_hash
     except (IOError, OSError):
@@ -294,7 +315,7 @@ def secure_delete_file(file_path: Path) -> bool:
         if file_path.exists() and file_path.is_file():
             # Sobrescrever com dados aleatórios antes de deletar
             file_size = file_path.stat().st_size
-            with open(file_path, 'wb') as f:
+            with open(file_path, "wb") as f:
                 f.write(secrets.token_bytes(file_size))
 
             file_path.unlink()

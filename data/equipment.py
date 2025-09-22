@@ -8,7 +8,7 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=0,
         descricao="Uma adaga antiga e oxidada, mas ainda afiada.",
         preco=10,
-        raridade="comum"
+        raridade="comum",
     ),
     "Espada Curta": Equipamento(
         nome="Espada Curta",
@@ -17,7 +17,7 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=0,
         descricao="Uma espada bem balanceada, ideal para combate ágil.",
         preco=50,
-        raridade="comum"
+        raridade="comum",
     ),
     "Cimitarra Enfeiticada": Equipamento(
         nome="Cimitarra Enfeiticada",
@@ -26,7 +26,7 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=0,
         descricao="Uma lâmina curva com runas mágicas que brilham fracamente.",
         preco=150,
-        raridade="raro"
+        raridade="raro",
     ),
     "Espada Runica": Equipamento(
         nome="Espada Runica",
@@ -35,9 +35,8 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=0,
         descricao="Uma espada forjada com magia ancestral, pulsa com poder.",
         preco=400,
-        raridade="épico"
+        raridade="épico",
     ),
-
     "Roupas de Pano": Equipamento(
         nome="Roupas de Pano",
         tipo=TipoEquipamento.ARMADURA,
@@ -45,7 +44,7 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=1,
         descricao="Roupas simples que oferecem proteção mínima.",
         preco=5,
-        raridade="comum"
+        raridade="comum",
     ),
     "Armadura de Couro": Equipamento(
         nome="Armadura de Couro",
@@ -54,7 +53,7 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=3,
         descricao="Armadura flexível feita de couro curtido resistente.",
         preco=25,
-        raridade="comum"
+        raridade="comum",
     ),
     "Armadura de Aco Reforcado": Equipamento(
         nome="Armadura de Aco Reforcado",
@@ -63,9 +62,8 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=6,
         descricao="Armadura pesada de aço com reforços estratégicos.",
         preco=100,
-        raridade="raro"
+        raridade="raro",
     ),
-
     "Escudo de Madeira": Equipamento(
         nome="Escudo de Madeira",
         tipo=TipoEquipamento.ESCUDO,
@@ -73,7 +71,7 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=2,
         descricao="Um escudo simples mas eficaz, feito de madeira robusta.",
         preco=15,
-        raridade="comum"
+        raridade="comum",
     ),
     "Escudo de Bronze": Equipamento(
         nome="Escudo de Bronze",
@@ -82,7 +80,7 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=4,
         descricao="Escudo metálico que oferece boa proteção.",
         preco=40,
-        raridade="comum"
+        raridade="comum",
     ),
     "Escudo de Aco": Equipamento(
         nome="Escudo de Aco",
@@ -91,9 +89,8 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=7,
         descricao="Um escudo pesado de aço, quase indestrutível.",
         preco=120,
-        raridade="raro"
+        raridade="raro",
     ),
-
     # Equipamentos intermediários
     "Espada de Ferro": Equipamento(
         nome="Espada de Ferro",
@@ -102,7 +99,7 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=0,
         descricao="Uma espada sólida de ferro bem forjada.",
         preco=80,
-        raridade="comum"
+        raridade="comum",
     ),
     "Machado de Guerra": Equipamento(
         nome="Machado de Guerra",
@@ -111,7 +108,7 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=0,
         descricao="Arma pesada que causa dano devastador mas é lenta.",
         preco=200,
-        raridade="raro"
+        raridade="raro",
     ),
     "Lâmina Élfica": Equipamento(
         nome="Lâmina Élfica",
@@ -120,9 +117,8 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=1,
         descricao="Espada leve e elegante forjada pelos elfos antigos.",
         preco=250,
-        raridade="raro"
+        raridade="raro",
     ),
-
     # Armaduras intermediárias
     "Armadura de Malha": Equipamento(
         nome="Armadura de Malha",
@@ -131,7 +127,7 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=4,
         descricao="Armadura flexível feita de anéis de metal entrelaçados.",
         preco=60,
-        raridade="comum"
+        raridade="comum",
     ),
     "Armadura de Placas": Equipamento(
         nome="Armadura de Placas",
@@ -140,7 +136,7 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=8,
         descricao="Armadura pesada que oferece proteção máxima.",
         preco=180,
-        raridade="raro"
+        raridade="raro",
     ),
     "Manto Élfico": Equipamento(
         nome="Manto Élfico",
@@ -149,9 +145,8 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=5,
         descricao="Manto mágico que oferece proteção e agilidade.",
         preco=220,
-        raridade="raro"
+        raridade="raro",
     ),
-
     # Escudos intermediários
     "Escudo de Ferro": Equipamento(
         nome="Escudo de Ferro",
@@ -160,7 +155,7 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=5,
         descricao="Escudo robusto de ferro com boa proteção.",
         preco=70,
-        raridade="comum"
+        raridade="comum",
     ),
     "Escudo Rúnico": Equipamento(
         nome="Escudo Rúnico",
@@ -169,9 +164,8 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=9,
         descricao="Escudo gravado com runas mágicas de proteção.",
         preco=280,
-        raridade="épico"
+        raridade="épico",
     ),
-
     # Equipamentos lendários
     "Excalibur": Equipamento(
         nome="Excalibur",
@@ -180,7 +174,7 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=3,
         descricao="A lendária espada do rei, brilha com poder divino.",
         preco=1000,
-        raridade="lendário"
+        raridade="lendário",
     ),
     "Armadura Dragão": Equipamento(
         nome="Armadura Dragão",
@@ -189,7 +183,7 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=12,
         descricao="Armadura forjada com escamas de dragão antigo.",
         preco=800,
-        raridade="lendário"
+        raridade="lendário",
     ),
     "Aegis Celestial": Equipamento(
         nome="Aegis Celestial",
@@ -198,6 +192,6 @@ DB_EQUIPAMENTOS = {
         bonus_defesa=15,
         descricao="Escudo abençoado pelos próprios deuses.",
         preco=900,
-        raridade="lendário"
-    )
+        raridade="lendário",
+    ),
 }

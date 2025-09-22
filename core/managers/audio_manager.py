@@ -1,19 +1,18 @@
 """
 Gerenciador de audio para música e efeitos sonoros.
 """
-import asyncio
-from pathlib import Path
-from typing import Dict, Optional, Any
-from enum import Enum
 
-from core.managers.base_manager import BaseManager
-from core.managers.event_manager import subscribe_to_event, EventType
-from utils.logging_config import get_logger
+from enum import Enum
+from typing import Any, Dict, Optional
+
 from config.settings import GameSettings
+from core.managers.base_manager import BaseManager
+from core.managers.event_manager import EventType, subscribe_to_event
 
 
 class AudioType(Enum):
     """Tipos de audio."""
+
     MUSIC = "music"
     SOUND_EFFECT = "sound_effect"
     AMBIENT = "ambient"
@@ -115,7 +114,9 @@ class AudioManager(BaseManager):
 
             self._current_music = None
 
-    def play_sound_effect(self, sound_name: str, volume: Optional[float] = None) -> bool:
+    def play_sound_effect(
+        self, sound_name: str, volume: Optional[float] = None
+    ) -> bool:
         """Toca um efeito sonoro."""
         if not self._is_effects_enabled:
             return False
@@ -219,7 +220,7 @@ class AudioManager(BaseManager):
             "effects_enabled": self._is_effects_enabled,
             "music_volume": self._music_volume,
             "effects_volume": self._effects_volume,
-            "loaded_sounds_count": len(self._loaded_sounds)
+            "loaded_sounds_count": len(self._loaded_sounds),
         }
 
     def shutdown(self) -> None:

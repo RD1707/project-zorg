@@ -1,18 +1,18 @@
 """
 Testes para os managers do ZORG.
 """
-import pytest
-from unittest.mock import patch, MagicMock
-from pathlib import Path
+
 import json
 
-from core.managers.combat_manager import CombatManager, CombatAction, CombatResult
+import pytest
+
+from core.exceptions import CombatError, SaveLoadError
+from core.managers.cache_manager import CacheManager, LRUCache
+from core.managers.combat_manager import CombatAction, CombatManager, CombatResult
+from core.managers.event_manager import EventManager, EventType
 from core.managers.inventory_manager import InventoryManager
 from core.managers.save_manager import SaveManager
-from core.managers.event_manager import EventManager, EventType
-from core.managers.cache_manager import CacheManager, LRUCache
-from core.models import Personagem, TipoHabilidade
-from core.exceptions import CombatError, InvalidActionError, SaveLoadError
+from core.models import TipoHabilidade
 
 
 class TestCombatManager:
@@ -33,12 +33,14 @@ class TestCombatManager:
         """Testa início de combate."""
         combat_state = combat_manager.start_combat(sample_player, sample_enemy)
 
-        assert combat_state["active"] == True
+        assert combat_state["active"] is True
         assert combat_state["player"] == sample_player
         assert combat_state["enemy"] == sample_enemy
         assert combat_state["turn_count"] == 0
 
-    def test_start_combat_invalid_conditions(self, combat_manager, sample_player, sample_enemy):
+    def test_start_combat_invalid_conditions(
+        self, combat_manager, sample_player, sample_enemy
+    ):
         """Testa início de combate com condições inválidas."""
         # Player morto
         sample_player.hp = 0
@@ -62,7 +64,9 @@ class TestCombatManager:
         assert len(combat_state["log"]) > 0
         assert combat_state["turn_count"] == 1
 
-    def test_player_skill_turn(self, combat_manager, sample_player, sample_enemy, sample_skill):
+    def test_player_skill_turn(
+        self, combat_manager, sample_player, sample_enemy, sample_skill
+    ):
         """Testa turno de habilidade do jogador."""
         sample_player.habilidades_conhecidas.append(sample_skill)
         combat_manager.start_combat(sample_player, sample_enemy)
@@ -71,8 +75,7 @@ class TestCombatManager:
             sample_player.hp = 50  # Reduzir HP para testar cura
 
         combat_state = combat_manager.process_player_turn(
-            CombatAction.SKILL,
-            skill_name=sample_skill.nome
+            CombatAction.SKILL, skill_name=sample_skill.nome
         )
 
         assert len(combat_state["log"]) > 0
@@ -106,7 +109,7 @@ class TestCombatManager:
 
         final_state = combat_manager.end_combat()
         assert not combat_manager.is_combat_active()
-        assert final_state["active"] == True  # Estado final ainda tem dados
+        assert final_state["active"] is True  # Estado final ainda tem dados
 
 
 class TestInventoryManager:
@@ -127,11 +130,13 @@ class TestInventoryManager:
         initial_count = len(sample_player.inventario)
 
         result = inventory_manager.add_item(sample_player, "Test Item", 2)
-        assert result == True
+        assert result is True
         assert len(sample_player.inventario) == initial_count + 1
 
         # Verificar se item foi adicionado corretamente
-        item = next((i for i in sample_player.inventario if i.nome == "Test Item"), None)
+        item = next(
+            (i for i in sample_player.inventario if i.nome == "Test Item"), None
+        )
         assert item is not None
         assert item.quantidade == 2
 
@@ -142,7 +147,7 @@ class TestInventoryManager:
 
         # Tentar adicionar mais do mesmo item
         result = inventory_manager.add_item(sample_player, sample_item.nome, 3)
-        assert result == True
+        assert result is True
         assert len(sample_player.inventario) == 1
         assert sample_player.inventario[0].quantidade == 4  # 1 + 3
 
@@ -152,15 +157,17 @@ class TestInventoryManager:
         sample_player.inventario.append(sample_item)
 
         result = inventory_manager.remove_item(sample_player, sample_item.nome, 2)
-        assert result == True
+        assert result is True
         assert sample_item.quantidade == 3
 
         # Remover tudo
         result = inventory_manager.remove_item(sample_player, sample_item.nome, 3)
-        assert result == True
+        assert result is True
         assert len(sample_player.inventario) == 0
 
-    def test_use_item(self, inventory_manager, sample_player, sample_item, mock_db_data):
+    def test_use_item(
+        self, inventory_manager, sample_player, sample_item, mock_db_data
+    ):
         """Testa uso de item."""
         sample_player.hp = 50  # HP parcial para testar cura
         sample_player.inventario.append(sample_item)
@@ -184,8 +191,22 @@ class TestInventoryManager:
         # Adicionar vários itens
         from core.models import Item
 
-        item1 = Item(nome="Z Item", descricao="", cura_hp=0, cura_mp=0, cura_veneno=0, preco_venda=10)
-        item2 = Item(nome="A Item", descricao="", cura_hp=0, cura_mp=0, cura_veneno=0, preco_venda=5)
+        item1 = Item(
+            nome="Z Item",
+            descricao="",
+            cura_hp=0,
+            cura_mp=0,
+            cura_veneno=0,
+            preco_venda=10,
+        )
+        item2 = Item(
+            nome="A Item",
+            descricao="",
+            cura_hp=0,
+            cura_mp=0,
+            cura_veneno=0,
+            preco_venda=5,
+        )
 
         sample_player.inventario.extend([item1, item2])
 
@@ -210,11 +231,11 @@ class TestSaveManager:
     def test_save_game(self, save_manager, sample_player, mock_save_dir):
         """Testa salvamento do jogo."""
         result = save_manager.save_game(sample_player)
-        assert result == True
+        assert result is True
         assert mock_save_dir.exists()
 
         # Verificar conteúdo do arquivo
-        with open(mock_save_dir, 'r', encoding='utf-8') as f:
+        with open(mock_save_dir, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         assert data["player"]["nome"] == sample_player.nome
@@ -242,7 +263,7 @@ class TestSaveManager:
         save_manager.save_game(sample_player)
 
         # Corromper arquivo
-        with open(mock_save_dir, 'w') as f:
+        with open(mock_save_dir, "w") as f:
             json.dump({"invalid": "data"}, f)
 
         with pytest.raises(SaveLoadError):
@@ -258,7 +279,7 @@ class TestSaveManager:
         save_manager.save_game(sample_player)
         info = save_manager.get_save_info()
         assert info is not None
-        assert info["exists"] == True
+        assert info["exists"] is True
         assert info["player_name"] == sample_player.nome
 
 
@@ -360,7 +381,7 @@ class TestCacheManager:
 
         # Delete
         result = cache_manager.delete("test_key")
-        assert result == True
+        assert result is True
         assert cache_manager.get("test_key") is None
 
     def test_cache_with_different_names(self, cache_manager):
@@ -415,6 +436,7 @@ class TestCacheManager:
         cache.set("temp_key", "temp_value", ttl=0.001)  # 1ms
 
         import time
+
         time.sleep(0.01)  # Esperar expirar
 
         cleaned = cache_manager.cleanup_expired()

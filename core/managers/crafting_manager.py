@@ -2,14 +2,14 @@
 Sistema de crafting/melhoramento de equipamentos para o jogo ZORG.
 Permite que jogadores aprimorem suas armas e armaduras usando materiais coletados.
 """
-from typing import Dict, List, Any, Optional, Tuple
+
+import random
 from dataclasses import dataclass
 from enum import Enum
-import random
+from typing import Any, Dict, List, Optional, Tuple
 
-from core.managers.base_manager import BaseManager
-from core.models import Equipamento, Item
 from core.elemental_system import Element
+from core.managers.base_manager import BaseManager
 from utils.logging_config import get_logger
 
 logger = get_logger("crafting_manager")
@@ -36,6 +36,7 @@ class CraftingCategory(Enum):
 @dataclass
 class CraftingMaterial:
     """Material usado no crafting."""
+
     name: str
     material_type: MaterialType
     description: str
@@ -52,6 +53,7 @@ class CraftingMaterial:
 @dataclass
 class CraftingRecipe:
     """Receita de crafting."""
+
     id: str
     name: str
     description: str
@@ -74,6 +76,7 @@ class CraftingRecipe:
 @dataclass
 class CraftingResult:
     """Resultado de uma operação de crafting."""
+
     success: bool
     message: str
     item_created: Optional[Any] = None
@@ -106,7 +109,7 @@ class CraftingManager(BaseManager):
             material_type=MaterialType.COMMON_METAL,
             description="Metal básico encontrado em minas. Útil para melhorias simples.",
             rarity="common",
-            value=10
+            value=10,
         )
 
         materials["aco_refinado"] = CraftingMaterial(
@@ -114,7 +117,7 @@ class CraftingManager(BaseManager):
             material_type=MaterialType.RARE_METAL,
             description="Metal de alta qualidade, forjado com técnicas avançadas.",
             rarity="uncommon",
-            value=50
+            value=50,
         )
 
         materials["mithril"] = CraftingMaterial(
@@ -122,7 +125,7 @@ class CraftingManager(BaseManager):
             material_type=MaterialType.PRECIOUS_METAL,
             description="Metal élfico lendário, leve como uma pluma mas forte como diamante.",
             rarity="rare",
-            value=200
+            value=200,
         )
 
         # Cristais mágicos
@@ -131,7 +134,7 @@ class CraftingManager(BaseManager):
             material_type=MaterialType.MAGIC_CRYSTAL,
             description="Cristal que pulsa com energia mágica fraca.",
             rarity="common",
-            value=25
+            value=25,
         )
 
         materials["cristal_maior"] = CraftingMaterial(
@@ -139,7 +142,7 @@ class CraftingManager(BaseManager):
             material_type=MaterialType.MAGIC_CRYSTAL,
             description="Cristal radiante com poder mágico considerável.",
             rarity="rare",
-            value=150
+            value=150,
         )
 
         # Essências elementais
@@ -150,7 +153,7 @@ class CraftingManager(BaseManager):
             rarity="uncommon",
             value=75,
             element=Element.FOGO,
-            special_properties=["fire_enchantment", "burn_chance"]
+            special_properties=["fire_enchantment", "burn_chance"],
         )
 
         materials["essencia_gelo"] = CraftingMaterial(
@@ -160,7 +163,7 @@ class CraftingManager(BaseManager):
             rarity="uncommon",
             value=75,
             element=Element.GELO,
-            special_properties=["ice_enchantment", "slow_chance"]
+            special_properties=["ice_enchantment", "slow_chance"],
         )
 
         materials["essencia_sombra"] = CraftingMaterial(
@@ -170,7 +173,7 @@ class CraftingManager(BaseManager):
             rarity="rare",
             value=100,
             element=Element.SOMBRA,
-            special_properties=["shadow_enchantment", "critical_boost"]
+            special_properties=["shadow_enchantment", "critical_boost"],
         )
 
         # Partes de monstros
@@ -180,7 +183,7 @@ class CraftingManager(BaseManager):
             description="Garra afiada de um predador sombrio.",
             rarity="common",
             value=30,
-            special_properties=["sharpness", "agility_boost"]
+            special_properties=["sharpness", "agility_boost"],
         )
 
         materials["escama_dragao"] = CraftingMaterial(
@@ -189,7 +192,7 @@ class CraftingManager(BaseManager):
             description="Escama quase indestrutível de um dragão antigo.",
             rarity="legendary",
             value=500,
-            special_properties=["fire_resistance", "defense_boost", "intimidation"]
+            special_properties=["fire_resistance", "defense_boost", "intimidation"],
         )
 
         # Runas antigas
@@ -199,7 +202,7 @@ class CraftingManager(BaseManager):
             description="Símbolo antigo que amplifica força física.",
             rarity="rare",
             value=180,
-            special_properties=["attack_boost", "strength_enhancement"]
+            special_properties=["attack_boost", "strength_enhancement"],
         )
 
         materials["runa_protecao"] = CraftingMaterial(
@@ -208,7 +211,7 @@ class CraftingManager(BaseManager):
             description="Símbolo antigo que oferece proteção divina.",
             rarity="rare",
             value=180,
-            special_properties=["defense_boost", "magic_resistance"]
+            special_properties=["defense_boost", "magic_resistance"],
         )
 
         return materials
@@ -227,7 +230,7 @@ class CraftingManager(BaseManager):
             required_gold=100,
             required_level=3,
             success_chance=0.9,
-            upgrade_bonus={"bonus_ataque": 2}
+            upgrade_bonus={"bonus_ataque": 2},
         )
 
         # Melhorias de arma - Nível 2
@@ -240,7 +243,7 @@ class CraftingManager(BaseManager):
             required_gold=250,
             required_level=5,
             success_chance=0.75,
-            upgrade_bonus={"bonus_ataque": 5}
+            upgrade_bonus={"bonus_ataque": 5},
         )
 
         # Melhorias de armadura - Nível 1
@@ -253,7 +256,7 @@ class CraftingManager(BaseManager):
             required_gold=120,
             required_level=3,
             success_chance=0.85,
-            upgrade_bonus={"bonus_defesa": 3}
+            upgrade_bonus={"bonus_defesa": 3},
         )
 
         # Encantamentos elementais
@@ -266,7 +269,7 @@ class CraftingManager(BaseManager):
             required_gold=300,
             required_level=4,
             success_chance=0.7,
-            special_effects=["fire_damage", "burn_chance"]
+            special_effects=["fire_damage", "burn_chance"],
         )
 
         recipes["ice_enchantment"] = CraftingRecipe(
@@ -278,7 +281,7 @@ class CraftingManager(BaseManager):
             required_gold=300,
             required_level=4,
             success_chance=0.7,
-            special_effects=["ice_damage", "slow_chance"]
+            special_effects=["ice_damage", "slow_chance"],
         )
 
         # Reparo de equipamentos
@@ -291,7 +294,7 @@ class CraftingManager(BaseManager):
             required_gold=50,
             required_level=1,
             success_chance=1.0,
-            special_effects=["restore_durability"]
+            special_effects=["restore_durability"],
         )
 
         # Fusão de itens
@@ -304,7 +307,7 @@ class CraftingManager(BaseManager):
             required_gold=80,
             required_level=2,
             success_chance=0.8,
-            output_item="cristal_maior"
+            output_item="cristal_maior",
         )
 
         # Receitas lendárias
@@ -313,26 +316,31 @@ class CraftingManager(BaseManager):
             name="Forja Lendária",
             description="Cria uma arma lendária usando materiais raríssimos.",
             category=CraftingCategory.WEAPON_UPGRADE,
-            required_materials={"mithril": 2, "escama_dragao": 1, "runa_poder": 1, "cristal_maior": 3},
+            required_materials={
+                "mithril": 2,
+                "escama_dragao": 1,
+                "runa_poder": 1,
+                "cristal_maior": 3,
+            },
             required_gold=1000,
             required_level=8,
             success_chance=0.5,
             upgrade_bonus={"bonus_ataque": 15, "bonus_defesa": 5},
-            special_effects=["legendary_power", "critical_boost", "intimidation"]
+            special_effects=["legendary_power", "critical_boost", "intimidation"],
         )
 
         return recipes
 
     def get_available_recipes(self, player_level: int) -> List[CraftingRecipe]:
         """Retorna receitas disponíveis para o nível do jogador."""
-        return [recipe for recipe in self.recipes.values()
-                if recipe.required_level <= player_level]
+        return [
+            recipe
+            for recipe in self.recipes.values()
+            if recipe.required_level <= player_level
+        ]
 
     def check_recipe_requirements(
-        self,
-        recipe: CraftingRecipe,
-        player_materials: Dict[str, int],
-        player_gold: int
+        self, recipe: CraftingRecipe, player_materials: Dict[str, int], player_gold: int
     ) -> Tuple[bool, List[str]]:
         """Verifica se o jogador atende aos requisitos da receita."""
         missing_requirements = []
@@ -358,14 +366,11 @@ class CraftingManager(BaseManager):
         recipe_id: str,
         player_materials: Dict[str, int],
         player_gold: int,
-        target_item: Optional[Any] = None
+        target_item: Optional[Any] = None,
     ) -> CraftingResult:
         """Executa uma operação de crafting."""
         if recipe_id not in self.recipes:
-            return CraftingResult(
-                success=False,
-                message="Receita não encontrada!"
-            )
+            return CraftingResult(success=False, message="Receita não encontrada!")
 
         recipe = self.recipes[recipe_id]
 
@@ -376,8 +381,7 @@ class CraftingManager(BaseManager):
 
         if not can_craft:
             return CraftingResult(
-                success=False,
-                message=f"Requisitos não atendidos: {', '.join(missing)}"
+                success=False, message=f"Requisitos não atendidos: {', '.join(missing)}"
             )
 
         # Calcular chance de sucesso
@@ -397,7 +401,7 @@ class CraftingManager(BaseManager):
                 message=f"Crafting falhou! ({success_roll:.2f} > {recipe.success_chance:.2f})",
                 materials_consumed=consumed_materials,
                 gold_spent=gold_spent,
-                experience_gained=10
+                experience_gained=10,
             )
 
         # Sucesso - aplicar efeitos da receita
@@ -409,9 +413,7 @@ class CraftingManager(BaseManager):
         return result
 
     def _apply_crafting_effects(
-        self,
-        recipe: CraftingRecipe,
-        target_item: Optional[Any]
+        self, recipe: CraftingRecipe, target_item: Optional[Any]
     ) -> CraftingResult:
         """Aplica os efeitos de uma receita de crafting."""
 
@@ -432,16 +434,14 @@ class CraftingManager(BaseManager):
 
         else:
             return CraftingResult(
-                success=False,
-                message="Categoria de crafting não implementada!"
+                success=False, message="Categoria de crafting não implementada!"
             )
 
     def _upgrade_weapon(self, recipe: CraftingRecipe, weapon: Any) -> CraftingResult:
         """Melhora uma arma."""
         if not weapon:
             return CraftingResult(
-                success=False,
-                message="Nenhuma arma selecionada para melhoramento!"
+                success=False, message="Nenhuma arma selecionada para melhoramento!"
             )
 
         # Aplicar bônus
@@ -450,28 +450,27 @@ class CraftingManager(BaseManager):
             setattr(weapon, stat, current_value + bonus)
 
         # Aplicar efeitos especiais
-        if hasattr(weapon, 'special_effects'):
+        if hasattr(weapon, "special_effects"):
             weapon.special_effects.extend(recipe.special_effects)
         else:
             weapon.special_effects = recipe.special_effects.copy()
 
         # Aumentar nível de melhoramento
-        if not hasattr(weapon, 'upgrade_level'):
+        if not hasattr(weapon, "upgrade_level"):
             weapon.upgrade_level = 0
         weapon.upgrade_level += 1
 
         return CraftingResult(
             success=True,
             message=f"{weapon.nome} foi melhorada para nível +{weapon.upgrade_level}!",
-            item_modified=weapon
+            item_modified=weapon,
         )
 
     def _upgrade_armor(self, recipe: CraftingRecipe, armor: Any) -> CraftingResult:
         """Melhora uma armadura."""
         if not armor:
             return CraftingResult(
-                success=False,
-                message="Nenhuma armadura selecionada para melhoramento!"
+                success=False, message="Nenhuma armadura selecionada para melhoramento!"
             )
 
         # Aplicar bônus
@@ -480,41 +479,41 @@ class CraftingManager(BaseManager):
             setattr(armor, stat, current_value + bonus)
 
         # Aplicar efeitos especiais
-        if hasattr(armor, 'special_effects'):
+        if hasattr(armor, "special_effects"):
             armor.special_effects.extend(recipe.special_effects)
         else:
             armor.special_effects = recipe.special_effects.copy()
 
         # Aumentar nível de melhoramento
-        if not hasattr(armor, 'upgrade_level'):
+        if not hasattr(armor, "upgrade_level"):
             armor.upgrade_level = 0
         armor.upgrade_level += 1
 
         return CraftingResult(
             success=True,
             message=f"{armor.nome} foi melhorada para nível +{armor.upgrade_level}!",
-            item_modified=armor
+            item_modified=armor,
         )
 
     def _apply_enchantment(self, recipe: CraftingRecipe, item: Any) -> CraftingResult:
         """Aplica encantamento a um item."""
         if not item:
             return CraftingResult(
-                success=False,
-                message="Nenhum item selecionado para encantamento!"
+                success=False, message="Nenhum item selecionado para encantamento!"
             )
 
         # Verificar se já tem encantamento
-        if hasattr(item, 'enchantment') and item.enchantment:
+        if hasattr(item, "enchantment") and item.enchantment:
             return CraftingResult(
-                success=False,
-                message=f"{item.nome} já possui um encantamento!"
+                success=False, message=f"{item.nome} já possui um encantamento!"
             )
 
         # Aplicar encantamento
-        item.enchantment = recipe.special_effects[0] if recipe.special_effects else "magical"
+        item.enchantment = (
+            recipe.special_effects[0] if recipe.special_effects else "magical"
+        )
 
-        if hasattr(item, 'special_effects'):
+        if hasattr(item, "special_effects"):
             item.special_effects.extend(recipe.special_effects)
         else:
             item.special_effects = recipe.special_effects.copy()
@@ -526,19 +525,18 @@ class CraftingManager(BaseManager):
         return CraftingResult(
             success=True,
             message=f"{item.nome} foi encantado com sucesso!",
-            item_modified=item
+            item_modified=item,
         )
 
     def _repair_item(self, recipe: CraftingRecipe, item: Any) -> CraftingResult:
         """Repara um item danificado."""
         if not item:
             return CraftingResult(
-                success=False,
-                message="Nenhum item selecionado para reparo!"
+                success=False, message="Nenhum item selecionado para reparo!"
             )
 
         # Restaurar durabilidade
-        if hasattr(item, 'durabilidade'):
+        if hasattr(item, "durabilidade"):
             item.durabilidade = 100
         else:
             item.durabilidade = 100
@@ -546,29 +544,27 @@ class CraftingManager(BaseManager):
         return CraftingResult(
             success=True,
             message=f"{item.nome} foi reparado completamente!",
-            item_modified=item
+            item_modified=item,
         )
 
     def _fuse_materials(self, recipe: CraftingRecipe) -> CraftingResult:
         """Funde materiais para criar um novo."""
         if not recipe.output_item:
             return CraftingResult(
-                success=False,
-                message="Receita de fusão sem item de saída definido!"
+                success=False, message="Receita de fusão sem item de saída definido!"
             )
 
         # Criar novo material
         output_material = self.materials.get(recipe.output_item)
         if not output_material:
             return CraftingResult(
-                success=False,
-                message="Material de saída não encontrado!"
+                success=False, message="Material de saída não encontrado!"
             )
 
         return CraftingResult(
             success=True,
             message=f"Criou {output_material.name} através da fusão!",
-            item_created=output_material
+            item_created=output_material,
         )
 
     def _get_enchantment_description(self, effects: List[str]) -> str:
@@ -579,7 +575,7 @@ class CraftingManager(BaseManager):
             "shadow_damage": "Sombrio",
             "light_damage": "Radiante",
             "critical_boost": "Letal",
-            "legendary_power": "Lendário"
+            "legendary_power": "Lendário",
         }
 
         for effect in effects:

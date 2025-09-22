@@ -1,16 +1,25 @@
 """
 Configurações e fixtures compartilhadas para os testes do ZORG.
 """
-import pytest
-from unittest.mock import MagicMock, patch
-from pathlib import Path
-import tempfile
+
 import shutil
+import tempfile
+from pathlib import Path
 from typing import Generator
+from unittest.mock import patch
+
+import pytest
 
 from core.engine import GameEngine
-from core.models import Personagem, Item, Equipamento, Habilidade, TipoEquipamento, TipoHabilidade
 from core.managers.event_manager import get_event_manager
+from core.models import (
+    Equipamento,
+    Habilidade,
+    Item,
+    Personagem,
+    TipoEquipamento,
+    TipoHabilidade,
+)
 
 
 @pytest.fixture(scope="function")
@@ -26,7 +35,7 @@ def temp_dir() -> Generator[Path, None, None]:
 @pytest.fixture(scope="function")
 def mock_save_dir(temp_dir: Path):
     """Mock do diretório de save."""
-    with patch('config.settings.get_save_path') as mock_path:
+    with patch("config.settings.get_save_path") as mock_path:
         save_file = temp_dir / "test_save.json"
         mock_path.return_value = save_file
         yield save_file
@@ -36,7 +45,7 @@ def mock_save_dir(temp_dir: Path):
 def clean_engine():
     """Fixture que reseta o GameEngine entre os testes."""
     # Reset do singleton
-    if hasattr(GameEngine, '_instance'):
+    if hasattr(GameEngine, "_instance"):
         engine = GameEngine._instance
         if engine:
             engine.shutdown()
@@ -46,7 +55,7 @@ def clean_engine():
     yield
 
     # Cleanup após o teste
-    if hasattr(GameEngine, '_instance') and GameEngine._instance:
+    if hasattr(GameEngine, "_instance") and GameEngine._instance:
         GameEngine._instance.shutdown()
         GameEngine._instance = None
         GameEngine._initialized = False
@@ -56,11 +65,7 @@ def clean_engine():
 def sample_player() -> Personagem:
     """Cria um jogador de exemplo para testes."""
     player = Personagem(
-        nome="TestPlayer",
-        hp_max=100,
-        mp_max=50,
-        ataque_base=10,
-        defesa_base=5
+        nome="TestPlayer", hp_max=100, mp_max=50, ataque_base=10, defesa_base=5
     )
     return player
 
@@ -75,7 +80,7 @@ def sample_enemy() -> Personagem:
         ataque_base=8,
         defesa_base=3,
         xp_dado=50,
-        ouro_dado=25
+        ouro_dado=25,
     )
     return enemy
 
@@ -89,7 +94,7 @@ def sample_item() -> Item:
         cura_hp=25,
         cura_mp=0,
         cura_veneno=0,
-        preco_venda=10
+        preco_venda=10,
     )
 
 
@@ -101,7 +106,7 @@ def sample_equipment() -> Equipamento:
         tipo=TipoEquipamento.ARMA,
         bonus_ataque=5,
         bonus_defesa=0,
-        descricao="Uma espada de teste"
+        descricao="Uma espada de teste",
     )
 
 
@@ -113,7 +118,7 @@ def sample_skill() -> Habilidade:
         descricao="Uma habilidade de cura de teste",
         custo_mp=10,
         tipo=TipoHabilidade.CURA,
-        valor_efeito=30
+        valor_efeito=30,
     )
 
 
@@ -146,7 +151,7 @@ def mock_db_data():
             cura_hp=20,
             cura_mp=0,
             cura_veneno=0,
-            preco_venda=5
+            preco_venda=5,
         )
     }
 
@@ -155,7 +160,7 @@ def mock_db_data():
             nome="Test Weapon",
             tipo=TipoEquipamento.ARMA,
             bonus_ataque=3,
-            bonus_defesa=0
+            bonus_defesa=0,
         )
     }
 
@@ -165,7 +170,7 @@ def mock_db_data():
             descricao="Habilidade de teste",
             custo_mp=5,
             tipo=TipoHabilidade.ATAQUE,
-            valor_efeito=15
+            valor_efeito=15,
         )
     }
 
@@ -177,17 +182,18 @@ def mock_db_data():
             ataque_base=6,
             defesa_base=2,
             xp_dado=30,
-            ouro_dado=15
+            ouro_dado=15,
         )
     }
 
-    with patch('data.items.DB_ITENS', mock_items), \
-         patch('data.equipment.DB_EQUIPAMENTOS', mock_equipment), \
-         patch('data.abilities.DB_HABILIDADES', mock_skills), \
-         patch('data.enemies.DB_INIMIGOS', mock_enemies):
+    with patch("data.items.DB_ITENS", mock_items), patch(
+        "data.equipment.DB_EQUIPAMENTOS", mock_equipment
+    ), patch("data.abilities.DB_HABILIDADES", mock_skills), patch(
+        "data.enemies.DB_INIMIGOS", mock_enemies
+    ):
         yield {
-            'items': mock_items,
-            'equipment': mock_equipment,
-            'skills': mock_skills,
-            'enemies': mock_enemies
+            "items": mock_items,
+            "equipment": mock_equipment,
+            "skills": mock_skills,
+            "enemies": mock_enemies,
         }

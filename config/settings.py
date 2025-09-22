@@ -1,7 +1,7 @@
-from pathlib import Path
-from typing import Dict, Any
-import os
 import json
+import os
+from pathlib import Path
+from typing import Any, Dict
 
 BASE_DIR = Path(__file__).parent.parent
 CONFIG_DIR = BASE_DIR / "config"
@@ -21,7 +21,7 @@ SAVE_CONFIG: Dict[str, Any] = {
     "save_file_name": "zorg_save.json",
     "backup_enabled": True,
     "max_backups": 5,
-    "auto_save_interval": 300,  
+    "auto_save_interval": 300,
 }
 
 COMBAT_CONFIG: Dict[str, Any] = {
@@ -45,7 +45,7 @@ LOG_CONFIG: Dict[str, Any] = {
     "file_enabled": True,
     "console_enabled": True,
     "max_log_files": 10,
-    "max_file_size": 10 * 1024 * 1024,  
+    "max_file_size": 10 * 1024 * 1024,
 }
 
 DEV_CONFIG: Dict[str, Any] = {
@@ -62,18 +62,22 @@ PERFORMANCE_CONFIG: Dict[str, Any] = {
     "preload_phases": True,
 }
 
+
 def get_save_path(filename: str = None) -> Path:
     if filename is None:
         filename = SAVE_CONFIG["save_file_name"]
     return SAVE_DIR / filename
+
 
 def get_log_path() -> Path:
     log_dir = SAVE_DIR / "logs"
     log_dir.mkdir(exist_ok=True)
     return log_dir
 
+
 def is_debug_mode() -> bool:
     return DEV_CONFIG["debug_mode"]
+
 
 def get_config(section: str) -> Dict[str, Any]:
     config_map = {
@@ -103,30 +107,27 @@ class GameSettings:
             "text_speed": "normal",
             "auto_save": True,
             "confirm_actions": True,
-
             # Audio
             "background_music": True,
             "sound_effects": True,
             "master_volume": "75",
-
             # Interface
             "theme": "dark",
             "show_tooltips": True,
-
             # Controles
             "key_bindings": {
                 "quit": "q",
                 "menu": "escape",
                 "confirm": "enter",
-                "cancel": "escape"
-            }
+                "cancel": "escape",
+            },
         }
 
     def _load(self) -> None:
         """Carrega configurações do arquivo."""
         if self.settings_file.exists():
             try:
-                with open(self.settings_file, 'r', encoding='utf-8') as f:
+                with open(self.settings_file, "r", encoding="utf-8") as f:
                     saved_settings = json.load(f)
                     # Mesclar com configurações padrão
                     self._data.update(saved_settings)
@@ -145,7 +146,7 @@ class GameSettings:
     def save(self) -> bool:
         """Salva as configurações no arquivo."""
         try:
-            with open(self.settings_file, 'w', encoding='utf-8') as f:
+            with open(self.settings_file, "w", encoding="utf-8") as f:
                 json.dump(self._data, f, indent=2, ensure_ascii=False)
             return True
         except Exception as e:
@@ -163,6 +164,6 @@ class GameSettings:
             "slow": 0.05,
             "normal": 0.025,
             "fast": 0.01,
-            "instant": 0.0
+            "instant": 0.0,
         }
         return speed_map.get(self.get("text_speed", "normal"), 0.025)

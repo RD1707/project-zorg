@@ -1,10 +1,9 @@
-from typing import Dict, List, Callable, Any, Optional
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
 from core.managers.base_manager import BaseManager
-from utils.logging_config import get_logger
 
 
 class EventType(Enum):
@@ -65,17 +64,18 @@ class EventManager(BaseManager):
                 self._handlers[event_type].remove(handler)
                 self.logger.debug(f"Handler removido do evento {event_type.value}")
             except ValueError:
-                self.logger.warning(f"Handler não encontrado para evento {event_type.value}")
+                self.logger.warning(
+                    f"Handler não encontrado para evento {event_type.value}"
+                )
 
-    def emit(self, event_type: EventType, data: Dict[str, Any] = None, source: str = "game") -> None:
+    def emit(
+        self, event_type: EventType, data: Dict[str, Any] = None, source: str = "game"
+    ) -> None:
         if data is None:
             data = {}
 
         event = GameEvent(
-            type=event_type,
-            data=data,
-            timestamp=datetime.now(),
-            source=source
+            type=event_type, data=data, timestamp=datetime.now(), source=source
         )
 
         self._event_history.append(event)
@@ -87,11 +87,17 @@ class EventManager(BaseManager):
                 try:
                     handler(event)
                 except Exception as e:
-                    self.logger.error(f"Erro ao executar handler para evento {event_type.value}: {e}")
+                    self.logger.error(
+                        f"Erro ao executar handler para evento {event_type.value}: {e}"
+                    )
 
-        self.logger.debug(f"Evento {event_type.value} emitido com {len(self._handlers.get(event_type, []))} handlers")
+        self.logger.debug(
+            f"Evento {event_type.value} emitido com {len(self._handlers.get(event_type, []))} handlers"
+        )
 
-    def get_event_history(self, event_type: Optional[EventType] = None, limit: int = 100) -> List[GameEvent]:
+    def get_event_history(
+        self, event_type: Optional[EventType] = None, limit: int = 100
+    ) -> List[GameEvent]:
         if event_type is None:
             return self._event_history[-limit:]
 
@@ -107,16 +113,21 @@ class EventManager(BaseManager):
 
     def get_status(self) -> Dict[str, Any]:
         status = super().get_status()
-        status.update({
-            "total_handlers": sum(len(handlers) for handlers in self._handlers.values()),
-            "event_types": len(self._handlers),
-            "history_size": len(self._event_history),
-            "handlers_by_type": {
-                event_type.value: len(handlers)
-                for event_type, handlers in self._handlers.items()
+        status.update(
+            {
+                "total_handlers": sum(
+                    len(handlers) for handlers in self._handlers.values()
+                ),
+                "event_types": len(self._handlers),
+                "history_size": len(self._event_history),
+                "handlers_by_type": {
+                    event_type.value: len(handlers)
+                    for event_type, handlers in self._handlers.items()
+                },
             }
-        })
+        )
         return status
+
 
 _event_manager = EventManager()
 
@@ -127,7 +138,9 @@ def get_event_manager() -> EventManager:
     return _event_manager
 
 
-def emit_event(event_type: EventType, data: Dict[str, Any] = None, source: str = "game") -> None:
+def emit_event(
+    event_type: EventType, data: Dict[str, Any] = None, source: str = "game"
+) -> None:
     get_event_manager().emit(event_type, data, source)
 
 
