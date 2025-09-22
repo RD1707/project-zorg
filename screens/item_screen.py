@@ -115,14 +115,10 @@ class ItemScreen(Screen):
             with Vertical(id="filter_section"):
                 yield Input(placeholder="Buscar item...", id="filter_input")
                 with Horizontal(classes="filter_buttons"):
-                    yield Button("Todos", id="filter_all", variant="primary")
-                    yield Button(
-                        "Consumíveis", id="filter_consumable", variant="default"
-                    )
-                    yield Button(
-                        "Equipamentos", id="filter_equipment", variant="default"
-                    )
-                    yield Button("Cura", id="filter_healing", variant="default")
+                    yield Button("Todos", id="filter_all")
+                    yield Button("Consumíveis", id="filter_consumable")
+                    yield Button("Equipamentos", id="filter_equipment")
+                    yield Button("Cura", id="filter_healing")
 
             with TabbedContent():
                 with TabPane("Inventário", id="inventory_tab"):
@@ -212,7 +208,6 @@ class ItemScreen(Screen):
                         yield Button(
                             "Usar",
                             id=f"use_{item.nome.replace(' ', '_')}",
-                            variant="success",
                         )
 
     def create_equipment_row(self, container, slot_name, equipment):

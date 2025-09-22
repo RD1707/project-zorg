@@ -69,7 +69,6 @@ class SkillScreen(Screen):
                     yield Button(
                         f"{habilidade.nome} (Custo: {habilidade.custo_mp} MP)",
                         id=habilidade.nome.replace(" ", "_"),
-                        variant="warning",
                         disabled=not tem_mp_suficiente,  # Desativa o botão se não houver MP
                     )
 

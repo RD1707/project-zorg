@@ -67,24 +67,14 @@ class CityScreen(Screen):
         yield self.create_status_bar()
 
         with Vertical(id="city_options"):
-            yield Button(
-                "Visitar 'O Ponteiro Enferrujado' (Loja)", id="shop", variant="primary"
-            )
-            yield Button(
-                "Descansar na estalagem 'O Pescador Cansado'",
-                id="rest",
-                variant="success",
-            )
-            yield Button("Explorar as docas", id="docks", variant="default")
-            yield Button("Visitar a Praca Central", id="plaza", variant="default")
-            yield Button("Ir a Biblioteca Antiga", id="library", variant="default")
-            yield Button("Ir ao Portao da Cidade", id="gate", variant="default")
-            yield Button("Salvar Jogo", id="save", variant="warning")
-            yield Button(
-                "Partir Rumo ao Mar (Continuar Aventura)",
-                id="progress",
-                variant="error",
-            )
+            yield Button("Visitar 'O Ponteiro Enferrujado' (Loja)", id="shop")
+            yield Button("Descansar na estalagem 'O Pescador Cansado'", id="rest")
+            yield Button("Explorar as docas", id="docks")
+            yield Button("Visitar a Praca Central", id="plaza")
+            yield Button("Ir a Biblioteca Antiga", id="library")
+            yield Button("Ir ao Portao da Cidade", id="gate")
+            yield Button("Salvar Jogo", id="save")
+            yield Button("Partir Rumo ao Mar (Continuar Aventura)", id="progress")
 
         yield Footer()
 

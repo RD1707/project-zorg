@@ -73,7 +73,7 @@ class StoryScreen(Screen):
             self.query_one("#story_text", Static).update("...")
 
     async def type_text(self, text: str):
-        """Anima o texto letra por letra."""
+        """Anima o texto letra por letra com suporte a velocidade configurável."""
         self.is_typing = True
         story_text_widget = self.query_one("#story_text", Static)
         prompt = self.query_one("#prompt")
@@ -81,11 +81,18 @@ class StoryScreen(Screen):
         story_text_widget.update("")  # Limpa o texto anterior
 
         try:
+            # Obter velocidade das configurações se disponível
+            delay = 0.025  # Padrão
+            if hasattr(self.app, 'engine') and hasattr(self.app.engine, 'settings'):
+                if hasattr(self.app.engine.settings, 'get_text_speed_delay'):
+                    delay = self.app.engine.settings.get_text_speed_delay()
+
             current_text = ""
             for char in text:
                 current_text += char
                 story_text_widget.update(current_text)
-                await asyncio.sleep(0.025)  # Ajuste este valor para mudar a velocidade
+                if delay > 0:  # Se delay for 0, mostra instantaneamente
+                    await asyncio.sleep(delay)
         except asyncio.CancelledError:
             # Se foi cancelado, mostra o texto completo imediatamente
             story_text_widget.update(text)

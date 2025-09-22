@@ -139,8 +139,8 @@ class CharacterCreationScreen(Screen):
 
             # Botões
             with Horizontal(id="buttons_container"):
-                yield Button("Criar Personagem", id="create_button", variant="success")
-                yield Button("Cancelar", id="cancel_button", variant="error")
+                yield Button("Criar Personagem", id="create_button")
+                yield Button("Cancelar", id="cancel_button")
 
             # Mensagem de erro
             yield Static("", id="error_message", classes="error_message")

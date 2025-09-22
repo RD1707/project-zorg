@@ -336,20 +336,20 @@ class ElementalSystem:
 
         return total_damage, enchantment_element
 
-    def get_element_color(self, element: Element) -> str:
-        """Retorna cor/emoji representativo do elemento."""
-        colors = {
-            Element.NEUTRO: "O",
-            Element.FOGO: "X",
-            Element.GELO: "I",
-            Element.SOMBRA: "#",
-            Element.LUZ: "*",
-            Element.NATUREZA: "+",
-            Element.ARCANO: "~",
-            Element.FISICO: "=",
-            Element.DIVINO: "@",
+    def get_element_symbol(self, element: Element) -> str:
+        """Retorna símbolo de texto simples representativo do elemento."""
+        symbols = {
+            Element.NEUTRO: "[N]",
+            Element.FOGO: "[F]",
+            Element.GELO: "[G]",
+            Element.SOMBRA: "[S]",
+            Element.LUZ: "[L]",
+            Element.NATUREZA: "[V]",  # Verde/Vida
+            Element.ARCANO: "[A]",
+            Element.FISICO: "[P]",   # Físico
+            Element.DIVINO: "[D]",
         }
-        return colors.get(element, "O")
+        return symbols.get(element, "[N]")
 
 
 # Instância global do sistema elemental

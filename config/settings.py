@@ -1,13 +1,20 @@
+"""
+Configurações globais do jogo ZORG.
+Define paths, configurações de sistema e preferências do usuário.
+"""
+
 import json
 import os
 from pathlib import Path
 from typing import Any, Dict
 
+# Paths do sistema
 BASE_DIR = Path(__file__).parent.parent
 CONFIG_DIR = BASE_DIR / "config"
 DATA_DIR = BASE_DIR / "data"
 SAVE_DIR = Path.home() / ".zorg"
 
+# Garantir que o diretório de save existe
 SAVE_DIR.mkdir(exist_ok=True)
 
 GAME_CONFIG: Dict[str, Any] = {
@@ -43,7 +50,8 @@ LOG_CONFIG: Dict[str, Any] = {
     "level": os.getenv("ZORG_LOG_LEVEL", "INFO"),
     "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     "file_enabled": True,
-    "console_enabled": True,
+    "console_enabled": False,  # Desabilitado para interface limpa
+    "debug_mode": os.getenv("ZORG_DEBUG", "false").lower() == "true",
     "max_log_files": 10,
     "max_file_size": 10 * 1024 * 1024,
 }
@@ -131,9 +139,9 @@ class GameSettings:
                     saved_settings = json.load(f)
                     # Mesclar com configurações padrão
                     self._data.update(saved_settings)
-            except Exception as e:
-                print(f"Erro ao carregar configurações: {e}")
-                # Usar configurações padrão
+            except Exception:
+                # Em caso de erro, manter configurações padrão
+                pass
 
     def get(self, key: str, default=None):
         """Obtém uma configuração."""
@@ -149,8 +157,8 @@ class GameSettings:
             with open(self.settings_file, "w", encoding="utf-8") as f:
                 json.dump(self._data, f, indent=2, ensure_ascii=False)
             return True
-        except Exception as e:
-            print(f"Erro ao salvar configurações: {e}")
+        except Exception:
+            # Falha silenciosa - retorna False para indicar erro
             return False
 
     def reset_to_defaults(self) -> None:
@@ -158,12 +166,18 @@ class GameSettings:
         self._data = self._load_default_settings()
 
     def get_text_speed_delay(self) -> float:
-        """Converte configuração de velocidade para delay em segundos."""
-        speed_map = {
+        """
+        Converte configuração de velocidade para delay em segundos.
+
+        Returns:
+            float: Delay em segundos entre caracteres (0.0 = instantâneo)
+        """
+        SPEED_DELAYS = {
             "very_slow": 0.1,
             "slow": 0.05,
             "normal": 0.025,
             "fast": 0.01,
             "instant": 0.0,
         }
-        return speed_map.get(self.get("text_speed", "normal"), 0.025)
+        current_speed = self.get("text_speed", "normal")
+        return SPEED_DELAYS.get(current_speed, 0.025)

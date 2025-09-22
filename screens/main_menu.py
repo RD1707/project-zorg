@@ -94,57 +94,41 @@ class MainMenuScreen(Screen):
             yield Static("Onde o código encontra a coragem.", id="subtitle")
 
             with Vertical(id="menu"):
-                yield Button("Novo Jogo", id="new_game", variant="primary")
-                yield Button("Carregar Jogo", id="load_game", variant="default")
-                yield Button(
-                    "Salvar Jogo", id="save_game", variant="success", disabled=True
-                )
-                yield Button("Configurações", id="settings", variant="default")
+                yield Button("Iniciar Jogo", id="start_game")
+                yield Button("Configurações", id="settings")
 
     def on_mount(self) -> None:
-        """Chamado quando a tela é montada. Ativa o botão de salvar se houver um jogo em andamento."""
-        save_button = self.query_one("#save_game", Button)
-        save_button.disabled = self.app.engine.jogador is None
+        """Chamado quando a tela é montada."""
+        # Tentar carregar save automaticamente se existir
+        if hasattr(self.app.engine, 'load_game_state'):
+            try:
+                self.app.engine.load_game_state()
+            except Exception:
+                pass  # Sem save ou save corrompido, continua normalmente
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Chamado quando um botão é pressionado."""
-        if event.button.id == "new_game":
-            # Criar personagem Manu diretamente sem tela de criação
-            character_data = {
-                "nome": "Manu",
-                "hp_max": 50,
-                "mp_max": 20,
-                "ataque_base": 7,
-                "defesa_base": 2,
-                "nivel": 1,
-                "xp": 0,
-                "xp_proximo_nivel": 100,
-            }
-            self._handle_character_creation(character_data)
-
-        elif event.button.id == "load_game":
-            sucesso = self.app.engine.load_game_state()
-            if sucesso:
-                self.app.notify("Jogo carregado com sucesso!")
+        if event.button.id == "start_game":
+            # Verificar se existe save para continuar ou iniciar novo jogo
+            if hasattr(self.app.engine, 'jogador') and self.app.engine.jogador is not None:
+                # Continuar jogo salvo
                 self.start_game(None)
             else:
-                self.app.notify(
-                    "[b]Erro:[/b] Nenhum jogo salvo encontrado ou o ficheiro esta corrompido.",
-                    timeout=5,
-                )
-
-        elif event.button.id == "save_game":
-            sucesso = self.app.engine.save_game_state()
-            if sucesso:
-                self.app.notify("Jogo salvo com sucesso!")
-            else:
-                self.app.notify(
-                    "[b]Erro:[/b] Nao foi possivel salvar o jogo.", timeout=5
-                )
+                # Criar novo personagem Manu diretamente
+                character_data = {
+                    "nome": "Manu",
+                    "hp_max": 50,
+                    "mp_max": 20,
+                    "ataque_base": 7,
+                    "defesa_base": 2,
+                    "nivel": 1,
+                    "xp": 0,
+                    "xp_proximo_nivel": 100,
+                }
+                self._handle_character_creation(character_data)
 
         elif event.button.id == "settings":
             from .settings_screen import SettingsScreen
-
             self.app.push_screen(SettingsScreen())
 
     def _handle_character_creation(self, character_data):

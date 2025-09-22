@@ -106,7 +106,7 @@ class NPCScreen(Screen):
 
             with Vertical(id="dialog_options"):
                 for i, option in enumerate(self.npc.dialog_options):
-                    yield Button(option.text, id=f"dialog_{i}", variant="primary")
+                    yield Button(option.text, id=f"dialog_{i}")
 
             # Seção de missões
             if self.npc.quests:
@@ -272,7 +272,7 @@ class NPCLocationScreen(Screen):
                             quest_indicator = " -"
 
                         button_text = f"{npc.name}{quest_indicator}"
-                        yield Button(button_text, id=f"npc_{npc.id}", variant="primary")
+                        yield Button(button_text, id=f"npc_{npc.id}")
 
         yield Footer()
 

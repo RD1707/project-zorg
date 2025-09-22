@@ -38,10 +38,11 @@ class ZorgLogger:
         # Formatter
         formatter = logging.Formatter(LOG_CONFIG["format"])
 
-        # Console handler
-        if LOG_CONFIG["console_enabled"]:
+        # Console handler - Desabilitado para manter interface limpa
+        # Durante o jogo, logs ficam apenas nos arquivos
+        if LOG_CONFIG["console_enabled"] and LOG_CONFIG.get("debug_mode", False):
             console_handler = logging.StreamHandler(sys.stdout)
-            console_handler.setLevel(logging.INFO)
+            console_handler.setLevel(logging.WARNING)  # Apenas warnings e erros críticos
             console_handler.setFormatter(formatter)
             self.logger.addHandler(console_handler)
 

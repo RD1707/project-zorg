@@ -24,52 +24,55 @@ class CombatScreen(Screen):
     ]
 
     CSS = """
-    #combat_layout {
-        layout: horizontal;
-        height: 100%;
-    }
-
-    #character_panels {
-        width: 30%;
-        height: 100%;
-        padding: 1;
-    }
-
-    #action_panel {
-        width: 70%;
-        height: 100%;
+    CombatScreen {
         align: center middle;
+        background: #000000;
+    }
+
+    #combat_container {
+        width: 90%;
+        height: 90%;
+        layout: vertical;
+        border: round #555;
+        padding: 1;
+        background: #1a1a1a;
+    }
+
+    #character_info {
+        height: auto;
+        layout: horizontal;
+        margin-bottom: 2;
     }
 
     .character_box {
-        height: 50%;
-        border: round white;
+        width: 50%;
+        height: auto;
+        border: round #777;
         padding: 1;
-        margin-bottom: 2;
-        /* Adiciona transição para suavizar a animação */
+        margin: 0 1;
+        background: #2d2d2d;
     }
 
     #player_box {
+        border-title: "Jogador";
         border-title-align: center;
     }
 
     #enemy_box {
+        border-title: "Inimigo";
         border-title-align: center;
     }
 
-    #combat_log {
-        display: none;
-    }
-
     #turn_indicator {
-        width: 90%;
+        width: 100%;
         text-align: center;
         text-style: bold;
-        margin-bottom: 1;
+        margin-bottom: 2;
+        color: white;
     }
 
     #action_buttons {
-        width: 90%;
+        width: 100%;
         height: auto;
         layout: horizontal;
         align: center middle;
@@ -79,20 +82,28 @@ class CombatScreen(Screen):
         width: 1fr;
         height: 3;
         margin: 0 1;
-        background: #1e1e1e;
+        background: #333;
         color: white;
         border: tall #555;
     }
 
     Button:hover {
-        background: #333;
+        background: #555;
         border: tall white;
     }
 
-    Button.-disabled {
-        background: #333;
-        color: #555;
+    Button:disabled {
+        background: #222;
+        color: #888;
         border: tall #444;
+    }
+
+    #combat_log {
+        height: 8;
+        width: 100%;
+        border: round #555;
+        margin-top: 1;
+        background: #1e1e1e;
     }
     """
 
@@ -108,35 +119,37 @@ class CombatScreen(Screen):
         width = 15  # Largura da barra em caracteres
         filled_width = int(percent * width)
 
-        # Diferentes estilos de borda para HP e MP
-        if bar_type == "hp":
-            # Barra de HP com borda vermelha
-            bar_content = "█" * filled_width + "░" * (width - filled_width)
-            bordered_bar = f"[red]│[/red]{bar_content}[red]│[/red]"
-        elif bar_type == "mp":
-            # Barra de MP com borda azul
-            bar_content = "█" * filled_width + "░" * (width - filled_width)
-            bordered_bar = f"[blue]│[/blue]{bar_content}[blue]│[/blue]"
-        else:
-            # Padrão para outros tipos (inimigos)
-            bar_content = "█" * filled_width + "░" * (width - filled_width)
-            bordered_bar = f"[white]│[/white]{bar_content}[white]│[/white]"
+        # Barras monocromáticas simples
+        bar_content = "█" * filled_width + "░" * (width - filled_width)
 
-        return f"{bordered_bar} {current}/{maximum}"
+        # Labels diferentes para HP e MP
+        if bar_type == "hp":
+            label = "HP"
+        elif bar_type == "mp":
+            label = "MP"
+        else:
+            label = "HP"
+
+        return f"{label} │{bar_content}│ {current}/{maximum}"
 
     def compose(self) -> ComposeResult:
-        with Horizontal(id="combat_layout"):
-            with Vertical(id="character_panels"):
-                yield Container(id="player_box")
-                yield Container(id="enemy_box")
+        with Vertical(id="combat_container"):
+            # Informações dos personagens lado a lado
+            with Horizontal(id="character_info"):
+                yield Container(id="player_box", classes="character_box")
+                yield Container(id="enemy_box", classes="character_box")
 
-            with Vertical(id="action_panel"):
-                yield Static("Sua Vez!", id="turn_indicator")
-                yield RichLog(id="combat_log", highlight=True, markup=True)
-                with Horizontal(id="action_buttons"):
-                    yield Button("Atacar (A)", id="attack", variant="primary")
-                    yield Button("Habilidade (H)", id="skill", variant="warning")
-                    yield Button("Item (I)", id="item", variant="success")
+            # Indicador de turno
+            yield Static("Sua Vez!", id="turn_indicator")
+
+            # Botões de ação
+            with Horizontal(id="action_buttons"):
+                yield Button("Atacar (A)", id="attack")
+                yield Button("Habilidade (H)", id="skill")
+                yield Button("Item (I)", id="item")
+
+            # Log de combate
+            yield RichLog(id="combat_log", highlight=True, markup=True)
 
     def on_mount(self) -> None:
         self.update_character_panels()

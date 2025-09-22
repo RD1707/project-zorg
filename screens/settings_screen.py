@@ -24,49 +24,82 @@ class SettingsScreen(Screen):
     CSS = """
     SettingsScreen {
         align: center middle;
+        background: #000000;
     }
 
     #settings_container {
-        width: 80%;
-        max-width: 100;
-        height: 85%;
-        padding: 1;
-        border: round #444;
-        background: #1e1e1e;
+        width: 85%;
+        max-width: 120;
+        height: 90%;
+        padding: 2;
+        border: round #777;
+        background: #1a1a1a;
     }
 
     #settings_header {
         text-align: center;
         text-style: bold;
         margin-bottom: 2;
+        color: white;
     }
 
     .setting_row {
-        height: 3;
+        height: auto;
         margin-bottom: 1;
         padding: 1;
-        background: #2a2a2a;
-        border: round #555;
+        background: #333;
+        border: round #777;
     }
 
     .setting_label {
-        width: 50%;
-        color: #cccccc;
+        width: 60%;
+        color: white;
+        text-style: bold;
     }
 
     .setting_control {
-        width: 50%;
+        width: 40%;
     }
 
     .section_header {
         text-style: bold;
-        margin-top: 1;
+        color: #ddd;
+        margin-top: 2;
         margin-bottom: 1;
+        text-align: center;
     }
 
     #save_button {
         margin-top: 2;
         width: 100%;
+        background: #555;
+        color: white;
+        border: tall #777;
+    }
+
+    #save_button:hover {
+        background: #777;
+        border: tall white;
+    }
+
+    /* Melhorar visibilidade dos controles */
+    Select {
+        background: #555 !important;
+        color: white !important;
+        border: tall #777 !important;
+    }
+
+    Select:focus {
+        border: tall white !important;
+    }
+
+    Switch {
+        background: #333 !important;
+        color: white !important;
+    }
+
+    Switch.-on {
+        background: #777 !important;
     }
     """
 
@@ -171,7 +204,7 @@ class SettingsScreen(Screen):
                     classes="setting_control",
                 )
 
-            yield Button("Salvar Configurações", id="save_button", variant="success")
+            yield Button("Salvar Configurações", id="save_button")
 
         yield Footer()
 
@@ -210,13 +243,34 @@ class SettingsScreen(Screen):
             self.app.notify(f"Erro: {e}", timeout=5)
 
     def _apply_settings(self) -> None:
-        """Aplica as configurações ao jogo."""
-        # Aqui você pode aplicar as configurações em tempo real
-        # Por exemplo, ajustar velocidade do texto, volume, etc.
+        """Aplica as configurações ao jogo em tempo real."""
+        # Aplicar configurações de áudio se o engine tiver audio manager
+        if hasattr(self.app, 'engine') and hasattr(self.app.engine, 'audio_manager'):
+            audio_manager = self.app.engine.audio_manager
+
+            # Volume geral
+            if 'master_volume' in self.modified_settings:
+                volume = int(self.modified_settings['master_volume']) / 100.0
+                audio_manager.set_master_volume(volume)
+
+            # Música de fundo
+            if 'background_music' in self.modified_settings:
+                if self.modified_settings['background_music']:
+                    audio_manager.resume_music()
+                else:
+                    audio_manager.pause_music()
+
+            # Efeitos sonoros
+            if 'sound_effects' in self.modified_settings:
+                audio_manager.sound_effects_enabled = self.modified_settings['sound_effects']
+
+        # Aplicar configurações de interface
+        if 'theme' in self.modified_settings:
+            # Aplicar mudanças de tema se necessário
+            pass
 
         # Notificar outros componentes sobre mudanças
         from core.managers.event_manager import EventType, emit_event
-
         emit_event(EventType.SETTINGS_CHANGED, {"settings": dict(self.settings._data)})
 
     def action_dismiss(self) -> None:

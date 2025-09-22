@@ -1,7 +1,12 @@
+"""
+GameEngine - Motor principal do jogo ZORG.
+Gerencia estado do jogo, lógica de negócio e coordenação entre componentes.
+"""
+
 import threading
 from typing import Any, Dict, List, Optional
 
-from config.settings import is_debug_mode
+from config.settings import is_debug_mode, GameSettings
 from core.object_factory import get_object_factory
 from data.abilities import DB_HABILIDADES
 from data.enemies import DB_INIMIGOS
@@ -66,8 +71,10 @@ class GameEngine:
 
         # Inicializar sistema de conquistas
         from core.achievements import get_achievement_manager
-
         self._achievement_manager = get_achievement_manager()
+
+        # Configurações do usuário
+        self.settings = GameSettings()
 
         # Inicializar todos os managers
         self._initialize_managers()
@@ -76,7 +83,7 @@ class GameEngine:
         self._preload_data()
 
         GameEngine._initialized = True
-        self.logger.info("GameEngine inicializado")
+        self.logger.info("GameEngine inicializado com sucesso")
 
     def _initialize_managers(self) -> None:
         """Inicializa todos os managers."""
@@ -152,6 +159,25 @@ class GameEngine:
         if not self.jogador:
             raise GameEngineError("Nenhum jogador para salvar")
         return self._save_manager.save_game(self.jogador)
+
+    def auto_save(self) -> None:
+        """Realiza auto-save silencioso do jogo."""
+        if self.jogador:
+            try:
+                self._save_manager.save_game(self.jogador, {"auto_save": True})
+                self.logger.debug("Auto-save realizado com sucesso")
+            except Exception as e:
+                self.logger.warning(f"Falha no auto-save: {e}")
+
+    def trigger_auto_save_on_progress(self) -> None:
+        """Dispara auto-save quando há progresso significativo."""
+        if hasattr(self, '_last_auto_save_phase'):
+            if self._last_auto_save_phase != self.jogador.fase_atual:
+                self.auto_save()
+                self._last_auto_save_phase = self.jogador.fase_atual
+        else:
+            self._last_auto_save_phase = self.jogador.fase_atual
+            self.auto_save()
 
     @handle_exceptions(reraise=True)
     def load_game_state(self) -> bool:

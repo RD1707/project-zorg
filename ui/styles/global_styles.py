@@ -73,47 +73,20 @@ Button {{
     height: 3;
     margin: {SIZES["margin_small"]};
     border: tall {COLORS["border"]};
-    background: {COLORS["surface"]};
+    background: {COLORS["surface_variant"]};
     color: {COLORS["text_primary"]};
+    text-align: center;
 }}
 
 Button:hover {{
-    border: tall {COLORS["border_active"]};
-    background: {COLORS["surface_variant"]};
+    border: tall {COLORS["text_primary"]};
+    background: {COLORS["border"]};
     color: {COLORS["text_primary"]};
 }}
 
 Button:focus {{
     border: tall {COLORS["accent"]};
     background: {COLORS["surface_variant"]};
-}}
-
-Button.-primary {{
-    border: tall {COLORS["accent"]};
-    background: {COLORS["accent"]};
-    color: {COLORS["background"]};
-}}
-
-Button.-primary:hover {{
-    background: {COLORS["info"]};
-    border: tall {COLORS["info"]};
-}}
-
-Button.-success {{
-    border: tall {COLORS["success"]};
-    background: {COLORS["success"]};
-    color: {COLORS["background"]};
-}}
-
-Button.-warning {{
-    border: tall {COLORS["warning"]};
-    background: {COLORS["warning"]};
-    color: {COLORS["background"]};
-}}
-
-Button.-error {{
-    border: tall {COLORS["error"]};
-    background: {COLORS["error"]};
     color: {COLORS["text_primary"]};
 }}
 
@@ -122,6 +95,8 @@ Button:disabled {{
     background: {COLORS["surface"]};
     color: {COLORS["text_disabled"]};
 }}
+
+/* Estilos de variantes removidos para evitar ícones automáticos */
 
 /* === CABECALHOS === */
 .header {{

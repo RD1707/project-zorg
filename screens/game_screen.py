@@ -111,6 +111,8 @@ class GameScreen(Screen):
 
             elif event["type"] == "phase_end":
                 self.engine.jogador.fase_atual += 1
+                # Auto-save ao avançar de fase
+                self.engine.trigger_auto_save_on_progress()
                 self.start_phase(self.engine.jogador.fase_atual)
 
             # 3. Adicionar lógica para o fim do jogo
@@ -128,6 +130,8 @@ class GameScreen(Screen):
             victory_data = self.engine.processar_vitoria(
                 self.current_enemy, self._pending_rewards
             )
+            # Auto-save após vitória em combate
+            self.engine.auto_save()
             self._pending_rewards = []  # Limpar a lista
             self.app.push_screen(VictoryScreen(victory_data), self.on_victory_closed)
         else:
@@ -146,6 +150,8 @@ class GameScreen(Screen):
         """Callback: chamado quando uma tela de hub é fechada."""
         if can_progress:
             self.engine.jogador.fase_atual += 1
+            # Auto-save ao avançar de fase
+            self.engine.trigger_auto_save_on_progress()
             self.start_phase(self.engine.jogador.fase_atual)
         else:
             self.app.pop_screen()
